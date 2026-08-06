@@ -65,6 +65,18 @@ writeFileSync(
   JSON.stringify({ version: dsVersion, components: COMPONENTS, tokenCount, vendoredAt: new Date().toISOString() }, null, 2)
 );
 
+// GSAP is bundled locally too, so the published page has no external
+// dependency and keeps working if a CDN is blocked or slow.
+await build({
+  entryPoints: [resolve(root, 'src/motion.js')],
+  bundle: true,
+  format: 'esm',
+  minify: true,
+  target: ['es2022'],
+  outfile: resolve(outDir, 'motion.js'),
+  logLevel: 'warning',
+});
+
 console.log(`Vendored design system ${dsVersion}`);
 console.log(`  components: ${COMPONENTS.join(', ')}`);
 console.log(`  tokens:     ${tokenCount} --eo-* custom properties`);

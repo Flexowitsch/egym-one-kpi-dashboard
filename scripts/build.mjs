@@ -28,10 +28,19 @@ const chip = (t, intent = 'neutral') => `<eo-label intent="${intent}" size="smal
 // hand-built things left are the charts, because the system has no chart
 // component in code yet (DSC-100).
 const tile = (cls, inner) => `<eo-card class="tile ${cls}"><div class="tile-in">${inner}</div></eo-card>`;
+// Split a display value into a number and its surrounding text so the count-up
+// animation keeps the unit: "41%" counts to 41 and still renders the percent.
+const countAttrs = (v) => {
+  const m = String(v).match(/^([\d]+(?:\.[\d]+)?)(.*)$/);
+  if (!m) return '';
+  return ` data-count="${m[1]}" data-tpl="__${esc(m[2])}"`;
+};
 const stat = (v, k, t = '', tone = '', small = false) =>
-  `<eo-card class="stat ${tone}"><div class="stat-in"><div class="v ${small ? 'small' : ''}">${esc(
-    v
-  )}</div><p class="k">${esc(k)}</p>${t ? `<p class="t">${esc(t)}</p>` : ''}</div></eo-card>`;
+  `<eo-card class="stat ${tone}"><div class="stat-in"><div class="v ${
+    small ? 'small' : ''
+  }"${countAttrs(v)}>${esc(v)}</div><p class="k">${esc(k)}</p>${
+    t ? `<p class="t">${esc(t)}</p>` : ''
+  }</div></eo-card>`;
 const facts = (rows) =>
   `<ul class="facts">${rows
     .map(([k, v, tone = '']) => `<li><span class="k">${esc(k)}</span><span class="v ${tone}">${esc(v)}</span></li>`)
@@ -70,7 +79,9 @@ const overview = `
   <h1>The state of EGYM One,<br>on one screen</h1>
   <p class="standfirst">One number for the system, ten stations behind it, and the delivery data that explains why it sits where it does.</p>
   <div class="score-hero">
-    <span class="n">${inspection?.shippedTotal ?? '—'}</span><span class="d">/100</span>
+    <span class="n"${inspection ? ` data-count="${inspection.shippedTotal}" data-tpl="__"` : ''}>${
+      inspection?.shippedTotal ?? '—'
+    }</span><span class="d">/100</span>
   </div>
   <p class="score-sub"><b>${inspection?.reds ?? 0}</b> red · <b>${inspection?.yellows ?? 0}</b> yellow · <b>${
     inspection?.greens ?? 0
@@ -500,6 +511,7 @@ const html = `<!doctype html>
 </footer>
 
 <script type="module" src="./vendor/egym-one-ds.js"></script>
+<script type="module" src="./vendor/motion.js"></script>
 <script>
   const tabs = [...document.querySelectorAll('.tab')];
   const show = (id, push) => {
@@ -517,6 +529,7 @@ const html = `<!doctype html>
     });
     if (push) history.replaceState(null, '', '#' + id);
     window.scrollTo({ top: 0, behavior: 'instant' });
+    window.__dashTabIn && window.__dashTabIn(document.getElementById('panel-' + id));
   };
   tabs.forEach((t) => t.addEventListener('click', () => show(t.dataset.tab, true)));
   // keyboard support: arrow keys move between tabs, per the ARIA tabs pattern
