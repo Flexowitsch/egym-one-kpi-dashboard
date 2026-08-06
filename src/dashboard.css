@@ -1,0 +1,348 @@
+/* ---------------------------------------------------------------------------
+   EGYM One — Design System KPI dashboard
+
+   Every colour, type step, radius and spacing value resolves to an --eo-* token
+   from the published design system. No hex values, no magic numbers. Where a
+   token does not exist for something, it is called out in a comment rather than
+   papered over with a literal.
+   --------------------------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { background: var(--eo-color-surface-subtle); }
+
+body {
+  margin: 0;
+  background: var(--eo-color-surface-subtle);
+  color: var(--eo-color-content-emphasized);
+  font-family: var(--eo-typography-body-100-font-family);
+  font-size: var(--eo-typography-body-100-font-size);
+  line-height: var(--eo-typography-body-100-line-height);
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 1400px; margin: 0 auto; padding: 0 var(--eo-dimension-24) var(--eo-dimension-64); }
+
+/* ===========================================================================
+   HERO — the inspection score leads, because it is the one number that answers
+   "what state is the system in right now?"
+   =========================================================================== */
+.hero {
+  background: var(--eo-color-surface-emphasized);
+  color: var(--eo-color-content-on-emphasized);
+  border-radius: var(--eo-dimension-border-radius-large);
+  padding: var(--eo-dimension-32);
+  margin: var(--eo-dimension-24) 0 var(--eo-dimension-32);
+}
+.hero-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--eo-dimension-24);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.hero h1 {
+  margin: 0;
+  font-family: var(--eo-typography-headline-600-font-family);
+  font-size: var(--eo-typography-headline-600-font-size);
+  line-height: var(--eo-typography-headline-600-line-height);
+  color: var(--eo-color-content-on-emphasized);
+}
+.hero .kicker {
+  margin: 0 0 var(--eo-dimension-4);
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--eo-color-content-on-emphasized-subtle);
+}
+.hero .sub {
+  margin: var(--eo-dimension-8) 0 0;
+  color: var(--eo-color-content-on-emphasized-subtle);
+  font-size: var(--eo-typography-body-50-font-size);
+  max-width: 62ch;
+}
+
+.score-block { display: flex; align-items: baseline; gap: var(--eo-dimension-16); flex-wrap: wrap; }
+.score-now {
+  font-family: var(--eo-typography-headline-800-font-family);
+  font-size: var(--eo-typography-headline-800-font-size);
+  line-height: 0.9;
+  color: var(--eo-color-content-on-emphasized);
+  font-variant-numeric: tabular-nums;
+}
+.score-now .of {
+  font-family: var(--eo-typography-body-100-font-family);
+  font-size: var(--eo-typography-headline-300-font-size);
+  color: var(--eo-color-content-on-emphasized-subtle);
+}
+.score-meta { display: grid; gap: var(--eo-dimension-2); }
+/* No tabular-nums: these lines mix prose with version strings, and the tabular
+   feature in Helvetica Now Display widens the dots, rendering "0.1.25" as
+   "0 . 1 . 25". */
+.score-meta .line {
+  font-size: var(--eo-typography-body-50-font-size);
+  line-height: var(--eo-typography-body-50-line-height);
+  color: var(--eo-color-content-on-emphasized-subtle);
+}
+.score-meta .line b { color: var(--eo-color-content-on-emphasized); font-weight: 600; }
+
+/* ---------- station rail: ten stations, one glance ---------- */
+.rail {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: var(--eo-dimension-8);
+  margin-top: var(--eo-dimension-24);
+}
+.station {
+  background: var(--eo-color-surface-default);
+  border-radius: var(--eo-dimension-border-radius-default);
+  padding: var(--eo-dimension-12) var(--eo-dimension-8);
+  border-top: 3px solid var(--eo-color-border-hinted);
+  text-align: center;
+  min-width: 0;
+}
+.station.red    { border-top-color: var(--eo-color-border-utility-negative); }
+.station.yellow { border-top-color: var(--eo-color-border-utility-warning); }
+.station.green  { border-top-color: var(--eo-color-border-utility-positive); }
+
+.station .n {
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-hinted);
+  font-variant-numeric: tabular-nums;
+}
+.station .s {
+  font-family: var(--eo-typography-headline-300-font-family);
+  font-size: var(--eo-typography-headline-300-font-size);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--eo-color-content-emphasized);
+}
+.station.red    .s { color: var(--eo-color-content-utility-negative); }
+.station.yellow .s { color: var(--eo-color-content-utility-warning); }
+.station.green  .s { color: var(--eo-color-content-utility-positive); }
+/* No hyphenation — it broke "Machine-readable docs" as "Machine-read-able". */
+.station .t {
+  font-size: var(--eo-typography-body-50-font-size);
+  line-height: 1.25;
+  color: var(--eo-color-content-subtle);
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+.station .up {
+  margin-top: var(--eo-dimension-2);
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===========================================================================
+   SECTIONS
+   =========================================================================== */
+.section { margin-top: var(--eo-dimension-48); }
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--eo-dimension-12);
+  margin-bottom: var(--eo-dimension-4);
+  border-bottom: 1px solid var(--eo-color-border-subtle);
+  padding-bottom: var(--eo-dimension-8);
+}
+.section-head .num {
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-accent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+.section-head h2 {
+  margin: 0;
+  font-family: var(--eo-typography-headline-400-font-family);
+  font-size: var(--eo-typography-headline-400-font-size);
+  line-height: var(--eo-typography-headline-400-line-height);
+}
+.section > .lede {
+  margin: var(--eo-dimension-8) 0 var(--eo-dimension-16);
+  color: var(--eo-color-content-subtle);
+  font-size: var(--eo-typography-body-50-font-size);
+  max-width: 92ch;
+}
+
+.grid { display: grid; gap: var(--eo-dimension-16); }
+.grid.kpi   { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.grid.two   { grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); }
+.grid.three { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+
+/* eo-card's shadow container is `display:flex; align-items:flex-start`, so slotted
+   content shrinks to its own width instead of filling the card. Without this the
+   bar charts and tables collapse. Worth fixing upstream — that container wants
+   `align-items: stretch`. */
+eo-card { display: block; }
+.card-body { width: 100%; padding: var(--eo-dimension-20); }
+.card-body > * + * { margin-top: var(--eo-dimension-12); }
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  line-height: var(--eo-typography-body-50-line-height);
+  color: var(--eo-color-content-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.card-title {
+  margin: 0;
+  font-size: var(--eo-typography-body-100-font-size);
+  font-weight: 600;
+  color: var(--eo-color-content-emphasized);
+}
+
+/* ---------- the big number ---------- */
+.metric { display: flex; align-items: baseline; gap: var(--eo-dimension-8); margin: 0; flex-wrap: wrap; }
+.metric .value {
+  font-family: var(--eo-typography-headline-500-font-family);
+  font-size: var(--eo-typography-headline-500-font-size);
+  line-height: 1;
+  color: var(--eo-color-content-emphasized);
+  font-variant-numeric: tabular-nums;
+}
+.metric .unit { font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-subtle); }
+.metric.is-good .value { color: var(--eo-color-content-utility-positive); }
+.metric.is-warn .value { color: var(--eo-color-content-utility-warning); }
+.metric.is-bad  .value { color: var(--eo-color-content-utility-negative); }
+/* a KPI never measured — kept quiet so it does not read as a zero */
+.metric.is-unmeasured .value {
+  font-family: var(--eo-typography-body-100-font-family);
+  font-size: var(--eo-typography-headline-300-font-size);
+  color: var(--eo-color-content-hinted);
+}
+
+.target { margin: 0; font-size: var(--eo-typography-body-50-font-size); line-height: var(--eo-typography-body-50-line-height); color: var(--eo-color-content-subtle); }
+.target b { color: var(--eo-color-content-emphasized); font-weight: 600; }
+
+/* ---------- meters and bars ----------
+   The design system has no chart, meter or progress component in code yet
+   (progress-bar is DSC-100, still in the Ready-for-Development queue). Built
+   from tokens so they can be swapped for the real component when it ships. */
+.meter { height: var(--eo-dimension-8); border-radius: var(--eo-dimension-border-radius-round); background: var(--eo-color-surface-subtle); overflow: hidden; }
+.meter > span { display: block; height: 100%; border-radius: var(--eo-dimension-border-radius-round); background: var(--eo-color-surface-accent); }
+.meter.is-good > span { background: var(--eo-color-surface-utility-positive); }
+.meter.is-warn > span { background: var(--eo-color-surface-utility-warning); }
+.meter.is-bad  > span { background: var(--eo-color-surface-utility-negative); }
+
+.bars { display: grid; gap: var(--eo-dimension-8); margin: 0; }
+.bar-row {
+  display: grid;
+  grid-template-columns: minmax(150px, auto) 1fr minmax(2.5rem, auto);
+  align-items: center;
+  gap: var(--eo-dimension-12);
+  font-size: var(--eo-typography-body-50-font-size);
+}
+.bar-row .label { color: var(--eo-color-content-subtle); }
+.bar-row .count { text-align: right; font-variant-numeric: tabular-nums; color: var(--eo-color-content-emphasized); font-weight: 600; }
+.bar-track { height: var(--eo-dimension-12); border-radius: var(--eo-dimension-border-radius-small); background: var(--eo-color-surface-subtle); overflow: hidden; }
+.bar-track > span { display: block; height: 100%; border-radius: var(--eo-dimension-border-radius-small); background: var(--eo-color-surface-accent); }
+/* border-hinted sits too close to the track's surface-subtle to read as a fill —
+   content-subtle is the lightest token with enough separation */
+.bar-track.neutral  > span { background: var(--eo-color-content-subtle); }
+.bar-track.positive > span { background: var(--eo-color-surface-utility-positive); }
+.bar-track.warning  > span { background: var(--eo-color-surface-utility-warning); }
+.bar-track.negative > span { background: var(--eo-color-surface-utility-negative); }
+
+/* ---------- chips ---------- */
+.chips { display: flex; flex-wrap: wrap; gap: var(--eo-dimension-4); margin: 0; padding: 0; list-style: none; }
+.chips li { display: block; }
+
+/* ---------- key/value facts ---------- */
+.facts { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--eo-dimension-8); }
+.facts li {
+  display: flex; justify-content: space-between; gap: var(--eo-dimension-12);
+  padding-bottom: var(--eo-dimension-8);
+  border-bottom: 1px solid var(--eo-color-border-subtle);
+  font-size: var(--eo-typography-body-50-font-size);
+}
+.facts li:last-child { border-bottom: 0; padding-bottom: 0; }
+.facts .k { color: var(--eo-color-content-subtle); }
+.facts .v { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; white-space: nowrap; }
+.facts .v.bad  { color: var(--eo-color-content-utility-negative); }
+.facts .v.good { color: var(--eo-color-content-utility-positive); }
+.facts .v.warn { color: var(--eo-color-content-utility-warning); }
+
+/* ---------- tables ---------- */
+.table-scroll { overflow-x: auto; }
+table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: var(--eo-typography-body-50-font-size); }
+thead th {
+  text-align: left; padding: var(--eo-dimension-8);
+  border-bottom: 1px solid var(--eo-color-border-hinted);
+  color: var(--eo-color-content-subtle); font-weight: 600; white-space: nowrap;
+}
+tbody td { padding: var(--eo-dimension-8); border-bottom: 1px solid var(--eo-color-border-subtle); vertical-align: top; }
+tbody tr:last-child td { border-bottom: 0; }
+/* No tabular-nums on keys: in Helvetica Now Display the tabular feature widens the
+   hyphen, rendering "DSC-100" as "DSC - 100". These are identifiers, not figures. */
+td.key { white-space: nowrap; font-weight: 600; }
+td.age { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.age.stale { color: var(--eo-color-content-utility-negative); font-weight: 600; }
+
+/* ---------- roadmap ---------- */
+.phases { display: grid; gap: var(--eo-dimension-16); grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.phase-weeks {
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-accent); font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.ticket-list { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--eo-dimension-4); }
+.ticket-list li {
+  font-size: var(--eo-typography-body-50-font-size);
+  font-weight: 600;
+  padding: var(--eo-dimension-2) var(--eo-dimension-8);
+  border-radius: var(--eo-dimension-border-radius-small);
+  background: var(--eo-color-surface-subtle);
+  color: var(--eo-color-content-subtle);
+}
+
+/* ---------- findings ---------- */
+.findings { display: grid; gap: var(--eo-dimension-12); margin: 0; padding: 0; list-style: none; }
+.findings li {
+  display: grid; grid-template-columns: auto 1fr; gap: var(--eo-dimension-12);
+  font-size: var(--eo-typography-body-50-font-size);
+  line-height: var(--eo-typography-body-50-line-height);
+}
+.findings .idx {
+  font-family: var(--eo-typography-action-label-100-font-family);
+  color: var(--eo-color-content-accent); font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.findings b { color: var(--eo-color-content-emphasized); }
+.findings span.txt { color: var(--eo-color-content-subtle); }
+
+/* ---------- links ----------
+   Deliberately a native <a>, not <eo-link>. The shipped eo-link renders no anchor
+   element, is not keyboard reachable and does not announce as a link
+   (WCAG 4.1.2 / 2.1.1) — tracked as DSC-202. Styled from tokens so it matches the
+   system, and can be swapped once that component is fixed. */
+a { color: var(--eo-color-content-accent); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: var(--eo-color-content-accent-hovered); }
+a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offset: 2px; border-radius: var(--eo-dimension-border-radius-small); }
+.hero a { color: var(--eo-color-content-on-emphasized); }
+
+footer {
+  margin-top: var(--eo-dimension-48);
+  padding-top: var(--eo-dimension-16);
+  border-top: 1px solid var(--eo-color-border-subtle);
+  color: var(--eo-color-content-hinted);
+  font-size: var(--eo-typography-body-50-font-size);
+}
+footer p { margin: 0 0 var(--eo-dimension-4); }
+footer code { font-size: 0.95em; }
+
+@media (max-width: 1100px) { .rail { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 640px) {
+  .rail { grid-template-columns: repeat(2, 1fr); }
+  .hero { padding: var(--eo-dimension-20); }
+  .bar-row { grid-template-columns: 1fr; gap: var(--eo-dimension-4); }
+  .bar-row .count { text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }

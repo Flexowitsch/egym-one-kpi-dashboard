@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="en" class="brand-egym light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EGYM One Design System — Engineering Rollout KPI Data</title>
+<meta name="description" content="Live state of the EGYM One design system: inspection score, coverage, delivery queue, community velocity and release governance.">
+<link rel="stylesheet" href="./vendor/egym-one-tokens.css">
+<style>/* ---------------------------------------------------------------------------
+   EGYM One — Design System KPI dashboard
+
+   Every colour, type step, radius and spacing value resolves to an --eo-* token
+   from the published design system. No hex values, no magic numbers. Where a
+   token does not exist for something, it is called out in a comment rather than
+   papered over with a literal.
+   --------------------------------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { background: var(--eo-color-surface-subtle); }
+
+body {
+  margin: 0;
+  background: var(--eo-color-surface-subtle);
+  color: var(--eo-color-content-emphasized);
+  font-family: var(--eo-typography-body-100-font-family);
+  font-size: var(--eo-typography-body-100-font-size);
+  line-height: var(--eo-typography-body-100-line-height);
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: 1400px; margin: 0 auto; padding: 0 var(--eo-dimension-24) var(--eo-dimension-64); }
+
+/* ===========================================================================
+   HERO — the inspection score leads, because it is the one number that answers
+   "what state is the system in right now?"
+   =========================================================================== */
+.hero {
+  background: var(--eo-color-surface-emphasized);
+  color: var(--eo-color-content-on-emphasized);
+  border-radius: var(--eo-dimension-border-radius-large);
+  padding: var(--eo-dimension-32);
+  margin: var(--eo-dimension-24) 0 var(--eo-dimension-32);
+}
+.hero-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--eo-dimension-24);
+  align-items: flex-start;
+  justify-content: space-between;
+}
+.hero h1 {
+  margin: 0;
+  font-family: var(--eo-typography-headline-600-font-family);
+  font-size: var(--eo-typography-headline-600-font-size);
+  line-height: var(--eo-typography-headline-600-line-height);
+  color: var(--eo-color-content-on-emphasized);
+}
+.hero .kicker {
+  margin: 0 0 var(--eo-dimension-4);
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--eo-color-content-on-emphasized-subtle);
+}
+.hero .sub {
+  margin: var(--eo-dimension-8) 0 0;
+  color: var(--eo-color-content-on-emphasized-subtle);
+  font-size: var(--eo-typography-body-50-font-size);
+  max-width: 62ch;
+}
+
+.score-block { display: flex; align-items: baseline; gap: var(--eo-dimension-16); flex-wrap: wrap; }
+.score-now {
+  font-family: var(--eo-typography-headline-800-font-family);
+  font-size: var(--eo-typography-headline-800-font-size);
+  line-height: 0.9;
+  color: var(--eo-color-content-on-emphasized);
+  font-variant-numeric: tabular-nums;
+}
+.score-now .of {
+  font-family: var(--eo-typography-body-100-font-family);
+  font-size: var(--eo-typography-headline-300-font-size);
+  color: var(--eo-color-content-on-emphasized-subtle);
+}
+.score-meta { display: grid; gap: var(--eo-dimension-2); }
+/* No tabular-nums: these lines mix prose with version strings, and the tabular
+   feature in Helvetica Now Display widens the dots, rendering "0.1.25" as
+   "0 . 1 . 25". */
+.score-meta .line {
+  font-size: var(--eo-typography-body-50-font-size);
+  line-height: var(--eo-typography-body-50-line-height);
+  color: var(--eo-color-content-on-emphasized-subtle);
+}
+.score-meta .line b { color: var(--eo-color-content-on-emphasized); font-weight: 600; }
+
+/* ---------- station rail: ten stations, one glance ---------- */
+.rail {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: var(--eo-dimension-8);
+  margin-top: var(--eo-dimension-24);
+}
+.station {
+  background: var(--eo-color-surface-default);
+  border-radius: var(--eo-dimension-border-radius-default);
+  padding: var(--eo-dimension-12) var(--eo-dimension-8);
+  border-top: 3px solid var(--eo-color-border-hinted);
+  text-align: center;
+  min-width: 0;
+}
+.station.red    { border-top-color: var(--eo-color-border-utility-negative); }
+.station.yellow { border-top-color: var(--eo-color-border-utility-warning); }
+.station.green  { border-top-color: var(--eo-color-border-utility-positive); }
+
+.station .n {
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-hinted);
+  font-variant-numeric: tabular-nums;
+}
+.station .s {
+  font-family: var(--eo-typography-headline-300-font-family);
+  font-size: var(--eo-typography-headline-300-font-size);
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--eo-color-content-emphasized);
+}
+.station.red    .s { color: var(--eo-color-content-utility-negative); }
+.station.yellow .s { color: var(--eo-color-content-utility-warning); }
+.station.green  .s { color: var(--eo-color-content-utility-positive); }
+/* No hyphenation — it broke "Machine-readable docs" as "Machine-read-able". */
+.station .t {
+  font-size: var(--eo-typography-body-50-font-size);
+  line-height: 1.25;
+  color: var(--eo-color-content-subtle);
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+.station .up {
+  margin-top: var(--eo-dimension-2);
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-accent);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===========================================================================
+   SECTIONS
+   =========================================================================== */
+.section { margin-top: var(--eo-dimension-48); }
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: var(--eo-dimension-12);
+  margin-bottom: var(--eo-dimension-4);
+  border-bottom: 1px solid var(--eo-color-border-subtle);
+  padding-bottom: var(--eo-dimension-8);
+}
+.section-head .num {
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-accent);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+}
+.section-head h2 {
+  margin: 0;
+  font-family: var(--eo-typography-headline-400-font-family);
+  font-size: var(--eo-typography-headline-400-font-size);
+  line-height: var(--eo-typography-headline-400-line-height);
+}
+.section > .lede {
+  margin: var(--eo-dimension-8) 0 var(--eo-dimension-16);
+  color: var(--eo-color-content-subtle);
+  font-size: var(--eo-typography-body-50-font-size);
+  max-width: 92ch;
+}
+
+.grid { display: grid; gap: var(--eo-dimension-16); }
+.grid.kpi   { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.grid.two   { grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); }
+.grid.three { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+
+/* eo-card's shadow container is `display:flex; align-items:flex-start`, so slotted
+   content shrinks to its own width instead of filling the card. Without this the
+   bar charts and tables collapse. Worth fixing upstream — that container wants
+   `align-items: stretch`. */
+eo-card { display: block; }
+.card-body { width: 100%; padding: var(--eo-dimension-20); }
+.card-body > * + * { margin-top: var(--eo-dimension-12); }
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  line-height: var(--eo-typography-body-50-line-height);
+  color: var(--eo-color-content-subtle);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.card-title {
+  margin: 0;
+  font-size: var(--eo-typography-body-100-font-size);
+  font-weight: 600;
+  color: var(--eo-color-content-emphasized);
+}
+
+/* ---------- the big number ---------- */
+.metric { display: flex; align-items: baseline; gap: var(--eo-dimension-8); margin: 0; flex-wrap: wrap; }
+.metric .value {
+  font-family: var(--eo-typography-headline-500-font-family);
+  font-size: var(--eo-typography-headline-500-font-size);
+  line-height: 1;
+  color: var(--eo-color-content-emphasized);
+  font-variant-numeric: tabular-nums;
+}
+.metric .unit { font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-subtle); }
+.metric.is-good .value { color: var(--eo-color-content-utility-positive); }
+.metric.is-warn .value { color: var(--eo-color-content-utility-warning); }
+.metric.is-bad  .value { color: var(--eo-color-content-utility-negative); }
+/* a KPI never measured — kept quiet so it does not read as a zero */
+.metric.is-unmeasured .value {
+  font-family: var(--eo-typography-body-100-font-family);
+  font-size: var(--eo-typography-headline-300-font-size);
+  color: var(--eo-color-content-hinted);
+}
+
+.target { margin: 0; font-size: var(--eo-typography-body-50-font-size); line-height: var(--eo-typography-body-50-line-height); color: var(--eo-color-content-subtle); }
+.target b { color: var(--eo-color-content-emphasized); font-weight: 600; }
+
+/* ---------- meters and bars ----------
+   The design system has no chart, meter or progress component in code yet
+   (progress-bar is DSC-100, still in the Ready-for-Development queue). Built
+   from tokens so they can be swapped for the real component when it ships. */
+.meter { height: var(--eo-dimension-8); border-radius: var(--eo-dimension-border-radius-round); background: var(--eo-color-surface-subtle); overflow: hidden; }
+.meter > span { display: block; height: 100%; border-radius: var(--eo-dimension-border-radius-round); background: var(--eo-color-surface-accent); }
+.meter.is-good > span { background: var(--eo-color-surface-utility-positive); }
+.meter.is-warn > span { background: var(--eo-color-surface-utility-warning); }
+.meter.is-bad  > span { background: var(--eo-color-surface-utility-negative); }
+
+.bars { display: grid; gap: var(--eo-dimension-8); margin: 0; }
+.bar-row {
+  display: grid;
+  grid-template-columns: minmax(150px, auto) 1fr minmax(2.5rem, auto);
+  align-items: center;
+  gap: var(--eo-dimension-12);
+  font-size: var(--eo-typography-body-50-font-size);
+}
+.bar-row .label { color: var(--eo-color-content-subtle); }
+.bar-row .count { text-align: right; font-variant-numeric: tabular-nums; color: var(--eo-color-content-emphasized); font-weight: 600; }
+.bar-track { height: var(--eo-dimension-12); border-radius: var(--eo-dimension-border-radius-small); background: var(--eo-color-surface-subtle); overflow: hidden; }
+.bar-track > span { display: block; height: 100%; border-radius: var(--eo-dimension-border-radius-small); background: var(--eo-color-surface-accent); }
+/* border-hinted sits too close to the track's surface-subtle to read as a fill —
+   content-subtle is the lightest token with enough separation */
+.bar-track.neutral  > span { background: var(--eo-color-content-subtle); }
+.bar-track.positive > span { background: var(--eo-color-surface-utility-positive); }
+.bar-track.warning  > span { background: var(--eo-color-surface-utility-warning); }
+.bar-track.negative > span { background: var(--eo-color-surface-utility-negative); }
+
+/* ---------- chips ---------- */
+.chips { display: flex; flex-wrap: wrap; gap: var(--eo-dimension-4); margin: 0; padding: 0; list-style: none; }
+.chips li { display: block; }
+
+/* ---------- key/value facts ---------- */
+.facts { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--eo-dimension-8); }
+.facts li {
+  display: flex; justify-content: space-between; gap: var(--eo-dimension-12);
+  padding-bottom: var(--eo-dimension-8);
+  border-bottom: 1px solid var(--eo-color-border-subtle);
+  font-size: var(--eo-typography-body-50-font-size);
+}
+.facts li:last-child { border-bottom: 0; padding-bottom: 0; }
+.facts .k { color: var(--eo-color-content-subtle); }
+.facts .v { font-variant-numeric: tabular-nums; font-weight: 600; text-align: right; white-space: nowrap; }
+.facts .v.bad  { color: var(--eo-color-content-utility-negative); }
+.facts .v.good { color: var(--eo-color-content-utility-positive); }
+.facts .v.warn { color: var(--eo-color-content-utility-warning); }
+
+/* ---------- tables ---------- */
+.table-scroll { overflow-x: auto; }
+table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: var(--eo-typography-body-50-font-size); }
+thead th {
+  text-align: left; padding: var(--eo-dimension-8);
+  border-bottom: 1px solid var(--eo-color-border-hinted);
+  color: var(--eo-color-content-subtle); font-weight: 600; white-space: nowrap;
+}
+tbody td { padding: var(--eo-dimension-8); border-bottom: 1px solid var(--eo-color-border-subtle); vertical-align: top; }
+tbody tr:last-child td { border-bottom: 0; }
+/* No tabular-nums on keys: in Helvetica Now Display the tabular feature widens the
+   hyphen, rendering "DSC-100" as "DSC - 100". These are identifiers, not figures. */
+td.key { white-space: nowrap; font-weight: 600; }
+td.age { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.age.stale { color: var(--eo-color-content-utility-negative); font-weight: 600; }
+
+/* ---------- roadmap ---------- */
+.phases { display: grid; gap: var(--eo-dimension-16); grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+.phase-weeks {
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-accent); font-weight: 600;
+  letter-spacing: 0.06em; text-transform: uppercase;
+}
+.ticket-list { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--eo-dimension-4); }
+.ticket-list li {
+  font-size: var(--eo-typography-body-50-font-size);
+  font-weight: 600;
+  padding: var(--eo-dimension-2) var(--eo-dimension-8);
+  border-radius: var(--eo-dimension-border-radius-small);
+  background: var(--eo-color-surface-subtle);
+  color: var(--eo-color-content-subtle);
+}
+
+/* ---------- findings ---------- */
+.findings { display: grid; gap: var(--eo-dimension-12); margin: 0; padding: 0; list-style: none; }
+.findings li {
+  display: grid; grid-template-columns: auto 1fr; gap: var(--eo-dimension-12);
+  font-size: var(--eo-typography-body-50-font-size);
+  line-height: var(--eo-typography-body-50-line-height);
+}
+.findings .idx {
+  font-family: var(--eo-typography-action-label-100-font-family);
+  color: var(--eo-color-content-accent); font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.findings b { color: var(--eo-color-content-emphasized); }
+.findings span.txt { color: var(--eo-color-content-subtle); }
+
+/* ---------- links ----------
+   Deliberately a native <a>, not <eo-link>. The shipped eo-link renders no anchor
+   element, is not keyboard reachable and does not announce as a link
+   (WCAG 4.1.2 / 2.1.1) — tracked as DSC-202. Styled from tokens so it matches the
+   system, and can be swapped once that component is fixed. */
+a { color: var(--eo-color-content-accent); text-decoration: underline; text-underline-offset: 2px; }
+a:hover { color: var(--eo-color-content-accent-hovered); }
+a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offset: 2px; border-radius: var(--eo-dimension-border-radius-small); }
+.hero a { color: var(--eo-color-content-on-emphasized); }
+
+footer {
+  margin-top: var(--eo-dimension-48);
+  padding-top: var(--eo-dimension-16);
+  border-top: 1px solid var(--eo-color-border-subtle);
+  color: var(--eo-color-content-hinted);
+  font-size: var(--eo-typography-body-50-font-size);
+}
+footer p { margin: 0 0 var(--eo-dimension-4); }
+footer code { font-size: 0.95em; }
+
+@media (max-width: 1100px) { .rail { grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 640px) {
+  .rail { grid-template-columns: repeat(2, 1fr); }
+  .hero { padding: var(--eo-dimension-20); }
+  .bar-row { grid-template-columns: 1fr; gap: var(--eo-dimension-4); }
+  .bar-row .count { text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+
+<header class="hero">
+  <div class="hero-top">
+    <div>
+      <p class="kicker">Design system health · inspection 2026-08-05</p>
+      <h1>EGYM One Design System</h1>
+      <p class="sub">One number for the state of the system, ten stations behind it, and the delivery data that explains why it sits where it does.</p>
+    </div>
+    <div class="score-block">
+      <div class="score-now">51<span class="of">/100</span></div>
+      <div class="score-meta">
+        <span class="line"><b>1</b> red · <b>9</b> yellow · <b>0</b> green</span>
+        <span class="line"><b>+6</b> available by promoting work that already exists</span>
+        <span class="line">Trend 47 → 51</span>
+        <span class="line">Design system <b>0.1.25</b> · <b>988</b> tokens</span>
+      </div>
+    </div>
+  </div>
+  <div class="rail"><div class="station red">
+          <div class="n">01</div>
+          <div class="s">3</div>
+          <div class="t">Coverage &amp; gaps</div>
+          
+        </div><div class="station yellow">
+          <div class="n">02</div>
+          <div class="s">7</div>
+          <div class="t">Best practices</div>
+          
+        </div><div class="station yellow">
+          <div class="n">03</div>
+          <div class="s">5</div>
+          <div class="t">Accessibility</div>
+          
+        </div><div class="station yellow">
+          <div class="n">04</div>
+          <div class="s">7</div>
+          <div class="t">Shared language</div>
+          
+        </div><div class="station yellow">
+          <div class="n">05</div>
+          <div class="s">4</div>
+          <div class="t">Testing &amp; validation</div>
+          
+        </div><div class="station yellow">
+          <div class="n">06</div>
+          <div class="s">5</div>
+          <div class="t">Orchestration</div>
+          <div class="up">→ 6</div>
+        </div><div class="station yellow">
+          <div class="n">07</div>
+          <div class="s">6</div>
+          <div class="t">Governance</div>
+          
+        </div><div class="station yellow">
+          <div class="n">08</div>
+          <div class="s">5</div>
+          <div class="t">Feedback &amp; adoption</div>
+          
+        </div><div class="station yellow">
+          <div class="n">09</div>
+          <div class="s">5</div>
+          <div class="t">Machine-readable docs</div>
+          <div class="up">→ 8</div>
+        </div><div class="station yellow">
+          <div class="n">10</div>
+          <div class="s">4</div>
+          <div class="t">Agent access</div>
+          <div class="up">→ 6</div>
+        </div></div>
+</header>
+
+<eo-alert intent="warning" size="default">
+  22 of 37 core components are still unbuilt, and 25 specified tickets sit unstarted with 24 of them unassigned. The ask is 2 engineers for 12 weeks.
+</eo-alert>
+
+<section class="section">
+      <div class="section-head"><span class="num">01</span><h2>Inspection stations</h2></div>
+      <p class="lede">Scored against the design system multi-point inspection. Red is broken or missing, yellow is drift, green is healthy. An arrow marks a station that would move if work already finished were promoted into main. Source: <code>ds-inspection/reports/2026-08-05-inspection.md</code>.</p>
+      <div class="grid two">
+        <eo-card><div class="card-body">
+          <p class="eyebrow">Every station, with what moved it</p>
+          <div class="table-scroll"><table>
+            <thead><tr><th>#</th><th>Station</th><th>Score</th><th>Why it moved</th></tr></thead>
+            <tbody><tr>
+                  <td class="key">01</td>
+                  <td>Coverage &amp; gaps</td>
+                  <td><eo-label intent="negative" size="small">3</eo-label></td>
+                  <td>+2 components; the staple gap is unchanged</td>
+                </tr><tr>
+                  <td class="key">02</td>
+                  <td>Best practices</td>
+                  <td><eo-label intent="warning" size="small">7</eo-label></td>
+                  <td>new work follows the pattern; eo-link still doesn&#39;t</td>
+                </tr><tr>
+                  <td class="key">03</td>
+                  <td>Accessibility</td>
+                  <td><eo-label intent="warning" size="small">5</eo-label></td>
+                  <td>real a11y engineering; the gate is still off</td>
+                </tr><tr>
+                  <td class="key">04</td>
+                  <td>Shared language</td>
+                  <td><eo-label intent="warning" size="small">7</eo-label></td>
+                  <td>a Properties Glossary exists in Notion — never inspected</td>
+                </tr><tr>
+                  <td class="key">05</td>
+                  <td>Testing &amp; validation</td>
+                  <td><eo-label intent="warning" size="small">4</eo-label></td>
+                  <td>branch protection requires zero status checks</td>
+                </tr><tr>
+                  <td class="key">06</td>
+                  <td>Orchestration</td>
+                  <td><eo-label intent="warning" size="small">5</eo-label> <eo-label intent="info" size="small">→ 6</eo-label></td>
+                  <td>docs still broken; the drift detector isn&#39;t in main</td>
+                </tr><tr>
+                  <td class="key">07</td>
+                  <td>Governance</td>
+                  <td><eo-label intent="warning" size="small">6</eo-label></td>
+                  <td>documented governance found in Notion; correction</td>
+                </tr><tr>
+                  <td class="key">08</td>
+                  <td>Feedback &amp; adoption</td>
+                  <td><eo-label intent="warning" size="small">5</eo-label></td>
+                  <td>the feedback loop is alive — it just isn&#39;t Jira</td>
+                </tr><tr>
+                  <td class="key">09</td>
+                  <td>Machine-readable docs</td>
+                  <td><eo-label intent="warning" size="small">5</eo-label> <eo-label intent="info" size="small">→ 8</eo-label></td>
+                  <td>JSDoc 1→3 files; everything else is in the playground</td>
+                </tr><tr>
+                  <td class="key">10</td>
+                  <td>Agent access</td>
+                  <td><eo-label intent="warning" size="small">4</eo-label> <eo-label intent="info" size="small">→ 6</eo-label></td>
+                  <td>skills still user-level; no CLAUDE.md in either repo</td>
+                </tr></tbody>
+          </table></div>
+        </div></eo-card>
+        <eo-card><div class="card-body">
+          <p class="eyebrow">Where the points are</p>
+          <ul class="facts"><li><span class="k">Shipped today</span><span class="v warn">51/100</span></li><li><span class="k">Achievable now</span><span class="v good">57/100</span></li><li><span class="k">Stations at red</span><span class="v bad">1</span></li><li><span class="k">Stations at green</span><span class="v bad">0</span></li></ul>
+          <div class="meter is-warn"><span style="width:51%"></span></div>
+          <p class="target">The 6-point gap is not new work. It is finished, verified AI-readiness infrastructure sitting in a playground repository that is not linked from either design system repo.</p>
+          <p class="eyebrow">Lowest scoring</p>
+          <ul class="chips"><li><eo-label intent="negative" size="small">Coverage &amp; gaps · 3</eo-label></li><li><eo-label intent="warning" size="small">Testing &amp; validation · 4</eo-label></li><li><eo-label intent="warning" size="small">Agent access · 4</eo-label></li><li><eo-label intent="warning" size="small">Accessibility · 5</eo-label></li></ul>
+        </div></eo-card>
+      </div>
+    </section>
+
+<section class="section">
+  <div class="section-head"><span class="num">02</span><h2>Headline KPIs</h2></div>
+  <p class="lede">Baseline is today. Target is the state after the 12-week engagement.</p>
+  <div class="grid kpi"><eo-card><div class="card-body">
+      <p class="eyebrow">Core coverage in code</p>
+      <p class="metric is-bad">
+        <span class="value">43</span>
+        <span class="unit">% · 16/37</span>
+      </p>
+      <div class="meter is-bad"><span style="width:41%"></span></div>
+      <p class="target">Target <b>100</b> · 37/37</p>
+      
+    </div></eo-card><eo-card><div class="card-body">
+      <p class="eyebrow">Jira queue &#39;Ready for Development&#39;</p>
+      <p class="metric is-bad">
+        <span class="value">25</span>
+        <span class="unit">tickets</span>
+      </p>
+      
+      <p class="target">Target <b>0</b></p>
+      
+    </div></eo-card><eo-card><div class="card-body">
+      <p class="eyebrow">P90 time-to-merge (incl. community PRs)</p>
+      <p class="metric is-bad">
+        <span class="value">&gt;100</span>
+        <span class="unit">days</span>
+      </p>
+      
+      <p class="target">Target <b>&lt;14</b></p>
+      
+    </div></eo-card><eo-card><div class="card-body">
+      <p class="eyebrow">Tagged, versioned releases</p>
+      <p class="metric is-bad">
+        <span class="value">0</span>
+        <span class="unit">count</span>
+      </p>
+      
+      <p class="target">Target <b>every release</b></p>
+      
+    </div></eo-card><eo-card><div class="card-body">
+      <p class="eyebrow">New BMA features built from DS components</p>
+      <p class="metric is-unmeasured">
+        <span class="value">Not measured</span>
+        
+      </p>
+      
+      <p class="target">Target <b>100</b></p>
+      <p class="target">No code-side telemetry exists yet, so this cannot be reported until it is instrumented.</p>
+    </div></eo-card></div>
+</section>
+
+<section class="section">
+  <div class="section-head"><span class="num">03</span><h2>Coverage</h2></div>
+  <p class="lede">The core set is extrapolated from a year of library usage against the last 90 days, so it reflects what products actually place — not the full Figma inventory.</p>
+  <div class="grid two">
+    <eo-card><div class="card-body">
+      <p class="eyebrow">Core set built in code</p>
+      <p class="metric is-bad">
+        <span class="value">15<span class="unit"> / 37</span></span>
+        <span class="unit">41%</span>
+      </p>
+      <div class="meter is-bad"><span style="width:41%"></span></div>
+      <p class="target">Extrapolated from library usage, 1 year vs. 90 days comparison (AI-Readiness plan)</p>
+      <ul class="chips"><li><eo-label intent="positive" size="small">Alert</eo-label></li><li><eo-label intent="positive" size="small">Bottom Sheet</eo-label></li><li><eo-label intent="positive" size="small">Button</eo-label></li><li><eo-label intent="positive" size="small">Button Stack</eo-label></li><li><eo-label intent="positive" size="small">Card</eo-label></li><li><eo-label intent="positive" size="small">Checkbox</eo-label></li><li><eo-label intent="positive" size="small">Dialog</eo-label></li><li><eo-label intent="positive" size="small">Divider</eo-label></li><li><eo-label intent="positive" size="small">Label</eo-label></li><li><eo-label intent="positive" size="small">Link</eo-label></li><li><eo-label intent="positive" size="small">Loading Skeleton</eo-label></li><li><eo-label intent="positive" size="small">Navigation</eo-label></li><li><eo-label intent="positive" size="small">Radio Button</eo-label></li><li><eo-label intent="positive" size="small">Radio Group</eo-label></li><li><eo-label intent="positive" size="small">Tooltip</eo-label></li></ul>
+    </div></eo-card>
+    <eo-card><div class="card-body">
+      <p class="eyebrow">Moving through the pipeline</p>
+      <ul class="facts"><li><span class="k">Ready for release</span><span class="v good">2</span></li><li><span class="k">In development</span><span class="v ">2</span></li><li><span class="k">Design coverage, Wellpass</span><span class="v good">100%</span></li><li><span class="k">Still to build</span><span class="v bad">22</span></li></ul>
+      <p class="eyebrow">Ready for release</p>
+      <ul class="chips"><li><eo-label intent="info" size="small">Avatar (DSC-37)</eo-label></li><li><eo-label intent="info" size="small">Countdown (DSC-172)</eo-label></li></ul>
+      <p class="eyebrow">In development</p>
+      <ul class="chips"><li><eo-label intent="warning" size="small">Alert - Snackbar/Toast (DSC-101)</eo-label></li><li><eo-label intent="warning" size="small">Form - Search Filter (DSC-188)</eo-label></li></ul>
+    </div></eo-card>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><span class="num">04</span><h2>Delivery pipeline</h2></div>
+  <p class="lede">Everything in “Ready for Development” has a spec and a priority. It is waiting on capacity, not on decisions.</p>
+  <div class="grid two">
+    <eo-card><div class="card-body">
+      <p class="eyebrow">All open DSC issues</p>
+      <p class="metric"><span class="value">117</span><span class="unit">open</span></p>
+      <div class="bars"><div class="bar-row"><span class="label">Neu</span>
+        <span class="bar-track neutral"><span style="width:100%"></span></span>
+        <span class="count">59</span></div><div class="bar-row"><span class="label">Ready for Development</span>
+        <span class="bar-track neutral"><span style="width:42%"></span></span>
+        <span class="count">25</span></div><div class="bar-row"><span class="label">In Design</span>
+        <span class="bar-track neutral"><span style="width:8%"></span></span>
+        <span class="count">5</span></div><div class="bar-row"><span class="label">In Development</span>
+        <span class="bar-track neutral"><span style="width:7%"></span></span>
+        <span class="count">4</span></div><div class="bar-row"><span class="label">Discovery</span>
+        <span class="bar-track neutral"><span style="width:7%"></span></span>
+        <span class="count">4</span></div><div class="bar-row"><span class="label">Ready For Release</span>
+        <span class="bar-track neutral"><span style="width:3%"></span></span>
+        <span class="count">2</span></div><div class="bar-row"><span class="label">Backlog</span>
+        <span class="bar-track neutral"><span style="width:2%"></span></span>
+        <span class="count">1</span></div></div>
+    </div></eo-card>
+    <eo-card><div class="card-body">
+      <p class="eyebrow">The queue that engineers would drain</p>
+      <p class="metric is-bad"><span class="value">25</span><span class="unit">ready for development</span></p>
+      <ul class="facts"><li><span class="k">Unassigned</span><span class="v bad">24 of 25</span></li><li><span class="k">Waiting since Oct 2025</span><span class="v bad">8</span></li><li><span class="k">Currently in development</span><span class="v ">4</span></li></ul>
+      <p class="target">Specified, prioritised, and nobody is on them. This is the single number the ask is built on.</p>
+    </div></eo-card>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><span class="num">05</span><h2>The Ready-for-Development queue</h2></div>
+  <p class="lede">Oldest first. Age counts days since the ticket was created; anything past 180 days is flagged.</p>
+  <eo-card><div class="card-body"><div class="table-scroll"><table>
+    <thead><tr><th>Key</th><th>Title</th><th>Type</th><th>Age</th></tr></thead>
+    <tbody><tr>
+      <td class="key">DSC-58</td>
+      <td>Atom: Filter - Tag</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age stale">297 d</td>
+    </tr><tr>
+      <td class="key">DSC-100</td>
+      <td>Atom: Create Progress - Bar</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age stale">297 d</td>
+    </tr><tr>
+      <td class="key">DSC-113</td>
+      <td>Atom: Utility - Gym Avatar</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age stale">297 d</td>
+    </tr><tr>
+      <td class="key">DSC-40</td>
+      <td>Bottom Actions</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age stale">297 d</td>
+    </tr><tr>
+      <td class="key">DSC-64</td>
+      <td>Header - App</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age stale">297 d</td>
+    </tr><tr>
+      <td class="key">DSC-63</td>
+      <td>Create a Header-Desktop</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age stale">297 d</td>
+    </tr><tr>
+      <td class="key">DSC-78</td>
+      <td>Create List Component</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age stale">297 d</td>
+    </tr><tr>
+      <td class="key">DSC-90</td>
+      <td>Create Loader Spinner</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age stale">297 d</td>
+    </tr><tr>
+      <td class="key">DSC-92</td>
+      <td>Map - Cluster</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age stale">297 d</td>
+    </tr><tr>
+      <td class="key">DSC-159</td>
+      <td>Automate token conversion from Figma to repository</td>
+      <td><eo-label intent="neutral" size="small">Task</eo-label></td>
+      <td class="age stale">188 d</td>
+    </tr><tr>
+      <td class="key">DSC-175</td>
+      <td>Create Segmented Control</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age ">153 d</td>
+    </tr><tr>
+      <td class="key">DSC-187</td>
+      <td>Label component — Round 2</td>
+      <td><eo-label intent="neutral" size="small">Task</eo-label></td>
+      <td class="age ">71 d</td>
+    </tr><tr>
+      <td class="key">DSC-189</td>
+      <td>Token System v0.1.0 update: new primitive ramps, training goal &amp; component-level tokens</td>
+      <td><eo-label intent="neutral" size="small">Task</eo-label></td>
+      <td class="age ">64 d</td>
+    </tr><tr>
+      <td class="key">DSC-197</td>
+      <td>Create illustrations package and add illustrative iconography</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age ">34 d</td>
+    </tr><tr>
+      <td class="key">DSC-199</td>
+      <td>Remove layout property from Checkbox and Radio button component</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age ">31 d</td>
+    </tr><tr>
+      <td class="key">DSC-200</td>
+      <td>Update Navigation Drawer</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age ">28 d</td>
+    </tr><tr>
+      <td class="key">DSC-203</td>
+      <td>Atom: Create Filter-Button</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age ">21 d</td>
+    </tr><tr>
+      <td class="key">DSC-205</td>
+      <td>Create Tabs component</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age ">21 d</td>
+    </tr><tr>
+      <td class="key">DSC-206</td>
+      <td>Create List - Contained</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age ">21 d</td>
+    </tr><tr>
+      <td class="key">DSC-202</td>
+      <td>Update eo-link component</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age ">21 d</td>
+    </tr><tr>
+      <td class="key">DSC-204</td>
+      <td>Create Stepper - Static</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age ">21 d</td>
+    </tr><tr>
+      <td class="key">DSC-208</td>
+      <td>Update Navigation - Rail</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age ">20 d</td>
+    </tr><tr>
+      <td class="key">DSC-213</td>
+      <td>Bugfix in the path color for the icon set</td>
+      <td><eo-label intent="neutral" size="small">Story</eo-label></td>
+      <td class="age ">7 d</td>
+    </tr><tr>
+      <td class="key">DSC-214</td>
+      <td>vitest.config.ts references two non-existent paths — all Storybook and a11y tests silently skipped</td>
+      <td><eo-label intent="negative" size="small">Bug</eo-label></td>
+      <td class="age ">3 d</td>
+    </tr><tr>
+      <td class="key">DSC-216</td>
+      <td>Make QUICK_START an actual quick start</td>
+      <td><eo-label intent="neutral" size="small">Task</eo-label></td>
+      <td class="age ">3 d</td>
+    </tr></tbody>
+  </table></div></div></eo-card>
+</section>
+
+<section class="section">
+  <div class="section-head"><span class="num">06</span><h2>BMA build plan</h2></div>
+  <p class="lede">Only low-impact items remain in backlog; everything BMA-blocking is triaged, prioritized or already in design QA.</p>
+  <div class="grid two">
+    <eo-card><div class="card-body">
+      <p class="eyebrow">Items by status</p>
+      <p class="metric"><span class="value">51</span><span class="unit">items</span></p>
+      <div class="bars"><div class="bar-row"><span class="label">QA: Design</span>
+        <span class="bar-track neutral"><span style="width:100%"></span></span>
+        <span class="count">25</span></div><div class="bar-row"><span class="label">Won&#39;t Build</span>
+        <span class="bar-track neutral"><span style="width:48%"></span></span>
+        <span class="count">12</span></div><div class="bar-row"><span class="label">Backlog</span>
+        <span class="bar-track neutral"><span style="width:20%"></span></span>
+        <span class="count">5</span></div><div class="bar-row"><span class="label">In progress Design</span>
+        <span class="bar-track neutral"><span style="width:12%"></span></span>
+        <span class="count">3</span></div><div class="bar-row"><span class="label">Done</span>
+        <span class="bar-track neutral"><span style="width:12%"></span></span>
+        <span class="count">3</span></div><div class="bar-row"><span class="label">In progress Spec &amp; Doc</span>
+        <span class="bar-track neutral"><span style="width:8%"></span></span>
+        <span class="count">2</span></div><div class="bar-row"><span class="label">Planning</span>
+        <span class="bar-track neutral"><span style="width:4%"></span></span>
+        <span class="count">1</span></div></div>
+    </div></eo-card>
+    <eo-card><div class="card-body">
+      <p class="eyebrow">Remaining backlog, by impact</p>
+      <div class="bars"><div class="bar-row"><span class="label">Low</span>
+        <span class="bar-track positive"><span style="width:100%"></span></span>
+        <span class="count">3</span></div><div class="bar-row"><span class="label">Lowest</span>
+        <span class="bar-track positive"><span style="width:33%"></span></span>
+        <span class="count">1</span></div><div class="bar-row"><span class="label">Medium</span>
+        <span class="bar-track positive"><span style="width:33%"></span></span>
+        <span class="count">1</span></div></div>
+      <p class="target">Notion &#39;EGYM One Internal Design Tasks&#39;, workstream BMA Integration. Corrected count as of 2026-08-06 (deck previously said 48/22).</p>
+    </div></eo-card>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><span class="num">07</span><h2>Community &amp;amp; release governance</h2></div>
+  <p class="lede">Measured from live Slack and GitHub evidence in the 2026-08-05 governance re-inspection.</p>
+  <div class="grid three">
+    <eo-card><div class="card-body">
+      <p class="eyebrow">The community is contributing</p>
+      <ul class="facts"><li><span class="k">External contributors</span><span class="v good">9</span></li><li><span class="k">Merged community PRs</span><span class="v good">19</span></li><li><span class="k">Median time to merge</span><span class="v good">3 days</span></li></ul>
+      <p class="target">Contribution is not the bottleneck. Review capacity is.</p>
+    </div></eo-card>
+    <eo-card><div class="card-body">
+      <p class="eyebrow">…but the tail is where it fails</p>
+      <ul class="facts"><li><span class="k">Worst merges</span><span class="v bad">174, 152, 104 d</span></li><li><span class="k">Open human PRs</span><span class="v bad">13 · median 100 d</span></li><li><span class="k">Dependabot PRs</span><span class="v bad">18 · oldest 290 d</span></li><li><span class="k">CONTRIBUTING draft age</span><span class="v bad">198 d</span></li></ul>
+    </div></eo-card>
+    <eo-card><div class="card-body">
+      <p class="eyebrow">Release governance</p>
+      <ul class="facts"><li><span class="k">Git tags</span><span class="v bad">0</span></li><li><span class="k">GitHub releases</span><span class="v bad">0</span></li></ul>
+      <p class="target">Without tags and semver the system cannot express a breaking change, so no migration can be announced.</p>
+      <p class="target">Business-Suite rebuilt a component locally instead of waiting (2026-06-19)</p>
+    </div></eo-card>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><span class="num">08</span><h2>The ask</h2></div>
+  <div class="grid two">
+    <eo-card><div class="card-body">
+      <p class="eyebrow">Resourcing</p>
+      <p class="metric"><span class="value">2 × 12</span><span class="unit">engineers × weeks</span></p>
+      <ul class="facts"><li><span class="k">Check-in</span><span class="v ">week 6</span></li><li><span class="k">Final review</span><span class="v ">week 12</span></li></ul>
+      <p class="target">≈ 1 component per engineer per week incl. review &amp; QA (conservative; median merge is 2 days when review capacity exists)</p>
+    </div></eo-card>
+    <eo-card><div class="card-body">
+      <p class="eyebrow">Why rotation, not permanent headcount</p>
+      <p class="target">After tranche 1, two new engineers from another project take over (tranche 2). Alumni carry DS/package knowledge into their downstream teams → adoption via multipliers.</p>
+    </div></eo-card>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-head"><span class="num">09</span><h2>12-week roadmap</h2></div>
+  <div class="phases">
+    <eo-card><div class="card-body">
+    <p class="phase-weeks">Weeks 1-2</p>
+    <p class="card-title">Infrastructure &amp; Quick Wins</p>
+    <ul class="ticket-list"><li>DSC-214</li><li>DSC-216</li><li>DSC-172</li><li>DSC-37</li><li>DSC-199</li><li>DSC-187</li><li>DSC-202</li><li>DSC-213</li></ul>
+    <ul class="facts"><li><span class="k">Release tagging &amp; semver (pattern: egym-one-token-system)</span></li><li><span class="k">Onboarding on DS standards</span></li></ul>
+  </div></eo-card>
+    <eo-card><div class="card-body">
+    <p class="phase-weeks">Weeks 3-8</p>
+    <p class="card-title">Core by BMA priority</p>
+    <ul class="ticket-list"><li>DSC-64</li><li>DSC-63</li><li>DSC-200</li><li>DSC-208</li><li>DSC-205</li><li>DSC-175</li><li>DSC-78</li><li>DSC-206</li><li>DSC-58</li><li>DSC-203</li><li>DSC-100</li><li>DSC-204</li></ul>
+    
+  </div></eo-card>
+    <eo-card><div class="card-body">
+    <p class="phase-weeks">Weeks 9-12</p>
+    <p class="card-title">Clear the queue &amp; handover</p>
+    <ul class="ticket-list"><li>DSC-113</li><li>DSC-90</li><li>DSC-92</li><li>DSC-197</li><li>DSC-189</li><li>DSC-159</li></ul>
+    <ul class="facts"><li><span class="k">Component MDs &amp; documentation gaps</span></li><li><span class="k">Establish contribution model</span></li><li><span class="k">Buffer/spillover in week 12</span></li></ul>
+  </div></eo-card>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Sources.</strong> <a href="https://egym.atlassian.net/jira/software/c/projects/DSC/boards/1072" rel="noreferrer">jiraBoard</a> · <a href="https://egym.github.io/lib-egym-one-design-system/" rel="noreferrer">storybook</a> · <a href="https://app.notion.com/p/2f4d894dd22a809980e3c19fa6c3edb3" rel="noreferrer">bmaBuildPlan</a> · <a href="https://app.notion.com/p/38fd894dd22a81f59f84e91978ad88f9" rel="noreferrer">coreComponentsMetadata</a> · <a href="https://app.notion.com/p/DS-Engineering-Rollout-12-Week-Detailed-Plan-2-Engineers-3b4d894dd22a8138af03fe4c3192ba19" rel="noreferrer">rolloutPlan</a> · governanceReport · deck</p>
+  <p>Built with the real design system: <code>@egym-private/egym-one-design-system-web@0.1.25</code> — components eo-card, eo-label, eo-alert, eo-button, eo-divider, eo-tooltip, styled entirely from the 988 published <code>--eo-*</code> tokens.</p>
+  <p>Charts and meters are hand-built from tokens because the system has no chart or progress component in code yet (DSC-100). Links are native anchors rather than <code>eo-link</code>, which currently renders no anchor element and is not keyboard reachable (DSC-202).</p>
+  <p>Station scores are read directly from <code>ds-inspection/reports/2026-08-05-inspection.md</code>, so this dashboard cannot drift from the inspection. Generated 2026-08-06.</p>
+</footer>
+
+</div>
+<script type="module" src="./vendor/egym-one-ds.js"></script>
+</body>
+</html>

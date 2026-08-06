@@ -1,0 +1,88 @@
+name: Refresh dashboard
+
+# Keeps the dashboard current without anyone opening a laptop.
+#
+# The GitHub-sourced metrics (components in code, PR ages, tags, releases,
+# community contributor counts) refresh automatically. Jira and Notion figures
+# stay as last written — they need tokens this workflow does not have, and the
+# dashboard labels them as such rather than pretending they are live.
+#
+# Requires a repository secret DS_READ_TOKEN: a PAT with `repo` read scope on
+# egym/lib-egym-one-design-system. The default GITHUB_TOKEN cannot see it,
+# because that repo lives in a different org to this one.
+
+on:
+  schedule:
+    - cron: '17 6 * * 1-5' # weekday mornings, 06:17 UTC
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'ds-kpi-data.json'
+      - 'inspection/**'
+      - 'src/**'
+      - 'scripts/**'
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Refresh metrics from the GitHub API
+        env:
+          GITHUB_TOKEN: ${{ secrets.DS_READ_TOKEN }}
+        run: |
+          if [ -z "$GITHUB_TOKEN" ]; then
+            echo "::warning::DS_READ_TOKEN not set — skipping the GitHub refresh, rebuilding from committed data."
+          else
+            node scripts/refresh-data.mjs
+          fi
+
+      - name: Read station scores from the inspection reports
+        run: node scripts/read-inspection.mjs ./inspection
+
+      - name: Build
+        run: node scripts/build.mjs
+
+      - name: Commit refreshed data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ds-kpi-data.json docs/
+          if git diff --staged --quiet; then
+            echo "Nothing changed."
+          else
+            git commit -m "chore: refresh dashboard data [skip ci]"
+            git push
+          fi
+
+  deploy:
+    needs: refresh
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+      - id: deployment
+        uses: actions/deploy-pages@v4

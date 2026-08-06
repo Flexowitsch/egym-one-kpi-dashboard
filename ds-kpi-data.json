@@ -1,0 +1,545 @@
+{
+  "meta": {
+    "title": "EGYM One Design System — Engineering Rollout KPI Data",
+    "asOf": "2026-08-06",
+    "owner": "Felix Pfahlert · Design Systems",
+    "context": "Data basis for the Marco Melas negotiation deck and the KPI dashboard. Ask: 2 engineers × 3 months for coded components.",
+    "sources": {
+      "jiraBoard": "https://egym.atlassian.net/jira/software/c/projects/DSC/boards/1072",
+      "storybook": "https://egym.github.io/lib-egym-one-design-system/",
+      "bmaBuildPlan": "https://app.notion.com/p/2f4d894dd22a809980e3c19fa6c3edb3",
+      "coreComponentsMetadata": "https://app.notion.com/p/38fd894dd22a81f59f84e91978ad88f9",
+      "rolloutPlan": "https://app.notion.com/p/DS-Engineering-Rollout-12-Week-Detailed-Plan-2-Engineers-3b4d894dd22a8138af03fe4c3192ba19",
+      "governanceReport": "reports/2026-08-05-station07-reinspection.md",
+      "deck": "Figma → 01 - 🥇 EGYM One - Presentations → page '-> 260806 Dev Integration Design System'"
+    },
+    "refreshedBy": "scripts/refresh-data.mjs (GitHub API)",
+    "notAutoRefreshed": [
+      "jira — needs an Atlassian token (JIRA_BASE_URL, JIRA_EMAIL, JIRA_TOKEN)",
+      "bmaBuildPlan — needs a Notion integration token",
+      "coverage.coreSetTotal — set from Figma library analytics, reviewed manually"
+    ]
+  },
+  "coverage": {
+    "coreSetTotal": 37,
+    "coreSetSource": "Extrapolated from library usage, 1 year vs. 90 days comparison (AI-Readiness plan)",
+    "inCode": 15,
+    "inCodePct": 41,
+    "codedComponents": [
+      "Alert",
+      "Bottom Sheet",
+      "Button",
+      "Button Stack",
+      "Card",
+      "Checkbox",
+      "Dialog",
+      "Divider",
+      "Label",
+      "Link",
+      "Loading Skeleton",
+      "Navigation",
+      "Radio Button",
+      "Radio Group",
+      "Tooltip"
+    ],
+    "readyForRelease": [
+      "Avatar (DSC-37)",
+      "Countdown (DSC-172)"
+    ],
+    "inDevelopment": [
+      "Alert - Snackbar/Toast (DSC-101)",
+      "Form - Search Filter (DSC-188)"
+    ],
+    "designCoverageWellpassPct": 100
+  },
+  "jira": {
+    "project": "DSC",
+    "openIssuesTotal": 117,
+    "byStatus": {
+      "Neu": 59,
+      "Ready for Development": 25,
+      "In Design": 5,
+      "In Development": 4,
+      "Discovery": 4,
+      "Ready For Release": 2,
+      "Backlog": 1
+    },
+    "readyForDevelopment": {
+      "count": 25,
+      "unassigned": 24,
+      "waitingSinceOct2025": 8,
+      "tickets": [
+        {
+          "key": "DSC-214",
+          "title": "vitest.config.ts references two non-existent paths — all Storybook and a11y tests silently skipped",
+          "type": "Bug",
+          "created": "2026-08-03"
+        },
+        {
+          "key": "DSC-216",
+          "title": "Make QUICK_START an actual quick start",
+          "type": "Task",
+          "created": "2026-08-03"
+        },
+        {
+          "key": "DSC-58",
+          "title": "Atom: Filter - Tag",
+          "type": "Story",
+          "created": "2025-10-13"
+        },
+        {
+          "key": "DSC-203",
+          "title": "Atom: Create Filter-Button",
+          "type": "Story",
+          "created": "2026-07-16"
+        },
+        {
+          "key": "DSC-100",
+          "title": "Atom: Create Progress - Bar",
+          "type": "Story",
+          "created": "2025-10-13"
+        },
+        {
+          "key": "DSC-113",
+          "title": "Atom: Utility - Gym Avatar",
+          "type": "Story",
+          "created": "2025-10-13"
+        },
+        {
+          "key": "DSC-205",
+          "title": "Create Tabs component",
+          "type": "Story",
+          "created": "2026-07-16"
+        },
+        {
+          "key": "DSC-40",
+          "title": "Bottom Actions",
+          "type": "Story",
+          "created": "2025-10-13"
+        },
+        {
+          "key": "DSC-200",
+          "title": "Update Navigation Drawer",
+          "type": "Story",
+          "created": "2026-07-09"
+        },
+        {
+          "key": "DSC-208",
+          "title": "Update Navigation - Rail",
+          "type": "Story",
+          "created": "2026-07-17"
+        },
+        {
+          "key": "DSC-64",
+          "title": "Header - App",
+          "type": "Story",
+          "created": "2025-10-13"
+        },
+        {
+          "key": "DSC-63",
+          "title": "Create a Header-Desktop",
+          "type": "Story",
+          "created": "2025-10-13"
+        },
+        {
+          "key": "DSC-78",
+          "title": "Create List Component",
+          "type": "Story",
+          "created": "2025-10-13"
+        },
+        {
+          "key": "DSC-206",
+          "title": "Create List - Contained",
+          "type": "Story",
+          "created": "2026-07-16"
+        },
+        {
+          "key": "DSC-197",
+          "title": "Create illustrations package and add illustrative iconography",
+          "type": "Story",
+          "created": "2026-07-03"
+        },
+        {
+          "key": "DSC-189",
+          "title": "Token System v0.1.0 update: new primitive ramps, training goal & component-level tokens",
+          "type": "Task",
+          "created": "2026-06-03"
+        },
+        {
+          "key": "DSC-175",
+          "title": "Create Segmented Control",
+          "type": "Story",
+          "created": "2026-03-06"
+        },
+        {
+          "key": "DSC-187",
+          "title": "Label component — Round 2",
+          "type": "Task",
+          "created": "2026-05-27"
+        },
+        {
+          "key": "DSC-199",
+          "title": "Remove layout property from Checkbox and Radio button component",
+          "type": "Story",
+          "created": "2026-07-06"
+        },
+        {
+          "key": "DSC-159",
+          "title": "Automate token conversion from Figma to repository",
+          "type": "Task",
+          "created": "2026-01-30"
+        },
+        {
+          "key": "DSC-202",
+          "title": "Update eo-link component",
+          "type": "Story",
+          "created": "2026-07-16"
+        },
+        {
+          "key": "DSC-204",
+          "title": "Create Stepper - Static",
+          "type": "Story",
+          "created": "2026-07-16"
+        },
+        {
+          "key": "DSC-90",
+          "title": "Create Loader Spinner",
+          "type": "Story",
+          "created": "2025-10-13"
+        },
+        {
+          "key": "DSC-92",
+          "title": "Map - Cluster",
+          "type": "Story",
+          "created": "2025-10-13"
+        },
+        {
+          "key": "DSC-213",
+          "title": "Bugfix in the path color for the icon set",
+          "type": "Story",
+          "created": "2026-07-30"
+        }
+      ]
+    },
+    "inDevelopment": [
+      {
+        "key": "DSC-188",
+        "title": "Form - Search Filter",
+        "assignee": "Youssef Elassri"
+      },
+      {
+        "key": "DSC-101",
+        "title": "Alert - Snackbar / Toast",
+        "assignee": "Alex Wu Fan"
+      },
+      {
+        "key": "DSC-209",
+        "title": "Introduce AGENTS.md",
+        "assignee": "Luis Torres"
+      },
+      {
+        "key": "DSC-201",
+        "title": "iOS hover effect triggers incorrectly on ripple/button",
+        "assignee": null
+      }
+    ]
+  },
+  "bmaBuildPlan": {
+    "note": "Notion 'EGYM One Internal Design Tasks', workstream BMA Integration. Corrected count as of 2026-08-06 (deck previously said 48/22).",
+    "itemsTotal": 51,
+    "byStatus": {
+      "QA: Design": 25,
+      "Won't Build": 12,
+      "Backlog": 5,
+      "In progress Design": 3,
+      "Done": 3,
+      "In progress Spec & Doc": 2,
+      "Planning": 1
+    },
+    "backlogImpact": {
+      "Low": 3,
+      "Lowest": 1,
+      "Medium": 1
+    },
+    "backlogNote": "Only low-impact items remain in backlog; everything BMA-blocking is triaged, prioritized or already in design QA."
+  },
+  "communityVelocity": {
+    "source": "Governance re-inspection 2026-08-05 (Station 7), live Slack + GitHub evidence",
+    "externalContributors": 9,
+    "mergedCommunityPRs": 19,
+    "medianTimeToMergeDays": 3,
+    "timeToMergeTailDays": [
+      174,
+      152,
+      104
+    ],
+    "openHumanPRs": {
+      "count": 13,
+      "medianAgeDays": 100
+    },
+    "dependabotPRs": {
+      "count": 18,
+      "medianAgeDays": 137,
+      "oldestDays": 290
+    },
+    "gitTags": 0,
+    "gitHubReleases": 0,
+    "contributingPRDraftAgeDays": 198,
+    "evidence": {
+      "teamRoutedAround": "Business-Suite rebuilt a component locally instead of waiting (2026-06-19)",
+      "processBypassed": "Self-merge under pressure documented in Slack (2026-04-08)",
+      "reviewFatigue": "Multiple Slack quotes asking for 'brave' reviewers; 'super review session' proposed"
+    },
+    "mergedHumanPRsTotal": 48
+  },
+  "ask": {
+    "engineers": 2,
+    "durationWeeks": 12,
+    "velocityAssumption": "≈ 1 component per engineer per week incl. review & QA (conservative; median merge is 2 days when review capacity exists)",
+    "checkInWeek": 6,
+    "finalReviewWeek": 12,
+    "rotationModel": "After tranche 1, two new engineers from another project take over (tranche 2). Alumni carry DS/package knowledge into their downstream teams → adoption via multipliers."
+  },
+  "kpis": [
+    {
+      "id": "core-coverage",
+      "label": "Core coverage in code",
+      "baseline": 43,
+      "target": 100,
+      "unit": "%",
+      "baselineDetail": "16/37",
+      "targetDetail": "37/37"
+    },
+    {
+      "id": "ready-queue",
+      "label": "Jira queue 'Ready for Development'",
+      "baseline": 25,
+      "target": 0,
+      "unit": "tickets"
+    },
+    {
+      "id": "time-to-merge",
+      "label": "P90 time-to-merge (incl. community PRs)",
+      "baseline": ">100",
+      "target": "<14",
+      "unit": "days"
+    },
+    {
+      "id": "tagged-releases",
+      "label": "Tagged, versioned releases",
+      "baseline": 0,
+      "target": "every release",
+      "unit": "count"
+    },
+    {
+      "id": "bma-adoption",
+      "label": "New BMA features built from DS components",
+      "baseline": null,
+      "target": 100,
+      "unit": "%"
+    }
+  ],
+  "roadmap": {
+    "phase1": {
+      "weeks": "1-2",
+      "title": "Infrastructure & Quick Wins",
+      "tickets": [
+        "DSC-214",
+        "DSC-216",
+        "DSC-172",
+        "DSC-37",
+        "DSC-199",
+        "DSC-187",
+        "DSC-202",
+        "DSC-213"
+      ],
+      "extras": [
+        "Release tagging & semver (pattern: egym-one-token-system)",
+        "Onboarding on DS standards"
+      ]
+    },
+    "phase2": {
+      "weeks": "3-8",
+      "title": "Core by BMA priority",
+      "engineer1_structureNavigation": [
+        "DSC-64",
+        "DSC-63",
+        "DSC-200",
+        "DSC-208",
+        "DSC-205",
+        "DSC-175"
+      ],
+      "engineer2_contentForms": [
+        "DSC-78",
+        "DSC-206",
+        "DSC-58",
+        "DSC-203",
+        "DSC-100",
+        "DSC-204"
+      ]
+    },
+    "phase3": {
+      "weeks": "9-12",
+      "title": "Clear the queue & handover",
+      "tickets": [
+        "DSC-113",
+        "DSC-90",
+        "DSC-92",
+        "DSC-197",
+        "DSC-189",
+        "DSC-159"
+      ],
+      "extras": [
+        "Component MDs & documentation gaps",
+        "Establish contribution model",
+        "Buffer/spillover in week 12"
+      ]
+    }
+  },
+  "inspection": {
+    "source": "ds-inspection/reports/2026-08-05-inspection.md",
+    "date": "2026-08-05",
+    "shippedTotal": 51,
+    "potentialTotal": 57,
+    "maxTotal": 100,
+    "reds": 1,
+    "yellows": 9,
+    "greens": 0,
+    "trend": [
+      47,
+      51
+    ],
+    "stations": [
+      {
+        "n": 1,
+        "name": "Coverage & gaps",
+        "score": 3,
+        "light": "red",
+        "potential": null,
+        "history": [
+          3,
+          3,
+          3
+        ],
+        "note": "+2 components; the staple gap is unchanged"
+      },
+      {
+        "n": 2,
+        "name": "Best practices",
+        "score": 7,
+        "light": "yellow",
+        "potential": null,
+        "history": [
+          6,
+          7,
+          7
+        ],
+        "note": "new work follows the pattern; eo-link still doesn't"
+      },
+      {
+        "n": 3,
+        "name": "Accessibility",
+        "score": 5,
+        "light": "yellow",
+        "potential": null,
+        "history": [
+          5,
+          5,
+          5
+        ],
+        "note": "real a11y engineering; the gate is still off"
+      },
+      {
+        "n": 4,
+        "name": "Shared language",
+        "score": 7,
+        "light": "yellow",
+        "potential": null,
+        "history": [
+          6,
+          6,
+          7
+        ],
+        "note": "a Properties Glossary exists in Notion — never inspected"
+      },
+      {
+        "n": 5,
+        "name": "Testing & validation",
+        "score": 4,
+        "light": "yellow",
+        "potential": null,
+        "history": [
+          5,
+          5,
+          4
+        ],
+        "note": "branch protection requires zero status checks"
+      },
+      {
+        "n": 6,
+        "name": "Orchestration",
+        "score": 5,
+        "light": "yellow",
+        "potential": 6,
+        "history": [
+          5,
+          5,
+          5
+        ],
+        "note": "docs still broken; the drift detector isn't in main"
+      },
+      {
+        "n": 7,
+        "name": "Governance",
+        "score": 6,
+        "light": "yellow",
+        "potential": null,
+        "history": [
+          4,
+          4,
+          6
+        ],
+        "note": "documented governance found in Notion; correction"
+      },
+      {
+        "n": 8,
+        "name": "Feedback & adoption",
+        "score": 5,
+        "light": "yellow",
+        "potential": null,
+        "history": [
+          null,
+          3,
+          5
+        ],
+        "note": "the feedback loop is alive — it just isn't Jira"
+      },
+      {
+        "n": 9,
+        "name": "Machine-readable docs",
+        "score": 5,
+        "light": "yellow",
+        "potential": 8,
+        "history": [
+          4,
+          5,
+          5
+        ],
+        "note": "JSDoc 1→3 files; everything else is in the playground"
+      },
+      {
+        "n": 10,
+        "name": "Agent access",
+        "score": 4,
+        "light": "yellow",
+        "potential": 6,
+        "history": [
+          4,
+          4,
+          4
+        ],
+        "note": "skills still user-level; no CLAUDE.md in either repo"
+      }
+    ]
+  }
+}

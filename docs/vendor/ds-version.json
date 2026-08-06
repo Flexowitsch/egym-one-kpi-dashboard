@@ -1,0 +1,13 @@
+{
+  "version": "0.1.25",
+  "components": [
+    "eo-card",
+    "eo-label",
+    "eo-alert",
+    "eo-button",
+    "eo-divider",
+    "eo-tooltip"
+  ],
+  "tokenCount": 988,
+  "vendoredAt": "2026-08-06T08:23:21.183Z"
+}
