@@ -115,6 +115,8 @@ h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--eo-dimension-gap-extra-large)}
 .cell{margin:0}
 .cell iframe{width:100%;height:230px;}
+.grid.station{grid-template-columns:repeat(auto-fill,minmax(360px,1fr))}
+.grid.station .cell iframe{height:430px;border:0;display:block;background:var(--eo-color-surface-default);border-radius:var(--eo-dimension-border-radius-large)}
 .grid.tall .cell iframe{height:300px;border:0;display:block;background:var(--eo-color-surface-default);border-radius:var(--eo-dimension-border-radius-large)}
 figcaption{margin-top:var(--eo-dimension-8)}
 figcaption code{font-size:.72rem;color:var(--eo-color-content-hinted);word-break:break-all}
@@ -137,7 +139,7 @@ figcaption code{font-size:.72rem;color:var(--eo-color-content-hinted);word-break
 
   <h2>One per inspection station</h2>
   <p class="lede">Each of the ten stations as its own embeddable page — dial, history across the three inspections, and the finding. Animated, self-contained, no JavaScript.</p>
-  <div class="grid tall">
+  <div class="grid station">
     ${data.inspection.stations
       .map((s) => {
         const id = 'station-' + String(s.n).padStart(2, '0');
@@ -487,6 +489,10 @@ const stationPage = (s, dates) => {
 };
 
 const STATION_CSS = `
+/* The card has to fill whatever height the embed is given. Without a height on
+   the root elements, min-height:100% resolves against auto and the card stops
+   at its content, leaving a white band under it inside the iframe. */
+html,body{height:100%}
 .st{position:relative;overflow:hidden;min-height:100%;padding:0;
   border-top:3px solid var(--eo-color-border-hinted)}
 .st.good{border-top-color:var(--eo-color-border-utility-positive)}
@@ -503,13 +509,13 @@ const STATION_CSS = `
    embed stretched the history SVG (and with it its type) to three times the
    size of the dial next to it. */
 .st-in{position:relative;z-index:1;padding:var(--eo-dimension-padding-block-large);
-  display:flex;flex-direction:column;gap:var(--eo-dimension-gap-default);
+  display:flex;flex-direction:column;gap:var(--eo-dimension-gap-small);
   min-height:100%;max-width:760px}
 .st-name{margin:0;font-family:var(--eo-typography-headline-400-font-family);
   font-size:var(--eo-typography-headline-400-font-size);line-height:1.1;
   letter-spacing:-.01em;text-wrap:balance}
 .st-viz{display:flex;align-items:center;gap:var(--eo-dimension-gap-largest);
-  flex-wrap:wrap;margin:var(--eo-dimension-8) 0}
+  flex-wrap:wrap;margin:0}
 .dial{width:190px;max-width:46%;flex:0 0 auto}
 .hist{width:240px;max-width:52%;flex:0 0 auto}
 

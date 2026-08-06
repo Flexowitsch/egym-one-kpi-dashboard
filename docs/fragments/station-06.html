@@ -31,6 +31,10 @@ svg{display:block;max-width:100%;height:auto}
 .row .t{color:var(--eo-color-content-emphasized)}
 .row .w{margin-left:auto;color:var(--eo-color-content-hinted);white-space:nowrap}
 
+/* The card has to fill whatever height the embed is given. Without a height on
+   the root elements, min-height:100% resolves against auto and the card stops
+   at its content, leaving a white band under it inside the iframe. */
+html,body{height:100%}
 .st{position:relative;overflow:hidden;min-height:100%;padding:0;
   border-top:3px solid var(--eo-color-border-hinted)}
 .st.good{border-top-color:var(--eo-color-border-utility-positive)}
@@ -47,13 +51,13 @@ svg{display:block;max-width:100%;height:auto}
    embed stretched the history SVG (and with it its type) to three times the
    size of the dial next to it. */
 .st-in{position:relative;z-index:1;padding:var(--eo-dimension-padding-block-large);
-  display:flex;flex-direction:column;gap:var(--eo-dimension-gap-default);
+  display:flex;flex-direction:column;gap:var(--eo-dimension-gap-small);
   min-height:100%;max-width:760px}
 .st-name{margin:0;font-family:var(--eo-typography-headline-400-font-family);
   font-size:var(--eo-typography-headline-400-font-size);line-height:1.1;
   letter-spacing:-.01em;text-wrap:balance}
 .st-viz{display:flex;align-items:center;gap:var(--eo-dimension-gap-largest);
-  flex-wrap:wrap;margin:var(--eo-dimension-8) 0}
+  flex-wrap:wrap;margin:0}
 .dial{width:190px;max-width:46%;flex:0 0 auto}
 .hist{width:240px;max-width:52%;flex:0 0 auto}
 
