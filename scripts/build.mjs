@@ -723,6 +723,12 @@ const html = `<!doctype html>
 
 mkdirSync(resolve(root, 'docs'), { recursive: true });
 writeFileSync(resolve(root, 'docs/index.html'), html);
+
+// Pages serves this folder directly from main. Without .nojekyll it runs the
+// site through Jekyll, whose default excludes drop `vendor/` — which is where
+// the entire vendored design system and token stylesheet live. The page would
+// deploy "successfully" and render unstyled.
+writeFileSync(resolve(root, 'docs/.nojekyll'), '');
 writeFileSync(resolve(root, 'docs/ds-kpi-data.json'), JSON.stringify(data, null, 2));
 console.log(
   `Built docs/index.html (${(html.length / 1024).toFixed(1)} KB) — ${TABS.length} tabs, inspection ${
