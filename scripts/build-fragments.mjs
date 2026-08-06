@@ -135,6 +135,20 @@ figcaption code{font-size:.72rem;color:var(--eo-color-content-hinted);word-break
       .join('')}
   </div>
 
+  <h2>One per inspection station</h2>
+  <p class="lede">Each of the ten stations as its own embeddable page — dial, history across the three inspections, and the finding. Animated, self-contained, no JavaScript.</p>
+  <div class="grid tall">
+    ${data.inspection.stations
+      .map((s) => {
+        const id = 'station-' + String(s.n).padStart(2, '0');
+        return `<figure class="cell">
+          <iframe src="./${id}.html" title="${esc(s.name)}" loading="lazy"></iframe>
+          <figcaption><code>${BASE}/${id}.html</code></figcaption>
+        </figure>`;
+      })
+      .join('')}
+  </div>
+
   <h2>Ready — design side</h2>
   <div class="grid">${fragments.items.filter((f) => f.tone === 'good').map(card).join('')}</div>
 
