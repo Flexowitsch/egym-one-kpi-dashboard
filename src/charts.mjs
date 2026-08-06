@@ -176,52 +176,44 @@ export function splitMatrix(dimensions) {
   </div>`;
 }
 
-/* ----------------------------------------------------------- slope chart ---
-   How each station moved between the last two full inspections. Flat lines are
-   the point: most stations did not move. */
-export function slope(stations, { width = 520, height = 300, labels = ['3 Aug', '5 Aug'] } = {}) {
-  const pad = { t: 26, b: 26, l: 116, r: 116 };
-  const usable = height - pad.t - pad.b;
-  const y = (v) => pad.t + usable - (v / 10) * usable;
-  const x1 = pad.l;
-  const x2 = width - pad.r;
-
+/* ----------------------------------------------------------- change list ---
+   Replaces a slope chart. With ten stations on a 0-10 integer scale, slope
+   lines collide constantly and their labels stack independently of where the
+   lines land, so you cannot tell which series is which. A diverging bar per
+   station reads instantly and makes the real finding — that most stations did
+   not move — obvious rather than hidden behind crossing lines. */
+export function changeList(stations, { prevLabel = '3 Aug', nowLabel = '5 Aug' } = {}) {
   const rows = stations
-    .map((s) => {
-      const a = s.history?.[1];
-      const b = s.score;
-      if (a == null) return '';
-      const dir = b > a ? 'up' : b < a ? 'down' : 'flat';
-      return `<line class="sl ${dir}" x1="${x1}" y1="${r2(y(a))}" x2="${x2}" y2="${r2(y(b))}"/>
-        <circle class="sl-dot ${dir}" cx="${x1}" cy="${r2(y(a))}" r="3"/>
-        <circle class="sl-dot ${dir}" cx="${x2}" cy="${r2(y(b))}" r="3"/>`;
-    })
-    .join('');
+    .map((s) => ({ ...s, prev: s.history?.[1] }))
+    .filter((s) => s.prev != null)
+    .map((s) => ({ ...s, delta: s.score - s.prev }))
+    .sort((a, b) => b.delta - a.delta || a.n - b.n);
 
-  // label each end, nudged apart where scores collide
-  const stack = (col) => {
-    const seen = {};
-    return stations
-      .map((s) => {
-        const v = col === 0 ? s.history?.[1] : s.score;
-        if (v == null) return '';
-        seen[v] = (seen[v] || 0) + 1;
-        const off = (seen[v] - 1) * 12;
-        const tx = col === 0 ? x1 - 10 : x2 + 10;
-        const anchor = col === 0 ? 'end' : 'start';
-        return `<text class="c-label" x="${tx}" y="${r2(y(v) + off)}" text-anchor="${anchor}" dominant-baseline="middle">${esc(
-          s.name
-        )} ${v}</text>`;
+  const maxAbs = Math.max(1, ...rows.map((r) => Math.abs(r.delta)));
+
+  return `<div class="changes">
+    <div class="change-head"><span></span><span>${esc(prevLabel)}</span><span></span><span>${esc(nowLabel)}</span></div>
+    ${rows
+      .map((r) => {
+        const dir = r.delta > 0 ? 'up' : r.delta < 0 ? 'down' : 'flat';
+        const w = (Math.abs(r.delta) / maxAbs) * 50;
+        const bar =
+          r.delta === 0
+            ? `<span class="d-zero"></span>`
+            : `<span class="d-bar ${dir}" style="width:${r2(w)}%;${
+                r.delta > 0 ? 'left:50%' : `right:50%`
+              }"></span>`;
+        return `<div class="change-row">
+          <span class="c-name">${esc(r.name)}</span>
+          <span class="c-prev">${r.prev}</span>
+          <span class="c-track"><span class="c-mid"></span>${bar}</span>
+          <span class="c-now ${dir}">${r.score}${
+            r.delta !== 0 ? ` <b>${r.delta > 0 ? '+' : ''}${r.delta}</b>` : ''
+          }</span>
+        </div>`;
       })
-      .join('');
-  };
-
-  return `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img"
-    aria-label="Slope chart of station scores between the last two inspections.">
-    <text class="c-label" x="${x1}" y="14" text-anchor="middle">${esc(labels[0])}</text>
-    <text class="c-label" x="${x2}" y="14" text-anchor="middle">${esc(labels[1])}</text>
-    ${rows}${stack(0)}${stack(1)}
-  </svg>`;
+      .join('')}
+  </div>`;
 }
 
 /* ------------------------------------------------------- stacked pipeline ---

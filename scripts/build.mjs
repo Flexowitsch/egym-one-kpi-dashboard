@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { radar, donut, trend, stationBars, splitMatrix, slope, pipeline } from '../src/charts.mjs';
+import { radar, donut, trend, stationBars, splitMatrix, changeList, pipeline } from '../src/charts.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const data = JSON.parse(readFileSync(resolve(root, 'ds-kpi-data.json'), 'utf8'));
@@ -36,11 +36,11 @@ const countAttrs = (v) => {
   return ` data-count="${m[1]}" data-tpl="__${esc(m[2])}"`;
 };
 const stat = (v, k, t = '', tone = '', small = false) =>
-  `<eo-card class="stat ${tone}"><div class="stat-in"><div class="v ${
+  `<div class="stat ${tone}"><div class="stat-in"><div class="v ${
     small ? 'small' : ''
   }"${countAttrs(v)}>${esc(v)}</div><p class="k">${esc(k)}</p>${
     t ? `<p class="t">${esc(t)}</p>` : ''
-  }</div></eo-card>`;
+  }</div></div>`;
 const facts = (rows) =>
   `<ul class="facts">${rows
     .map(([k, v, tone = '']) => `<li><span class="k">${esc(k)}</span><span class="v ${tone}">${esc(v)}</span></li>`)
@@ -180,9 +180,9 @@ const overview = `
 </section>
 
 <section class="band tight">
-  ${bandHead('Progress', 'What actually moved', 'Station scores between the last two full inspections. Flat lines are the finding — most stations did not move.')}
+  ${bandHead('Progress', 'What actually moved', 'Station scores between the last two full inspections. Six of ten did not move at all — that is the finding, not the exceptions.')}
   <div class="bento">
-    ${tile('span-7', slope(inspection?.stations ?? []))}
+    ${tile('span-7', changeList(inspection?.stations ?? []))}
     ${tile(
       'span-5',
       `<p class="eyebrow">Component pipeline</p>

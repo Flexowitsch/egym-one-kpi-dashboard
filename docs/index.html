@@ -20,6 +20,14 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+:root {
+  /* Fluid gutter and a single easing curve, both borrowed from the rental-page
+     build. The token system has no motion-easing or layout-gutter token, so
+     these are the two literals in this file — everything else resolves to --eo-*. */
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 html { background: var(--eo-color-surface-subtle); scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
@@ -33,7 +41,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-.shell { max-width: 1180px; margin: 0 auto; padding: 0 var(--eo-dimension-24); }
+.shell { max-width: 1200px; margin: 0 auto; padding: 0 var(--gutter); }
 
 /* ===========================================================================
    NAV — minimal, sticky, tabs live here
@@ -45,7 +53,7 @@ body {
 }
 .nav-inner {
   max-width: 1180px; margin: 0 auto;
-  padding: var(--eo-dimension-16) var(--eo-dimension-24);
+  padding: var(--eo-dimension-16) var(--gutter);
   display: flex; align-items: center; gap: var(--eo-dimension-24); flex-wrap: wrap;
 }
 .wordmark {
@@ -81,8 +89,8 @@ body {
 .panel { display: none; }
 .panel.is-active { display: block; }
 
-.band { padding: var(--eo-dimension-64) 0; }
-.band.tight { padding: var(--eo-dimension-40) 0; }
+.band { padding: clamp(3.5rem, 8vw, 7rem) 0; }
+.band.tight { padding: clamp(2rem, 4vw, 3.5rem) 0; }
 
 .band-head { text-align: center; max-width: 62ch; margin: 0 auto var(--eo-dimension-40); }
 .band-head .eyebrow { margin-bottom: var(--eo-dimension-8); }
@@ -117,7 +125,7 @@ body {
 /* ===========================================================================
    HERO
    =========================================================================== */
-.hero { text-align: center; padding: var(--eo-dimension-64) 0 var(--eo-dimension-40); }
+.hero { text-align: center; padding: clamp(4rem, 10vw, 8rem) 0 clamp(2rem, 5vw, 4rem); }
 .hero h1 {
   margin: var(--eo-dimension-16) 0 0;
   font-family: var(--eo-typography-headline-700-font-family);
@@ -139,9 +147,9 @@ body {
 }
 .score-hero .n {
   font-family: var(--eo-typography-headline-800-font-family);
-  font-size: clamp(4rem, 14vw, 9rem);
-  line-height: 0.85;
-  letter-spacing: -0.03em;
+  font-size: clamp(5rem, 18vw, 12rem);
+  line-height: 0.82;
+  letter-spacing: -0.045em;
   font-variant-numeric: tabular-nums;
 }
 .score-hero .d {
@@ -160,9 +168,19 @@ body {
 /* ===========================================================================
    STAT ROW — the "20k / 700k / 2.2m / 4.8" treatment
    =========================================================================== */
-.stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--eo-dimension-16); }
+.stat-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0;
+  border-top: 1px solid var(--eo-color-border-subtle);
+  border-bottom: 1px solid var(--eo-color-border-subtle);
+}
+/* hairline between stats rather than five separate boxes */
+.stat-row > * + * { border-left: 1px solid var(--eo-color-border-subtle); }
+@media (max-width: 720px) {
+  .stat-row > * + * { border-left: 0; border-top: 1px solid var(--eo-color-border-subtle); }
+}
 /* eo-card paints the surface and radius; this only lays out its slotted content */
-.stat-in { padding: var(--eo-dimension-24) var(--eo-dimension-20); text-align: center; }
+.stat-in { padding: clamp(1.5rem, 3vw, 2.5rem) var(--eo-dimension-20); text-align: center; }
 .stat { display: block; }
 .stat-in .v {
   font-family: var(--eo-typography-headline-500-font-family);
@@ -424,6 +442,39 @@ eo-card > * { width: 100%; }
 }
 .openlist b { color: var(--eo-color-content-emphasized); }
 .openlist span { color: var(--eo-color-content-subtle); }
+
+/* ---------- change list (replaces the slope chart) ---------- */
+.changes { display: grid; gap: var(--eo-dimension-4); }
+.change-head, .change-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1.4fr) 2rem 1fr 3.5rem;
+  gap: var(--eo-dimension-12); align-items: center;
+}
+.change-head span {
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--eo-color-content-hinted);
+}
+.change-head span:nth-child(2) { text-align: center; }
+.change-head span:nth-child(4) { text-align: right; }
+.change-row { padding: var(--eo-dimension-4) 0; font-size: var(--eo-typography-body-50-font-size); }
+.c-name { color: var(--eo-color-content-subtle); overflow-wrap: break-word; }
+.c-prev { text-align: center; color: var(--eo-color-content-hinted); font-variant-numeric: tabular-nums; }
+.c-track { position: relative; height: var(--eo-dimension-12); }
+.c-mid { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--eo-color-border-hinted); }
+.d-bar { position: absolute; top: 2px; bottom: 2px; border-radius: var(--eo-dimension-border-radius-small); }
+.d-bar.up { background: var(--eo-color-surface-utility-positive); }
+.d-bar.down { background: var(--eo-color-surface-utility-negative); }
+.d-zero {
+  position: absolute; left: calc(50% - 3px); top: 50%; transform: translateY(-50%);
+  width: 6px; height: 6px; border-radius: var(--eo-dimension-border-radius-round);
+  background: var(--eo-color-border-hinted);
+}
+.c-now { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.c-now.up b { color: var(--eo-color-content-utility-positive); }
+.c-now.down b { color: var(--eo-color-content-utility-negative); }
+.c-now.flat { color: var(--eo-color-content-hinted); font-weight: 400; }
 </style>
 </head>
 <body>
@@ -469,11 +520,11 @@ eo-card > * { width: 100%; }
 
 <section class="band tight">
   <div class="stat-row">
-    <eo-card class="stat bad"><div class="stat-in"><div class="v " data-count="41" data-tpl="__%">41%</div><p class="k">Core coverage in code</p><p class="t">15 of 37</p></div></eo-card>
-    <eo-card class="stat bad"><div class="stat-in"><div class="v " data-count="25" data-tpl="__">25</div><p class="k">Ready for development</p><p class="t">24 unassigned</p></div></eo-card>
-    <eo-card class="stat bad"><div class="stat-in"><div class="v " data-count="100" data-tpl="__d">100d</div><p class="k">Median open PR age</p><p class="t">13 open</p></div></eo-card>
-    <eo-card class="stat good"><div class="stat-in"><div class="v " data-count="19" data-tpl="__">19</div><p class="k">Community PRs merged</p><p class="t">9 contributors</p></div></eo-card>
-    <eo-card class="stat good"><div class="stat-in"><div class="v " data-count="3" data-tpl="__d">3d</div><p class="k">Median time to merge</p><p class="t">when review happens</p></div></eo-card>
+    <div class="stat bad"><div class="stat-in"><div class="v " data-count="41" data-tpl="__%">41%</div><p class="k">Core coverage in code</p><p class="t">15 of 37</p></div></div>
+    <div class="stat bad"><div class="stat-in"><div class="v " data-count="25" data-tpl="__">25</div><p class="k">Ready for development</p><p class="t">24 unassigned</p></div></div>
+    <div class="stat bad"><div class="stat-in"><div class="v " data-count="100" data-tpl="__d">100d</div><p class="k">Median open PR age</p><p class="t">13 open</p></div></div>
+    <div class="stat good"><div class="stat-in"><div class="v " data-count="19" data-tpl="__">19</div><p class="k">Community PRs merged</p><p class="t">9 contributors</p></div></div>
+    <div class="stat good"><div class="stat-in"><div class="v " data-count="3" data-tpl="__d">3d</div><p class="k">Median time to merge</p><p class="t">when review happens</p></div></div>
   </div>
 </section>
 
@@ -703,34 +754,62 @@ eo-card > * { width: 100%; }
 </section>
 
 <section class="band tight">
-  <div class="band-head"><p class="eyebrow">Progress</p><h2>What actually moved</h2><p>Station scores between the last two full inspections. Flat lines are the finding — most stations did not move.</p></div>
+  <div class="band-head"><p class="eyebrow">Progress</p><h2>What actually moved</h2><p>Station scores between the last two full inspections. Six of ten did not move at all — that is the finding, not the exceptions.</p></div>
   <div class="bento">
-    <eo-card class="tile span-7"><div class="tile-in"><svg class="chart" viewBox="0 0 520 300" role="img"
-    aria-label="Slope chart of station scores between the last two inspections.">
-    <text class="c-label" x="116" y="14" text-anchor="middle">3 Aug</text>
-    <text class="c-label" x="404" y="14" text-anchor="middle">5 Aug</text>
-    <line class="sl flat" x1="116" y1="199.6" x2="404" y2="199.6"/>
-        <circle class="sl-dot flat" cx="116" cy="199.6" r="3"/>
-        <circle class="sl-dot flat" cx="404" cy="199.6" r="3"/><line class="sl flat" x1="116" y1="100.4" x2="404" y2="100.4"/>
-        <circle class="sl-dot flat" cx="116" cy="100.4" r="3"/>
-        <circle class="sl-dot flat" cx="404" cy="100.4" r="3"/><line class="sl flat" x1="116" y1="150" x2="404" y2="150"/>
-        <circle class="sl-dot flat" cx="116" cy="150" r="3"/>
-        <circle class="sl-dot flat" cx="404" cy="150" r="3"/><line class="sl up" x1="116" y1="125.2" x2="404" y2="100.4"/>
-        <circle class="sl-dot up" cx="116" cy="125.2" r="3"/>
-        <circle class="sl-dot up" cx="404" cy="100.4" r="3"/><line class="sl down" x1="116" y1="150" x2="404" y2="174.8"/>
-        <circle class="sl-dot down" cx="116" cy="150" r="3"/>
-        <circle class="sl-dot down" cx="404" cy="174.8" r="3"/><line class="sl flat" x1="116" y1="150" x2="404" y2="150"/>
-        <circle class="sl-dot flat" cx="116" cy="150" r="3"/>
-        <circle class="sl-dot flat" cx="404" cy="150" r="3"/><line class="sl up" x1="116" y1="174.8" x2="404" y2="125.2"/>
-        <circle class="sl-dot up" cx="116" cy="174.8" r="3"/>
-        <circle class="sl-dot up" cx="404" cy="125.2" r="3"/><line class="sl up" x1="116" y1="199.6" x2="404" y2="150"/>
-        <circle class="sl-dot up" cx="116" cy="199.6" r="3"/>
-        <circle class="sl-dot up" cx="404" cy="150" r="3"/><line class="sl flat" x1="116" y1="150" x2="404" y2="150"/>
-        <circle class="sl-dot flat" cx="116" cy="150" r="3"/>
-        <circle class="sl-dot flat" cx="404" cy="150" r="3"/><line class="sl flat" x1="116" y1="174.8" x2="404" y2="174.8"/>
-        <circle class="sl-dot flat" cx="116" cy="174.8" r="3"/>
-        <circle class="sl-dot flat" cx="404" cy="174.8" r="3"/><text class="c-label" x="106" y="199.6" text-anchor="end" dominant-baseline="middle">Coverage &amp; gaps 3</text><text class="c-label" x="106" y="100.4" text-anchor="end" dominant-baseline="middle">Best practices 7</text><text class="c-label" x="106" y="150" text-anchor="end" dominant-baseline="middle">Accessibility 5</text><text class="c-label" x="106" y="125.2" text-anchor="end" dominant-baseline="middle">Shared language 6</text><text class="c-label" x="106" y="162" text-anchor="end" dominant-baseline="middle">Testing &amp; validation 5</text><text class="c-label" x="106" y="174" text-anchor="end" dominant-baseline="middle">Orchestration 5</text><text class="c-label" x="106" y="174.8" text-anchor="end" dominant-baseline="middle">Governance 4</text><text class="c-label" x="106" y="211.6" text-anchor="end" dominant-baseline="middle">Feedback &amp; adoption 3</text><text class="c-label" x="106" y="186" text-anchor="end" dominant-baseline="middle">Machine-readable docs 5</text><text class="c-label" x="106" y="186.8" text-anchor="end" dominant-baseline="middle">Agent access 4</text><text class="c-label" x="414" y="199.6" text-anchor="start" dominant-baseline="middle">Coverage &amp; gaps 3</text><text class="c-label" x="414" y="100.4" text-anchor="start" dominant-baseline="middle">Best practices 7</text><text class="c-label" x="414" y="150" text-anchor="start" dominant-baseline="middle">Accessibility 5</text><text class="c-label" x="414" y="112.4" text-anchor="start" dominant-baseline="middle">Shared language 7</text><text class="c-label" x="414" y="174.8" text-anchor="start" dominant-baseline="middle">Testing &amp; validation 4</text><text class="c-label" x="414" y="162" text-anchor="start" dominant-baseline="middle">Orchestration 5</text><text class="c-label" x="414" y="125.2" text-anchor="start" dominant-baseline="middle">Governance 6</text><text class="c-label" x="414" y="174" text-anchor="start" dominant-baseline="middle">Feedback &amp; adoption 5</text><text class="c-label" x="414" y="186" text-anchor="start" dominant-baseline="middle">Machine-readable docs 5</text><text class="c-label" x="414" y="186.8" text-anchor="start" dominant-baseline="middle">Agent access 4</text>
-  </svg></div></eo-card>
+    <eo-card class="tile span-7"><div class="tile-in"><div class="changes">
+    <div class="change-head"><span></span><span>3 Aug</span><span></span><span>5 Aug</span></div>
+    <div class="change-row">
+          <span class="c-name">Governance</span>
+          <span class="c-prev">4</span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar up" style="width:50%;left:50%"></span></span>
+          <span class="c-now up">6 <b>+2</b></span>
+        </div><div class="change-row">
+          <span class="c-name">Feedback &amp; adoption</span>
+          <span class="c-prev">3</span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar up" style="width:50%;left:50%"></span></span>
+          <span class="c-now up">5 <b>+2</b></span>
+        </div><div class="change-row">
+          <span class="c-name">Shared language</span>
+          <span class="c-prev">6</span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar up" style="width:25%;left:50%"></span></span>
+          <span class="c-now up">7 <b>+1</b></span>
+        </div><div class="change-row">
+          <span class="c-name">Coverage &amp; gaps</span>
+          <span class="c-prev">3</span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-zero"></span></span>
+          <span class="c-now flat">3</span>
+        </div><div class="change-row">
+          <span class="c-name">Best practices</span>
+          <span class="c-prev">7</span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-zero"></span></span>
+          <span class="c-now flat">7</span>
+        </div><div class="change-row">
+          <span class="c-name">Accessibility</span>
+          <span class="c-prev">5</span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-zero"></span></span>
+          <span class="c-now flat">5</span>
+        </div><div class="change-row">
+          <span class="c-name">Orchestration</span>
+          <span class="c-prev">5</span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-zero"></span></span>
+          <span class="c-now flat">5</span>
+        </div><div class="change-row">
+          <span class="c-name">Machine-readable docs</span>
+          <span class="c-prev">5</span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-zero"></span></span>
+          <span class="c-now flat">5</span>
+        </div><div class="change-row">
+          <span class="c-name">Agent access</span>
+          <span class="c-prev">4</span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-zero"></span></span>
+          <span class="c-now flat">4</span>
+        </div><div class="change-row">
+          <span class="c-name">Testing &amp; validation</span>
+          <span class="c-prev">5</span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar down" style="width:25%;right:50%"></span></span>
+          <span class="c-now down">4 <b>-1</b></span>
+        </div>
+  </div></div></eo-card>
     <eo-card class="tile span-5"><div class="tile-in"><p class="eyebrow">Component pipeline</p>
        <h3>18 of 37 not started</h3>
        <svg class="chart" viewBox="0 0 520 40" role="img"
@@ -772,10 +851,10 @@ eo-card > * { width: 100%; }
 <section class="band">
   <div class="band-head"><p class="eyebrow">Stations 02 · 03 · 05</p><h2>Practices, accessibility and testing</h2><p>Craft is good where it is enforced, and drifts where nothing checks it.</p></div>
   <div class="stat-row">
-    <eo-card class="stat warn"><div class="stat-in"><div class="v " data-count="7" data-tpl="__">7</div><p class="k">Best practices</p><p class="t">of 10</p></div></eo-card>
-    <eo-card class="stat warn"><div class="stat-in"><div class="v " data-count="5" data-tpl="__">5</div><p class="k">Accessibility</p><p class="t">of 10</p></div></eo-card>
-    <eo-card class="stat bad"><div class="stat-in"><div class="v " data-count="4" data-tpl="__">4</div><p class="k">Testing &amp; validation</p><p class="t">of 10</p></div></eo-card>
-    <eo-card class="stat warn"><div class="stat-in"><div class="v " data-count="7" data-tpl="__">7</div><p class="k">Shared language</p><p class="t">of 10</p></div></eo-card>
+    <div class="stat warn"><div class="stat-in"><div class="v " data-count="7" data-tpl="__">7</div><p class="k">Best practices</p><p class="t">of 10</p></div></div>
+    <div class="stat warn"><div class="stat-in"><div class="v " data-count="5" data-tpl="__">5</div><p class="k">Accessibility</p><p class="t">of 10</p></div></div>
+    <div class="stat bad"><div class="stat-in"><div class="v " data-count="4" data-tpl="__">4</div><p class="k">Testing &amp; validation</p><p class="t">of 10</p></div></div>
+    <div class="stat warn"><div class="stat-in"><div class="v " data-count="7" data-tpl="__">7</div><p class="k">Shared language</p><p class="t">of 10</p></div></div>
   </div>
 </section>
 
@@ -922,10 +1001,10 @@ eo-card > * { width: 100%; }
 <section class="band">
   <div class="band-head"><p class="eyebrow">Stations 06 · 07 · 09 · 10</p><h2>Governance, orchestration and agent readiness</h2><p>The written governance is good. Most of it is invisible from where engineers work.</p></div>
   <div class="stat-row">
-    <eo-card class="stat warn"><div class="stat-in"><div class="v " data-count="6" data-tpl="__">6</div><p class="k">Governance</p><p class="t">of 10</p></div></eo-card>
-    <eo-card class="stat warn"><div class="stat-in"><div class="v " data-count="5" data-tpl="__">5</div><p class="k">Orchestration</p><p class="t">→ 6 if promoted</p></div></eo-card>
-    <eo-card class="stat warn"><div class="stat-in"><div class="v " data-count="5" data-tpl="__">5</div><p class="k">Machine-readable docs</p><p class="t">→ 8 if promoted</p></div></eo-card>
-    <eo-card class="stat bad"><div class="stat-in"><div class="v " data-count="4" data-tpl="__">4</div><p class="k">Agent access</p><p class="t">→ 6 if promoted</p></div></eo-card>
+    <div class="stat warn"><div class="stat-in"><div class="v " data-count="6" data-tpl="__">6</div><p class="k">Governance</p><p class="t">of 10</p></div></div>
+    <div class="stat warn"><div class="stat-in"><div class="v " data-count="5" data-tpl="__">5</div><p class="k">Orchestration</p><p class="t">→ 6 if promoted</p></div></div>
+    <div class="stat warn"><div class="stat-in"><div class="v " data-count="5" data-tpl="__">5</div><p class="k">Machine-readable docs</p><p class="t">→ 8 if promoted</p></div></div>
+    <div class="stat bad"><div class="stat-in"><div class="v " data-count="4" data-tpl="__">4</div><p class="k">Agent access</p><p class="t">→ 6 if promoted</p></div></div>
   </div>
 </section>
 
@@ -969,7 +1048,7 @@ eo-card > * { width: 100%; }
 <section class="band tight">
   <div class="band-head"><p class="eyebrow">Targets</p><h2>How we would know it worked</h2></div>
   <div class="stat-row">
-    <eo-card class="stat bad"><div class="stat-in"><div class="v " data-count="43" data-tpl="__">43</div><p class="k">Core coverage in code</p><p class="t">→ 100 · 37/37</p></div></eo-card><eo-card class="stat bad"><div class="stat-in"><div class="v " data-count="25" data-tpl="__">25</div><p class="k">Jira queue &#39;Ready for Development&#39;</p><p class="t">→ 0</p></div></eo-card><eo-card class="stat "><div class="stat-in"><div class="v small">&gt;100</div><p class="k">P90 time-to-merge (incl. community PRs)</p><p class="t">→ &lt;14</p></div></eo-card><eo-card class="stat "><div class="stat-in"><div class="v " data-count="0" data-tpl="__">0</div><p class="k">Tagged, versioned releases</p><p class="t">→ every release</p></div></eo-card><eo-card class="stat "><div class="stat-in"><div class="v small">—</div><p class="k">New BMA features built from DS components</p><p class="t">→ 100</p></div></eo-card>
+    <div class="stat bad"><div class="stat-in"><div class="v " data-count="43" data-tpl="__">43</div><p class="k">Core coverage in code</p><p class="t">→ 100 · 37/37</p></div></div><div class="stat bad"><div class="stat-in"><div class="v " data-count="25" data-tpl="__">25</div><p class="k">Jira queue &#39;Ready for Development&#39;</p><p class="t">→ 0</p></div></div><div class="stat "><div class="stat-in"><div class="v small">&gt;100</div><p class="k">P90 time-to-merge (incl. community PRs)</p><p class="t">→ &lt;14</p></div></div><div class="stat "><div class="stat-in"><div class="v " data-count="0" data-tpl="__">0</div><p class="k">Tagged, versioned releases</p><p class="t">→ every release</p></div></div><div class="stat "><div class="stat-in"><div class="v small">—</div><p class="k">New BMA features built from DS components</p><p class="t">→ 100</p></div></div>
   </div>
 </section></div>
 </main>

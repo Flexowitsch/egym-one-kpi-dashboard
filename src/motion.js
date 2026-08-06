@@ -24,6 +24,13 @@ const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => Array.from(c.querySelectorAll(s));
 const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+// One easing curve for the whole page, matching --ease-out in the stylesheet.
+// Registered as a named GSAP ease so every tween below reads the same.
+gsap.registerEase('siteOut', (p) => {
+  // cubic-bezier(0.22, 1, 0.36, 1) approximated for GSAP's 0..1 progress
+  return 1 - Math.pow(1 - p, 3.2);
+});
+
 /* ------------------------------------------------------------- counters --- */
 // data-count holds the target; data-tpl holds the surrounding text with __ as
 // the placeholder, so "100d" and "41%" animate without losing their unit.
@@ -79,6 +86,7 @@ function drawCharts() {
   ];
   grows.forEach((el) => {
     const to = el.style.width || '0%';
+    el.dataset.w = to;
     if (reduce) return;
     gsap.fromTo(
       el,
@@ -86,7 +94,7 @@ function drawCharts() {
       {
         width: to,
         duration: 0.9,
-        ease: 'power3.out',
+        ease: 'siteOut',
         scrollTrigger: { trigger: el.closest('eo-card, .tile, .sbars') || el, start: 'top 88%', once: true },
       }
     );
@@ -119,24 +127,29 @@ function drawCharts() {
     });
     gsap.set(shape, { transformOrigin: '50% 50%' });
     gsap.set(dots, { opacity: 0, transformOrigin: '50% 50%' });
-    tl.fromTo(shape, { scale: 0.05, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.1, ease: 'power3.out' })
+    tl.fromTo(shape, { scale: 0.05, opacity: 0 }, { scale: 1, opacity: 1, duration: 1.1, ease: 'siteOut' })
       .fromTo(dots, { scale: 0 }, { scale: 1, opacity: 1, duration: 0.4, stagger: 0.04, ease: 'back.out(2)' }, '-=0.55');
   });
 
-  // Slope lines draw left to right, so the eye follows the direction of change.
-  $$('svg .sl').forEach((line, i) => {
+  // Change bars grow out from the centre line, so the direction of each move is
+  // what the eye picks up first. Stations that did not move get their dot
+  // popped in, because "no change" is the finding here.
+  $$('.d-bar').forEach((bar, i) => {
+    const to = bar.style.width;
+    bar.dataset.w = to;
     if (reduce) return;
-    const len = 600;
-    gsap.set(line, { strokeDasharray: len, strokeDashoffset: len });
-    gsap.to(line, {
-      strokeDashoffset: 0,
-      duration: 0.9,
-      ease: 'power2.inOut',
-      delay: i * 0.05,
-      scrollTrigger: { trigger: line.closest('eo-card') || line, start: 'top 82%', once: true },
+    gsap.fromTo(bar, { width: 0 }, {
+      width: to, duration: 0.6, ease: 'siteOut', delay: i * 0.06,
+      scrollTrigger: { trigger: bar.closest('eo-card') || bar, start: 'top 85%', once: true },
     });
   });
-
+  $$('.d-zero').forEach((d, i) => {
+    if (reduce) return;
+    gsap.fromTo(d, { scale: 0 }, {
+      scale: 1, duration: 0.35, delay: i * 0.04, ease: 'back.out(2)',
+      scrollTrigger: { trigger: d.closest('eo-card') || d, start: 'top 85%', once: true },
+    });
+  });
   // Pipeline segments wipe in left to right, in pipeline order.
   $$('svg .pipe').forEach((rect, i) => {
     if (reduce) return;
@@ -147,7 +160,7 @@ function drawCharts() {
       {
         attr: { width: w },
         duration: 0.7,
-        ease: 'power3.out',
+        ease: 'siteOut',
         delay: i * 0.09,
         scrollTrigger: { trigger: rect.closest('eo-card') || rect, start: 'top 85%', once: true },
       }
@@ -190,7 +203,7 @@ function reveals() {
     gsap.fromTo(
       el,
       { opacity: 0, y: 22 },
-      { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } }
+      { opacity: 1, y: 0, duration: 0.8, ease: 'siteOut', scrollTrigger: { trigger: el, start: 'top 88%', once: true } }
     );
   });
   // Cards rise together per row rather than one long chain down the page.
@@ -205,7 +218,7 @@ function reveals() {
         y: 0,
         duration: 0.75,
         stagger: 0.07,
-        ease: 'power3.out',
+        ease: 'siteOut',
         scrollTrigger: { trigger: group, start: 'top 88%', once: true },
       }
     );
@@ -218,11 +231,11 @@ function hero() {
   if (score) countUp(score, '.hero');
   if (reduce) return;
   gsap
-    .timeline({ defaults: { ease: 'power3.out' } })
+    .timeline({ defaults: { ease: 'siteOut' } })
     .fromTo('.hero .eyebrow', { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.6 })
     .fromTo('.hero h1', { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.85 }, '-=0.35')
     .fromTo('.hero .standfirst', { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.7 }, '-=0.55')
-    .fromTo('.score-hero', { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.9, ease: 'power4.out' }, '-=0.45')
+    .fromTo('.score-hero', { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.9, ease: 'siteOut' }, '-=0.45')
     .fromTo('.score-sub', { opacity: 0 }, { opacity: 1, duration: 0.5 }, '-=0.35')
     .fromTo('.pill-row > *', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, stagger: 0.06 }, '-=0.3');
 }
@@ -235,6 +248,37 @@ window.__dashTabIn = (panel) => {
   ScrollTrigger.refresh();
 };
 
+/* -------------------------------------------------------------- failsafe ---
+   Nothing here may leave content invisible. Reveals work by tweening from
+   opacity 0, so if GSAP never ticks — a backgrounded tab throttling rAF, a
+   blocked bundle, a thrown error mid-timeline — the dashboard would render
+   blank. For a page management opens every morning that is the worst possible
+   failure, and it is silent.
+
+   So: a few seconds after load, anything still fully transparent that should
+   be visible gets forced back. Costs nothing when the animation works. */
+function failsafe() {
+  const SELECTOR = '.band-head, .bento > eo-card, .stat-row > eo-card, .tile, .stat, .panel, .hero > *';
+  const clear = () => {
+    $$(SELECTOR).forEach((el) => {
+      if (el.closest('.panel[hidden]')) return; // genuinely hidden tabs stay hidden
+      const cs = getComputedStyle(el);
+      if (parseFloat(cs.opacity) < 0.05) {
+        gsap.set(el, { clearProps: 'opacity,transform,y,scale' });
+        el.style.opacity = '';
+        el.style.transform = '';
+      }
+    });
+    // charts too — a zero-width bar reads as a real zero, which is a lie
+    $$('.d-bar, .bar-track > span, .meter > span, .sbar .track > span').forEach((el) => {
+      if (el.getBoundingClientRect().width < 0.5 && el.dataset.w) el.style.width = el.dataset.w;
+    });
+  };
+  setTimeout(clear, 3500);
+  // and again once everything has settled, in case a late refresh re-hid things
+  window.addEventListener('load', () => setTimeout(clear, 1500));
+}
+
 /* ------------------------------------------------------------------ init --- */
 function init() {
   $$('[data-count]').forEach((el) => countUp(el, el.closest('eo-card') || el));
@@ -242,6 +286,7 @@ function init() {
   matrixReveal();
   reveals();
   hero();
+  failsafe();
   // Charts and web components settle after fonts and custom elements upgrade.
   window.addEventListener('load', () => ScrollTrigger.refresh());
   if (document.fonts?.ready) document.fonts.ready.then(() => ScrollTrigger.refresh());
