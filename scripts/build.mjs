@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { radar, donut, trend, stationBars, splitMatrix, changeList, pipeline } from '../src/charts.mjs';
+import { radar, donut, trend, stationBars, splitMatrix, changeList, pipeline, cascadeField } from '../src/charts.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const data = JSON.parse(readFileSync(resolve(root, 'ds-kpi-data.json'), 'utf8'));
@@ -84,6 +84,7 @@ const dimN = designVsCode ? designVsCode.dimensions.length : 0;
 /* ══════════════════════════════════════════════════════════════ OVERVIEW ═══ */
 const overview = `
 <section class="hero">
+  <div class="cascade-wrap">${cascadeField()}</div>
   <p class="eyebrow">Design system health · inspection ${esc(inspection?.date ?? meta.asOf)}</p>
   <h1>The state of EGYM One,<br>on one screen</h1>
   <p class="standfirst">One number for the system, ten stations behind it, and the delivery data that explains why it sits where it does.</p>
@@ -580,7 +581,10 @@ const html = `<!doctype html>
 
 <nav class="nav">
   <div class="nav-inner">
-    <div class="wordmark">EGYM<span>One</span></div>
+    <a class="wordmark" href="#overview" aria-label="EGYM One design system dashboard">
+      <span class="mark"><span class="e">E</span>GYM</span>
+      <span class="sub">One · Design System</span>
+    </a>
     <div class="tabs" role="tablist" aria-label="Dashboard sections">
       ${TABS.map(
         ([id, label], i) =>

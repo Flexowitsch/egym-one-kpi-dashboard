@@ -49,7 +49,8 @@ h1{font-family:var(--eo-typography-headline-500-font-family);font-size:var(--eo-
 h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-typography-headline-300-font-size);margin:var(--eo-dimension-40) 0 var(--eo-dimension-16)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--eo-dimension-gap-extra-large)}
 .cell{margin:0}
-.cell iframe{width:100%;height:230px;border:0;display:block;background:var(--eo-color-surface-default);border-radius:var(--eo-dimension-border-radius-large)}
+.cell iframe{width:100%;height:230px;}
+.grid.tall .cell iframe{height:300px;border:0;display:block;background:var(--eo-color-surface-default);border-radius:var(--eo-dimension-border-radius-large)}
 figcaption{margin-top:var(--eo-dimension-8)}
 figcaption code{font-size:.72rem;color:var(--eo-color-content-hinted);word-break:break-all}
 </style>
@@ -58,6 +59,23 @@ figcaption code{font-size:.72rem;color:var(--eo-color-content-hinted);word-break
   <h1>Quality fragments</h1>
   <p class="lede">One fragment per quality bar. Each is self-contained and independently embeddable — designed to sit in the UI Kit, in Notion, or in a deck without needing the rest of the dashboard around it.</p>
   <p class="stamp">Updated 6 Aug 2026 · paste any URL below into Notion, FigJam or Confluence and choose Embed</p>
+
+  <h2>Visual</h2>
+  <div class="grid tall">
+    <figure class="cell">
+        <iframe src="./cascade.html" title="cascade" loading="lazy"></iframe>
+        <figcaption><code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/cascade.html</code></figcaption>
+      </figure><figure class="cell">
+        <iframe src="./coverage-rings.html" title="coverage-rings" loading="lazy"></iframe>
+        <figcaption><code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/coverage-rings.html</code></figcaption>
+      </figure><figure class="cell">
+        <iframe src="./stations.html" title="stations" loading="lazy"></iframe>
+        <figcaption><code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/stations.html</code></figcaption>
+      </figure><figure class="cell">
+        <iframe src="./now.html" title="now" loading="lazy"></iframe>
+        <figcaption><code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/now.html</code></figcaption>
+      </figure>
+  </div>
 
   <h2>Ready — design side</h2>
   <div class="grid">

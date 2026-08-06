@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" class="brand-egym light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Token cascade — EGYM One</title>
+<link rel="stylesheet" href="../vendor/egym-one-tokens.css">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:transparent}
+body{font-family:var(--eo-typography-body-100-font-family);color:var(--eo-color-content-emphasized);-webkit-font-smoothing:antialiased}
+.v-frag{background:var(--eo-color-surface-default);border-radius:var(--eo-dimension-border-radius-large);padding: var(--eo-dimension-padding-block-large);min-height:100%;display:flex;flex-direction:column;gap:var(--eo-dimension-gap-large)}
+.v-eyebrow{margin:0;font-family:var(--eo-typography-action-label-100-font-family);font-size:var(--eo-typography-body-50-font-size);letter-spacing:.1em;text-transform:uppercase;color:var(--eo-color-content-accent);font-weight:700}
+.v-title{margin:0;font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-typography-headline-300-font-size);line-height:1.2}
+.v-note{margin:0;font-size:var(--eo-typography-body-50-font-size);line-height:var(--eo-typography-body-50-line-height);color:var(--eo-color-content-subtle)}
+.v-meta{margin:auto 0 0;padding-top:var(--eo-dimension-12);border-top:1px solid var(--eo-color-border-subtle);font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-hinted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:var(--eo-dimension-gap-small)}
+svg{display:block;max-width:100%;height:auto}
+/* rings draw themselves in */
+.ring{fill:none;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%}
+.ring.track{stroke:var(--eo-color-surface-subtle)}
+.ring.fill{animation:draw 1.4s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:var(--off)}}
+.bar-fill{animation:grow 1.1s cubic-bezier(.22,1,.36,1) forwards;transform-origin:left center}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.pop{animation:pop .5s cubic-bezier(.22,1,.36,1) backwards}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.ring.fill,.bar-fill,.pop{animation:none}.ring.fill{stroke-dashoffset:var(--off)}.bar-fill{transform:none}}
+.rows{display:grid;gap:var(--eo-dimension-gap-default);margin:0;padding:0;list-style:none}
+.row{display:flex;align-items:baseline;gap:var(--eo-dimension-gap-default);font-size:var(--eo-typography-body-50-font-size)}
+.row .k{font-weight:700;font-variant-numeric:tabular-nums;color:var(--eo-color-content-accent);white-space:nowrap}
+.row .t{color:var(--eo-color-content-emphasized)}
+.row .w{margin-left:auto;color:var(--eo-color-content-hinted);white-space:nowrap}
+.cf-bg{position:absolute;inset:0;pointer-events:none;
+    -webkit-mask-image:radial-gradient(ellipse 75% 70% at 55% 50%,#000 30%,transparent 80%);
+            mask-image:radial-gradient(ellipse 75% 70% at 55% 50%,#000 30%,transparent 80%)}
+   .cf-bg svg{width:100%;height:100%;display:block}
+   .cf-link{fill:none;stroke:var(--eo-color-content-accent);stroke-width:1;opacity:.16;
+     stroke-dasharray:1400;stroke-dashoffset:1400;
+     animation:cf-draw 2.2s cubic-bezier(.22,1,.36,1) var(--d) forwards,
+               cf-breathe var(--t) ease-in-out calc(var(--d) + 2.2s) infinite}
+   .cf-node{fill:var(--eo-color-content-accent);opacity:0;
+     animation:cf-in .9s cubic-bezier(.22,1,.36,1) var(--d) forwards}
+   @keyframes cf-draw{to{stroke-dashoffset:0}}
+   @keyframes cf-in{to{opacity:.30}}
+   @keyframes cf-breathe{0%,100%{opacity:.10}50%{opacity:.24}}
+   @media(prefers-reduced-motion:reduce){
+     .cf-link{animation:none;stroke-dashoffset:0;opacity:.14}
+     .cf-node{animation:none;opacity:.26}}</style>
+</head>
+<body><div class="v-frag" style="position:relative;overflow:hidden;min-height:280px">
+     <div class="cf-bg"><svg class="cascade" viewBox="0 0 900 420" preserveAspectRatio="xMidYMid slice"
+    aria-hidden="true" focusable="false"><path class="cf-link" d="M105.3,62.5 C213.1,62.5 213.1,232.7 320.9,232.7" style="--d:0.19s;--t:2.84s"/><path class="cf-link" d="M110.3,92.9 C221.3,92.9 221.3,289.2 332.2,289.2" style="--d:0.49s;--t:2.64s"/><path class="cf-link" d="M126.7,147.8 C231.2,147.8 231.2,170.8 335.8,170.8" style="--d:0.40s;--t:3.15s"/><path class="cf-link" d="M98.3,180.0 C221.8,180.0 221.8,357.4 345.2,357.4" style="--d:0.28s;--t:3.72s"/><path class="cf-link" d="M99.2,202.8 C224.4,202.8 224.4,57.8 349.6,57.8" style="--d:0.32s;--t:3.21s"/><path class="cf-link" d="M99.2,202.8 C226.7,202.8 226.7,88.6 354.3,88.6" style="--d:0.19s;--t:4.03s"/><path class="cf-link" d="M129.9,239.7 C237.6,239.7 237.6,357.4 345.2,357.4" style="--d:0.31s;--t:4.06s"/><path class="cf-link" d="M110.7,277.3 C215.8,277.3 215.8,232.7 320.9,232.7" style="--d:0.23s;--t:2.77s"/><path class="cf-link" d="M117.8,320.0 C226.8,320.0 226.8,170.8 335.8,170.8" style="--d:0.12s;--t:3.44s"/><path class="cf-link" d="M117.8,320.0 C238.0,320.0 238.0,251.7 358.2,251.7" style="--d:0.24s;--t:3.58s"/><path class="cf-link" d="M112.2,351.3 C235.2,351.3 235.2,251.7 358.2,251.7" style="--d:0.28s;--t:2.76s"/><path class="cf-link" d="M112.2,351.3 C232.7,351.3 232.7,310.8 353.3,310.8" style="--d:0.36s;--t:3.78s"/><path class="cf-link" d="M349.6,57.8 C447.8,57.8 447.8,214.8 546.1,214.8" style="--d:0.53s;--t:2.71s"/><path class="cf-link" d="M325.2,86.2 C440.6,86.2 440.6,76.2 555.9,76.2" style="--d:0.40s;--t:3.53s"/><path class="cf-link" d="M354.3,88.6 C450.2,88.6 450.2,214.8 546.1,214.8" style="--d:0.54s;--t:4.08s"/><path class="cf-link" d="M354.3,88.6 C466.5,88.6 466.5,155.3 578.7,155.3" style="--d:0.80s;--t:3.82s"/><path class="cf-link" d="M333.2,110.8 C449.1,110.8 449.1,107.4 565.0,107.4" style="--d:0.68s;--t:3.38s"/><path class="cf-link" d="M345.4,128.8 C455.2,128.8 455.2,107.4 565.0,107.4" style="--d:0.51s;--t:3.43s"/><path class="cf-link" d="M335.8,170.8 C457.2,170.8 457.2,155.3 578.7,155.3" style="--d:0.67s;--t:3.56s"/><path class="cf-link" d="M355.8,185.8 C451.0,185.8 451.0,214.8 546.1,214.8" style="--d:0.60s;--t:3.62s"/><path class="cf-link" d="M363.0,188.6 C462.8,188.6 462.8,257.7 562.5,257.7" style="--d:0.73s;--t:3.80s"/><path class="cf-link" d="M363.0,188.6 C464.0,188.6 464.0,107.4 565.0,107.4" style="--d:0.39s;--t:3.75s"/><path class="cf-link" d="M335.8,226.9 C441.0,226.9 441.0,214.8 546.1,214.8" style="--d:0.50s;--t:3.71s"/><path class="cf-link" d="M335.8,226.9 C445.9,226.9 445.9,76.2 555.9,76.2" style="--d:0.77s;--t:2.82s"/><path class="cf-link" d="M320.9,232.7 C435.9,232.7 435.9,338.3 550.9,338.3" style="--d:0.75s;--t:2.75s"/><path class="cf-link" d="M320.9,232.7 C435.9,232.7 435.9,338.3 550.9,338.3" style="--d:0.77s;--t:2.96s"/><path class="cf-link" d="M358.2,251.7 C461.6,251.7 461.6,107.4 565.0,107.4" style="--d:0.85s;--t:2.82s"/><path class="cf-link" d="M332.2,289.2 C448.6,289.2 448.6,107.4 565.0,107.4" style="--d:0.68s;--t:4.03s"/><path class="cf-link" d="M353.3,310.8 C454.6,310.8 454.6,76.2 555.9,76.2" style="--d:0.74s;--t:2.69s"/><path class="cf-link" d="M353.3,310.8 C454.6,310.8 454.6,76.2 555.9,76.2" style="--d:0.85s;--t:3.46s"/><path class="cf-link" d="M352.1,311.0 C465.4,311.0 465.4,155.3 578.7,155.3" style="--d:0.36s;--t:2.84s"/><path class="cf-link" d="M340.3,342.0 C452.6,342.0 452.6,107.4 565.0,107.4" style="--d:0.45s;--t:3.04s"/><path class="cf-link" d="M340.3,342.0 C459.5,342.0 459.5,155.3 578.7,155.3" style="--d:0.42s;--t:3.68s"/><path class="cf-link" d="M345.2,357.4 C445.6,357.4 445.6,214.8 546.1,214.8" style="--d:0.44s;--t:3.12s"/><path class="cf-link" d="M345.2,357.4 C453.9,357.4 453.9,257.7 562.5,257.7" style="--d:0.84s;--t:3.75s"/><path class="cf-link" d="M555.9,76.2 C670.2,76.2 670.2,250.2 784.5,250.2" style="--d:1.11s;--t:2.91s"/><path class="cf-link" d="M565.0,107.4 C659.2,107.4 659.2,90.7 753.3,90.7" style="--d:1.03s;--t:3.52s"/><path class="cf-link" d="M578.7,155.3 C681.6,155.3 681.6,250.2 784.5,250.2" style="--d:1.08s;--t:4.06s"/><path class="cf-link" d="M546.1,214.8 C655.1,214.8 655.1,165.7 764.0,165.7" style="--d:1.04s;--t:3.83s"/><path class="cf-link" d="M546.1,214.8 C665.3,214.8 665.3,250.2 784.5,250.2" style="--d:0.76s;--t:3.42s"/><path class="cf-link" d="M562.5,257.7 C657.9,257.7 657.9,90.7 753.3,90.7" style="--d:0.81s;--t:3.71s"/><path class="cf-link" d="M562.5,257.7 C661.6,257.7 661.6,330.8 760.6,330.8" style="--d:1.14s;--t:3.17s"/><path class="cf-link" d="M557.1,313.7 C670.8,313.7 670.8,250.2 784.5,250.2" style="--d:1.20s;--t:4.10s"/><path class="cf-link" d="M550.9,338.3 C657.5,338.3 657.5,165.7 764.0,165.7" style="--d:0.82s;--t:3.12s"/><path class="cf-link" d="M550.9,338.3 C657.5,338.3 657.5,165.7 764.0,165.7" style="--d:1.03s;--t:3.21s"/><circle class="cf-node" cx="105.3" cy="62.5" r="3.4" style="--d:0.40s"/><circle class="cf-node" cx="110.3" cy="92.9" r="3.4" style="--d:0.49s"/><circle class="cf-node" cx="126.7" cy="147.8" r="3.4" style="--d:0.58s"/><circle class="cf-node" cx="98.3" cy="180.0" r="3.4" style="--d:0.67s"/><circle class="cf-node" cx="99.2" cy="202.8" r="3.4" style="--d:0.76s"/><circle class="cf-node" cx="129.9" cy="239.7" r="3.4" style="--d:0.85s"/><circle class="cf-node" cx="110.7" cy="277.3" r="3.4" style="--d:0.94s"/><circle class="cf-node" cx="117.8" cy="320.0" r="3.4" style="--d:1.03s"/><circle class="cf-node" cx="112.2" cy="351.3" r="3.4" style="--d:1.12s"/><circle class="cf-node" cx="349.6" cy="57.8" r="2.6" style="--d:1.21s"/><circle class="cf-node" cx="325.2" cy="86.2" r="2.6" style="--d:1.30s"/><circle class="cf-node" cx="354.3" cy="88.6" r="2.6" style="--d:0.40s"/><circle class="cf-node" cx="333.2" cy="110.8" r="2.6" style="--d:0.49s"/><circle class="cf-node" cx="345.4" cy="128.8" r="2.6" style="--d:0.58s"/><circle class="cf-node" cx="335.8" cy="170.8" r="2.6" style="--d:0.67s"/><circle class="cf-node" cx="355.8" cy="185.8" r="2.6" style="--d:0.76s"/><circle class="cf-node" cx="363.0" cy="188.6" r="2.6" style="--d:0.85s"/><circle class="cf-node" cx="335.8" cy="226.9" r="2.6" style="--d:0.94s"/><circle class="cf-node" cx="320.9" cy="232.7" r="2.6" style="--d:1.03s"/><circle class="cf-node" cx="358.2" cy="251.7" r="2.6" style="--d:1.12s"/><circle class="cf-node" cx="332.2" cy="289.2" r="2.6" style="--d:1.21s"/><circle class="cf-node" cx="353.3" cy="310.8" r="2.6" style="--d:1.30s"/><circle class="cf-node" cx="352.1" cy="311.0" r="2.6" style="--d:0.40s"/><circle class="cf-node" cx="340.3" cy="342.0" r="2.6" style="--d:0.49s"/><circle class="cf-node" cx="345.2" cy="357.4" r="2.6" style="--d:0.58s"/><circle class="cf-node" cx="555.9" cy="76.2" r="3" style="--d:0.67s"/><circle class="cf-node" cx="565.0" cy="107.4" r="3" style="--d:0.76s"/><circle class="cf-node" cx="578.7" cy="155.3" r="3" style="--d:0.85s"/><circle class="cf-node" cx="546.1" cy="214.8" r="3" style="--d:0.94s"/><circle class="cf-node" cx="562.5" cy="257.7" r="3" style="--d:1.03s"/><circle class="cf-node" cx="557.1" cy="313.7" r="3" style="--d:1.12s"/><circle class="cf-node" cx="550.9" cy="338.3" r="3" style="--d:1.21s"/><circle class="cf-node" cx="753.3" cy="90.7" r="3.8" style="--d:1.30s"/><circle class="cf-node" cx="764.0" cy="165.7" r="3.8" style="--d:0.40s"/><circle class="cf-node" cx="784.5" cy="250.2" r="3.8" style="--d:0.49s"/><circle class="cf-node" cx="760.6" cy="330.8" r="3.8" style="--d:0.58s"/></svg></div>
+     <div style="position:relative;z-index:1">
+       <p class="v-eyebrow">Token system</p>
+       <p class="v-title">1,619 variables, four tiers</p>
+       <p class="v-note">Core → Brand → Breakpoint → Appearance. 72% of values resolve through an alias rather than a literal, which is what lets one change reach every brand and breakpoint at once.</p>
+     </div>
+     <p class="v-meta" style="position:relative;z-index:1"><span>Full read of the token system</span><span>Updated 6 Aug 2026</span></p>
+   </div></body>
+</html>

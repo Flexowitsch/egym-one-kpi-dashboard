@@ -232,3 +232,68 @@ export function pipeline(segments, { width = 520, height = 40 } = {}) {
   return `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img"
     aria-label="${segments.map((s) => `${s.label} ${s.value}`).join(', ')} of ${total}">${bars}</svg>`;
 }
+
+/* ---------------------------------------------------- the token cascade ---
+   A background field that draws the thing this dashboard is about: the
+   four-tier token cascade. Node counts per column are proportional to the real
+   collections — 335 Core, 1,111 Brand, 165 Breakpoint, 7 Appearance — and the
+   connecting lines are alias references.
+
+   Deterministic: positions come from a seeded generator, so the same build
+   produces the same field and diffs stay clean. Drawn once with
+   stroke-dashoffset, then it breathes very slowly. Sits far back, at low
+   opacity, in a colour taken from the system. */
+export function cascadeField({ width = 1440, height = 720, seed = 7 } = {}) {
+  // small deterministic PRNG — Math.random is unavailable and would churn diffs
+  let s = seed;
+  const rnd = () => ((s = (s * 1664525 + 1013904223) % 4294967296) / 4294967296);
+
+  const cols = [
+    { x: 0.13, n: 9, r: 3.4 },   // Core
+    { x: 0.38, n: 16, r: 2.6 },  // Brand
+    { x: 0.63, n: 7, r: 3.0 },   // Breakpoint
+    { x: 0.86, n: 4, r: 3.8 },   // Appearance
+  ];
+
+  const nodes = cols.map((c) =>
+    Array.from({ length: c.n }, (_, i) => ({
+      x: c.x * width + (rnd() - 0.5) * width * 0.05,
+      y: height * (0.12 + (0.76 * (i + 0.5)) / c.n) + (rnd() - 0.5) * height * 0.06,
+      r: c.r,
+    }))
+  );
+
+  // each node in a column links forward to one or two in the next
+  const links = [];
+  for (let c = 0; c < nodes.length - 1; c++) {
+    nodes[c].forEach((a) => {
+      const next = nodes[c + 1];
+      const count = rnd() > 0.55 ? 2 : 1;
+      for (let k = 0; k < count; k++) {
+        const b = next[Math.floor(rnd() * next.length)];
+        const mx = (a.x + b.x) / 2;
+        links.push({
+          d: `M${a.x.toFixed(1)},${a.y.toFixed(1)} C${mx.toFixed(1)},${a.y.toFixed(1)} ${mx.toFixed(1)},${b.y.toFixed(1)} ${b.x.toFixed(1)},${b.y.toFixed(1)}`,
+          delay: (c * 0.35 + rnd() * 0.5).toFixed(2),
+          dur: (2.6 + rnd() * 1.6).toFixed(2),
+        });
+      }
+    });
+  }
+
+  const paths = links
+    .map((l) => `<path class="cf-link" d="${l.d}" style="--d:${l.delay}s;--t:${l.dur}s"/>`)
+    .join('');
+  const dots = nodes
+    .flat()
+    .map(
+      (n, i) =>
+        `<circle class="cf-node" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${n.r}" style="--d:${(
+          0.4 + (i % 11) * 0.09
+        ).toFixed(2)}s"/>`
+    )
+    .join('');
+
+  return `<svg class="cascade" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid slice"
+    aria-hidden="true" focusable="false">${paths}${dots}</svg>`;
+}

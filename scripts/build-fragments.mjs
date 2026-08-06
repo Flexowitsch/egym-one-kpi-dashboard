@@ -12,6 +12,7 @@
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
+import { cascadeField } from '../src/charts.mjs';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -113,7 +114,8 @@ h1{font-family:var(--eo-typography-headline-500-font-family);font-size:var(--eo-
 h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-typography-headline-300-font-size);margin:var(--eo-dimension-40) 0 var(--eo-dimension-16)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--eo-dimension-gap-extra-large)}
 .cell{margin:0}
-.cell iframe{width:100%;height:230px;border:0;display:block;background:var(--eo-color-surface-default);border-radius:var(--eo-dimension-border-radius-large)}
+.cell iframe{width:100%;height:230px;}
+.grid.tall .cell iframe{height:300px;border:0;display:block;background:var(--eo-color-surface-default);border-radius:var(--eo-dimension-border-radius-large)}
 figcaption{margin-top:var(--eo-dimension-8)}
 figcaption code{font-size:.72rem;color:var(--eo-color-content-hinted);word-break:break-all}
 </style>
@@ -122,6 +124,16 @@ figcaption code{font-size:.72rem;color:var(--eo-color-content-hinted);word-break
   <h1>Quality fragments</h1>
   <p class="lede">${esc(fragments.note)}</p>
   <p class="stamp">Updated ${esc(fmt(fragments.updated))} · paste any URL below into Notion, FigJam or Confluence and choose Embed</p>
+
+  <h2>Visual</h2>
+  <div class="grid tall">
+    ${['cascade','coverage-rings','stations','now']
+      .map((id) => `<figure class="cell">
+        <iframe src="./${id}.html" title="${id}" loading="lazy"></iframe>
+        <figcaption><code>${BASE}/${id}.html</code></figcaption>
+      </figure>`)
+      .join('')}
+  </div>
 
   <h2>Ready — design side</h2>
   <div class="grid">${fragments.items.filter((f) => f.tone === 'good').map(card).join('')}</div>
@@ -293,3 +305,35 @@ writeFileSync(resolve(outDir, 'coverage-rings.html'), ringPair());
 writeFileSync(resolve(outDir, 'now.html'), nowPage());
 writeFileSync(resolve(outDir, 'stations.html'), stationStrip());
 console.log('  visual: coverage-rings, now, stations');
+
+/* the cascade, as its own embeddable piece */
+const cascadeFragment = () => visPage(
+  'Token cascade',
+  `<div class="v-frag" style="position:relative;overflow:hidden;min-height:280px">
+     <div class="cf-bg">${cascadeField({ width: 900, height: 420, seed: 11 })}</div>
+     <div style="position:relative;z-index:1">
+       <p class="v-eyebrow">Token system</p>
+       <p class="v-title">${data.tokenAudit.variables.toLocaleString('en-GB')} variables, four tiers</p>
+       <p class="v-note">Core → Brand → Breakpoint → Appearance. ${data.tokenAudit.aliasPct}% of values resolve through an alias rather than a literal, which is what lets one change reach every brand and breakpoint at once.</p>
+     </div>
+     <p class="v-meta" style="position:relative;z-index:1"><span>Full read of the token system</span><span>Updated ${esc(fmt(fragments.updated))}</span></p>
+   </div>`,
+  `.cf-bg{position:absolute;inset:0;pointer-events:none;
+    -webkit-mask-image:radial-gradient(ellipse 75% 70% at 55% 50%,#000 30%,transparent 80%);
+            mask-image:radial-gradient(ellipse 75% 70% at 55% 50%,#000 30%,transparent 80%)}
+   .cf-bg svg{width:100%;height:100%;display:block}
+   .cf-link{fill:none;stroke:var(--eo-color-content-accent);stroke-width:1;opacity:.16;
+     stroke-dasharray:1400;stroke-dashoffset:1400;
+     animation:cf-draw 2.2s cubic-bezier(.22,1,.36,1) var(--d) forwards,
+               cf-breathe var(--t) ease-in-out calc(var(--d) + 2.2s) infinite}
+   .cf-node{fill:var(--eo-color-content-accent);opacity:0;
+     animation:cf-in .9s cubic-bezier(.22,1,.36,1) var(--d) forwards}
+   @keyframes cf-draw{to{stroke-dashoffset:0}}
+   @keyframes cf-in{to{opacity:.30}}
+   @keyframes cf-breathe{0%,100%{opacity:.10}50%{opacity:.24}}
+   @media(prefers-reduced-motion:reduce){
+     .cf-link{animation:none;stroke-dashoffset:0;opacity:.14}
+     .cf-node{animation:none;opacity:.26}}`
+);
+writeFileSync(resolve(outDir, 'cascade.html'), cascadeFragment());
+console.log('  visual: cascade');

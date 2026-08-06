@@ -66,14 +66,39 @@ body {
   padding: var(--eo-dimension-padding-block-medium) var(--gutter);
   display: flex; align-items: center; gap: var(--eo-dimension-gap-largest); flex-wrap: wrap;
 }
+/* The EGYM wordmark, set as type rather than an image: tracked capitals with
+   the leading E in the accent, matching the logo component in the UI Kit.
+   Reproducing it in type keeps it sharp at any size, follows the theme, and
+   uses the real accent token instead of a baked-in colour. */
 .wordmark {
+  display: block;
+  text-decoration: none;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.wordmark .mark {
+  display: block;
+  font-family: var(--eo-typography-headline-300-font-family);
+  font-size: var(--eo-typography-body-100-font-size);
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: var(--eo-color-content-emphasized);
+}
+.wordmark .mark .e { color: var(--eo-color-content-accent); }
+.wordmark .sub {
+  display: block;
   font-family: var(--eo-typography-action-label-100-font-family);
   font-size: var(--eo-typography-body-50-font-size);
-  letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--eo-color-content-emphasized); font-weight: 700;
-  line-height: 1.2; white-space: nowrap;
+  letter-spacing: 0.08em;
+  color: var(--eo-color-content-subtle);
+  margin-top: var(--eo-dimension-gap-smallest);
 }
-.wordmark span { display: block; color: var(--eo-color-content-accent); }
+.wordmark:hover .mark { color: var(--eo-color-content-emphasized); }
+.wordmark:focus-visible {
+  outline: 2px solid var(--eo-color-border-accent);
+  outline-offset: 4px;
+  border-radius: var(--eo-dimension-border-radius-small);
+}
 
 .tabs { display: flex; gap: var(--eo-dimension-gap-small); flex-wrap: wrap; margin-left: auto; }
 .tab {
@@ -517,13 +542,64 @@ eo-card > * { width: 100%; }
 .prov td:first-child { font-weight: 600; }
 .prov .when { white-space: nowrap; font-variant-numeric: tabular-nums; }
 .prov .how { color: var(--eo-color-content-subtle); }
+
+/* ===========================================================================
+   CASCADE FIELD — background vector animation
+   Draws the four-tier token cascade: Core → Brand → Breakpoint → Appearance.
+   Colour comes from the accent token at very low opacity, so it reads as
+   texture rather than content. Sits behind the hero and never intercepts
+   pointer events.
+   =========================================================================== */
+.hero { position: relative; }
+.cascade-wrap {
+  position: absolute; inset: -12% -8% auto -8%;
+  height: 130%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  /* fade out toward the edges so it never fights the type */
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 35%, transparent 78%);
+          mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 35%, transparent 78%);
+}
+.hero > *:not(.cascade-wrap) { position: relative; z-index: 1; }
+
+.cascade { width: 100%; height: 100%; display: block; }
+.cf-link {
+  fill: none;
+  stroke: var(--eo-color-content-accent);
+  stroke-width: 1;
+  opacity: 0.16;
+  stroke-dasharray: 1400;
+  stroke-dashoffset: 1400;
+  animation:
+    cf-draw 2.2s cubic-bezier(.22,1,.36,1) var(--d) forwards,
+    cf-breathe var(--t) ease-in-out calc(var(--d) + 2.2s) infinite;
+}
+.cf-node {
+  fill: var(--eo-color-content-accent);
+  opacity: 0;
+  animation: cf-in 0.9s cubic-bezier(.22,1,.36,1) var(--d) forwards;
+}
+@keyframes cf-draw { to { stroke-dashoffset: 0; } }
+@keyframes cf-in   { to { opacity: 0.30; } }
+@keyframes cf-breathe {
+  0%, 100% { opacity: 0.10; }
+  50%      { opacity: 0.24; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cf-link { animation: none; stroke-dashoffset: 0; opacity: 0.14; }
+  .cf-node { animation: none; opacity: 0.26; }
+}
 </style>
 </head>
 <body>
 
 <nav class="nav">
   <div class="nav-inner">
-    <div class="wordmark">EGYM<span>One</span></div>
+    <a class="wordmark" href="#overview" aria-label="EGYM One design system dashboard">
+      <span class="mark"><span class="e">E</span>GYM</span>
+      <span class="sub">One · Design System</span>
+    </a>
     <div class="tabs" role="tablist" aria-label="Dashboard sections">
       <eo-button class="tab" role="tab" id="tab-overview" aria-controls="panel-overview"
              aria-selected="true" data-tab="overview" size="small"
@@ -545,6 +621,8 @@ eo-card > * { width: 100%; }
 <main class="shell">
   <div class="panel is-active" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" >
 <section class="hero">
+  <div class="cascade-wrap"><svg class="cascade" viewBox="0 0 1440 720" preserveAspectRatio="xMidYMid slice"
+    aria-hidden="true" focusable="false"><path class="cf-link" d="M168.4,134.7 C353.5,134.7 353.5,637.9 538.5,637.9" style="--d:0.16s;--t:4.02s"/><path class="cf-link" d="M168.4,134.7 C369.8,134.7 369.8,200.0 571.3,200.0" style="--d:0.14s;--t:4.12s"/><path class="cf-link" d="M195.3,196.0 C383.3,196.0 383.3,200.0 571.3,200.0" style="--d:0.03s;--t:3.07s"/><path class="cf-link" d="M195.3,196.0 C364.4,196.0 364.4,533.3 533.5,533.3" style="--d:0.38s;--t:2.94s"/><path class="cf-link" d="M154.8,253.8 C351.4,253.8 351.4,523.0 548.1,523.0" style="--d:0.21s;--t:3.13s"/><path class="cf-link" d="M177.2,279.9 C374.2,279.9 374.2,200.0 571.3,200.0" style="--d:0.44s;--t:2.93s"/><path class="cf-link" d="M156.2,380.9 C346.4,380.9 346.4,471.6 536.6,471.6" style="--d:0.22s;--t:3.03s"/><path class="cf-link" d="M156.2,380.9 C361.5,380.9 361.5,359.2 566.8,359.2" style="--d:0.17s;--t:2.76s"/><path class="cf-link" d="M221.2,422.2 C370.3,422.2 370.3,348.2 519.4,348.2" style="--d:0.38s;--t:3.98s"/><path class="cf-link" d="M183.7,483.7 C377.5,483.7 377.5,200.0 571.3,200.0" style="--d:0.34s;--t:3.54s"/><path class="cf-link" d="M183.7,483.7 C360.5,483.7 360.5,136.9 537.3,136.9" style="--d:0.37s;--t:3.92s"/><path class="cf-link" d="M194.8,554.4 C364.1,554.4 364.1,533.3 533.5,533.3" style="--d:0.03s;--t:3.80s"/><path class="cf-link" d="M194.8,554.4 C369.4,554.4 369.4,291.8 544.1,291.8" style="--d:0.50s;--t:4.06s"/><path class="cf-link" d="M207.3,599.7 C365.7,599.7 365.7,261.1 524.1,261.1" style="--d:0.42s;--t:3.90s"/><path class="cf-link" d="M545.3,118.7 C713.5,118.7 713.5,596.4 881.6,596.4" style="--d:0.36s;--t:4.01s"/><path class="cf-link" d="M545.3,118.7 C717.4,118.7 717.4,221.8 889.5,221.8" style="--d:0.84s;--t:2.99s"/><path class="cf-link" d="M537.3,136.9 C729.1,136.9 729.1,527.6 921.0,527.6" style="--d:0.67s;--t:3.50s"/><path class="cf-link" d="M537.3,136.9 C725.4,136.9 725.4,281.5 913.5,281.5" style="--d:0.44s;--t:2.64s"/><path class="cf-link" d="M517.8,182.7 C712.0,182.7 712.0,111.6 906.1,111.6" style="--d:0.73s;--t:2.74s"/><path class="cf-link" d="M571.3,200.0 C727.5,200.0 727.5,357.1 883.8,357.1" style="--d:0.85s;--t:2.90s"/><path class="cf-link" d="M524.1,261.1 C703.9,261.1 703.9,357.1 883.8,357.1" style="--d:0.55s;--t:3.46s"/><path class="cf-link" d="M524.1,261.1 C715.1,261.1 715.1,111.6 906.1,111.6" style="--d:0.69s;--t:2.98s"/><path class="cf-link" d="M520.0,272.5 C704.7,272.5 704.7,221.8 889.5,221.8" style="--d:0.72s;--t:3.80s"/><path class="cf-link" d="M544.1,291.8 C725.1,291.8 725.1,111.6 906.1,111.6" style="--d:0.81s;--t:2.74s"/><path class="cf-link" d="M519.4,348.2 C704.4,348.2 704.4,221.8 889.5,221.8" style="--d:0.77s;--t:3.20s"/><path class="cf-link" d="M519.4,348.2 C701.7,348.2 701.7,416.7 884.1,416.7" style="--d:0.58s;--t:3.03s"/><path class="cf-link" d="M566.8,359.2 C725.5,359.2 725.5,416.7 884.1,416.7" style="--d:0.50s;--t:2.62s"/><path class="cf-link" d="M554.8,429.7 C719.3,429.7 719.3,357.1 883.8,357.1" style="--d:0.65s;--t:3.82s"/><path class="cf-link" d="M554.8,429.7 C719.3,429.7 719.3,357.1 883.8,357.1" style="--d:0.49s;--t:2.93s"/><path class="cf-link" d="M530.3,449.4 C725.7,449.4 725.7,527.6 921.0,527.6" style="--d:0.36s;--t:3.12s"/><path class="cf-link" d="M530.3,449.4 C707.1,449.4 707.1,357.1 883.8,357.1" style="--d:0.38s;--t:3.44s"/><path class="cf-link" d="M536.6,471.6 C725.1,471.6 725.1,281.5 913.5,281.5" style="--d:0.81s;--t:2.61s"/><path class="cf-link" d="M536.6,471.6 C709.1,471.6 709.1,596.4 881.6,596.4" style="--d:0.47s;--t:3.29s"/><path class="cf-link" d="M548.1,523.0 C718.8,523.0 718.8,221.8 889.5,221.8" style="--d:0.42s;--t:4.11s"/><path class="cf-link" d="M548.1,523.0 C727.1,523.0 727.1,111.6 906.1,111.6" style="--d:0.52s;--t:2.65s"/><path class="cf-link" d="M533.5,533.3 C711.5,533.3 711.5,221.8 889.5,221.8" style="--d:0.69s;--t:4.08s"/><path class="cf-link" d="M574.1,587.7 C740.1,587.7 740.1,111.6 906.1,111.6" style="--d:0.79s;--t:3.33s"/><path class="cf-link" d="M538.5,637.9 C711.2,637.9 711.2,357.1 883.8,357.1" style="--d:0.72s;--t:3.06s"/><path class="cf-link" d="M906.1,111.6 C1077.2,111.6 1077.2,442.6 1248.4,442.6" style="--d:1.13s;--t:4.16s"/><path class="cf-link" d="M889.5,221.8 C1072.6,221.8 1072.6,171.3 1255.8,171.3" style="--d:0.71s;--t:2.92s"/><path class="cf-link" d="M889.5,221.8 C1064.1,221.8 1064.1,564.4 1238.7,564.4" style="--d:0.99s;--t:3.90s"/><path class="cf-link" d="M913.5,281.5 C1080.9,281.5 1080.9,442.6 1248.4,442.6" style="--d:0.78s;--t:3.65s"/><path class="cf-link" d="M913.5,281.5 C1084.7,281.5 1084.7,171.3 1255.8,171.3" style="--d:0.73s;--t:4.05s"/><path class="cf-link" d="M883.8,357.1 C1056.5,357.1 1056.5,287.6 1229.1,287.6" style="--d:1.13s;--t:3.92s"/><path class="cf-link" d="M883.8,357.1 C1066.1,357.1 1066.1,442.6 1248.4,442.6" style="--d:0.70s;--t:3.25s"/><path class="cf-link" d="M884.1,416.7 C1061.4,416.7 1061.4,564.4 1238.7,564.4" style="--d:1.09s;--t:3.06s"/><path class="cf-link" d="M884.1,416.7 C1061.4,416.7 1061.4,564.4 1238.7,564.4" style="--d:0.70s;--t:4.17s"/><path class="cf-link" d="M921.0,527.6 C1084.7,527.6 1084.7,442.6 1248.4,442.6" style="--d:1.14s;--t:3.26s"/><path class="cf-link" d="M881.6,596.4 C1065.0,596.4 1065.0,442.6 1248.4,442.6" style="--d:1.12s;--t:3.37s"/><path class="cf-link" d="M881.6,596.4 C1055.4,596.4 1055.4,287.6 1229.1,287.6" style="--d:0.83s;--t:3.21s"/><circle class="cf-node" cx="168.4" cy="134.7" r="3.4" style="--d:0.40s"/><circle class="cf-node" cx="195.3" cy="196.0" r="3.4" style="--d:0.49s"/><circle class="cf-node" cx="154.8" cy="253.8" r="3.4" style="--d:0.58s"/><circle class="cf-node" cx="177.2" cy="279.9" r="3.4" style="--d:0.67s"/><circle class="cf-node" cx="156.2" cy="380.9" r="3.4" style="--d:0.76s"/><circle class="cf-node" cx="221.2" cy="422.2" r="3.4" style="--d:0.85s"/><circle class="cf-node" cx="183.7" cy="483.7" r="3.4" style="--d:0.94s"/><circle class="cf-node" cx="194.8" cy="554.4" r="3.4" style="--d:1.03s"/><circle class="cf-node" cx="207.3" cy="599.7" r="3.4" style="--d:1.12s"/><circle class="cf-node" cx="545.3" cy="118.7" r="2.6" style="--d:1.21s"/><circle class="cf-node" cx="537.3" cy="136.9" r="2.6" style="--d:1.30s"/><circle class="cf-node" cx="517.8" cy="182.7" r="2.6" style="--d:0.40s"/><circle class="cf-node" cx="571.3" cy="200.0" r="2.6" style="--d:0.49s"/><circle class="cf-node" cx="524.1" cy="261.1" r="2.6" style="--d:0.58s"/><circle class="cf-node" cx="520.0" cy="272.5" r="2.6" style="--d:0.67s"/><circle class="cf-node" cx="544.1" cy="291.8" r="2.6" style="--d:0.76s"/><circle class="cf-node" cx="519.4" cy="348.2" r="2.6" style="--d:0.85s"/><circle class="cf-node" cx="566.8" cy="359.2" r="2.6" style="--d:0.94s"/><circle class="cf-node" cx="554.8" cy="429.7" r="2.6" style="--d:1.03s"/><circle class="cf-node" cx="530.3" cy="449.4" r="2.6" style="--d:1.12s"/><circle class="cf-node" cx="536.6" cy="471.6" r="2.6" style="--d:1.21s"/><circle class="cf-node" cx="548.1" cy="523.0" r="2.6" style="--d:1.30s"/><circle class="cf-node" cx="533.5" cy="533.3" r="2.6" style="--d:0.40s"/><circle class="cf-node" cx="574.1" cy="587.7" r="2.6" style="--d:0.49s"/><circle class="cf-node" cx="538.5" cy="637.9" r="2.6" style="--d:0.58s"/><circle class="cf-node" cx="906.1" cy="111.6" r="3" style="--d:0.67s"/><circle class="cf-node" cx="889.5" cy="221.8" r="3" style="--d:0.76s"/><circle class="cf-node" cx="913.5" cy="281.5" r="3" style="--d:0.85s"/><circle class="cf-node" cx="883.8" cy="357.1" r="3" style="--d:0.94s"/><circle class="cf-node" cx="884.1" cy="416.7" r="3" style="--d:1.03s"/><circle class="cf-node" cx="921.0" cy="527.6" r="3" style="--d:1.12s"/><circle class="cf-node" cx="881.6" cy="596.4" r="3" style="--d:1.21s"/><circle class="cf-node" cx="1255.8" cy="171.3" r="3.8" style="--d:1.30s"/><circle class="cf-node" cx="1229.1" cy="287.6" r="3.8" style="--d:0.40s"/><circle class="cf-node" cx="1248.4" cy="442.6" r="3.8" style="--d:0.49s"/><circle class="cf-node" cx="1238.7" cy="564.4" r="3.8" style="--d:0.58s"/></svg></div>
   <p class="eyebrow">Design system health · inspection 2026-08-06</p>
   <h1>The state of EGYM One,<br>on one screen</h1>
   <p class="standfirst">One number for the system, ten stations behind it, and the delivery data that explains why it sits where it does.</p>
