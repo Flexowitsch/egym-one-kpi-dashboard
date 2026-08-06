@@ -712,6 +712,14 @@
       [
         "35 undescribed variables",
         "All recent component-level additions. The other 1,584 are described — 98% coverage."
+      ],
+      [
+        "13 icons spell the same property differently",
+        "isFilled is canonical across 320 sets, but 13 use \"is filled\", \"isfilled\" or \"IsFilled\" — including all four chevrons and checkmark. Anyone toggling filled state has to know which spelling that icon uses."
+      ],
+      [
+        "1 broken component set",
+        "illustrative-empty-state has conflicting variant combinations, so Figma cannot read its properties at all."
       ]
     ]
   },
@@ -839,5 +847,58 @@
       "The 35 undescribed variables are all recent component-level additions: radio-button, navigation item, list-contained, list-item studio-service, workout-progress and logo.",
       "radio-button/selection-marker and navigation/item/padding/inline appear here but not in the v0.0.24 export the code pipeline is pinned to — which is exactly the drift the component validator flagged."
     ]
+  },
+  "iconAudit": {
+    "measuredAt": "2026-08-06",
+    "source": "Live audit of the EGYM One Icons library via the Figma plugin bridge",
+    "inventory": {
+      "componentSets": 345,
+      "looseComponents": 38,
+      "inScope": 349,
+      "deprecated": 0
+    },
+    "byPage": {
+      "icons": 338,
+      "illustrative-iconography": 10,
+      "icon set organization components": 1
+    },
+    "documentation": {
+      "described": 335,
+      "bare": 14,
+      "describedPct": 96
+    },
+    "defects": {
+      "brokenComponentSet": {
+        "name": "illustrative-empty-state",
+        "page": "illustrative-iconography",
+        "detail": "Figma refuses to read its property definitions — the set has conflicting or duplicate variant combinations"
+      },
+      "propertyNameCasing": {
+        "canonical": "isFilled",
+        "conformingSets": 320,
+        "divergentSets": 13,
+        "variants": [
+          "is filled (6)",
+          "isfilled (6)",
+          "IsFilled (1)"
+        ],
+        "affected": [
+          "chevron-left",
+          "chevron-right",
+          "chevron-up",
+          "chevron-down",
+          "checkmark",
+          "indeterminate",
+          "unordered-list",
+          "ordered-list",
+          "text-bold",
+          "text-italics",
+          "indent-increase",
+          "indent-decrease",
+          "_distance-location"
+        ]
+      }
+    },
+    "note": "A consumer switching an icon to filled has to know which of four spellings that particular icon uses. The four chevrons and checkmark are among the most-used icons in the set."
   }
 }
