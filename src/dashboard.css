@@ -552,49 +552,196 @@ eo-card > * { width: 100%; }
 .prov .how { color: var(--eo-color-content-subtle); }
 
 /* ===========================================================================
-   CASCADE FIELD — background vector animation
-   Draws the four-tier token cascade: Core → Brand → Breakpoint → Appearance.
-   Colour comes from the accent token at very low opacity, so it reads as
-   texture rather than content. Sits behind the hero and never intercepts
-   pointer events.
+   THE PROMOTIONAL LAYER — overview tab only
+
+   Everything from here down belongs to the overview, which is the face of the
+   system: it argues that the design side is in good shape and the code side is
+   the constraint. The other five tabs are the technical read that the Notion
+   fragments come off, and they get none of this — body[data-tab-state] is the
+   single switch.
    =========================================================================== */
-.hero { position: relative; }
-.cascade-wrap {
-  position: absolute; inset: -12% -8% auto -8%;
-  height: 130%;
+
+/* ---------- the token cascade, fixed behind the whole page ----------
+   Core → Brand → Breakpoint → Appearance, repeating down a canvas three
+   viewports tall. Scrolling the page travels down through it, so the reader is
+   descending the cascade rather than watching it fill in. Colour is the accent
+   token at texture opacity; the mask keeps the reading column clear so it never
+   fights the type it sits behind. */
+.cascade-field {
+  position: fixed; inset: 0;
+  overflow: hidden;
   pointer-events: none;
   z-index: 0;
-  overflow: hidden;
-  /* fade out toward the edges so it never fights the type */
-  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 35%, transparent 78%);
-          mask-image: radial-gradient(ellipse 70% 60% at 50% 45%, #000 35%, transparent 78%);
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-out);
+  /* Clear down the middle, present either side — the field frames the reading
+     column instead of running underneath it. Two masks composited: the reading
+     column is punched out, and the whole thing fades at top and bottom so it
+     never collides with the sticky nav. */
+  -webkit-mask-image:
+    radial-gradient(ellipse 32% 60% at 50% 45%, transparent 25%, #000 100%),
+    linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
+          mask-image:
+    radial-gradient(ellipse 32% 60% at 50% 45%, transparent 25%, #000 100%),
+    linear-gradient(to bottom, transparent 0, #000 14%, #000 86%, transparent 100%);
+  -webkit-mask-composite: source-in;
+          mask-composite: intersect;
 }
-.hero > *:not(.cascade-wrap) { position: relative; z-index: 1; }
-
+body[data-tab-state="overview"] .cascade-field { opacity: 1; }
+/* Three viewports of cascade; motion.js slides it up as the page scrolls, so
+   two thirds of it are off-screen at any moment. */
+.cascade-track { position: absolute; inset: 0 0 auto 0; height: 300%; will-change: transform; }
 .cascade { width: 100%; height: 100%; display: block; }
+
+/* No-JS / reduced-motion resting state. Motion.js takes over from here and
+   scrubs the draw against scroll position; if it never runs, the field is
+   simply present and static, which is a perfectly good background. */
 .cf-link {
   fill: none;
   stroke: var(--eo-color-content-accent);
   stroke-width: 1;
-  opacity: 0.16;
-  stroke-dasharray: 1400;
-  stroke-dashoffset: 1400;
-  animation:
-    cf-draw 2.2s cubic-bezier(.22,1,.36,1) var(--d) forwards,
-    cf-breathe var(--t) ease-in-out calc(var(--d) + 2.2s) infinite;
+  opacity: 0.15;
 }
-.cf-node {
-  fill: var(--eo-color-content-accent);
+.cf-node { fill: var(--eo-color-content-accent); opacity: 0.28; }
+
+/* keep page content above the field */
+.nav, main, .closer { position: relative; z-index: 1; }
+
+/* ---------- hero ---------- */
+.hero { position: relative; }
+
+.scroll-cue {
+  margin: var(--eo-dimension-48) 0 0;
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--eo-color-content-hinted);
+}
+.scroll-cue span { display: inline-block; animation: cue 2.4s ease-in-out infinite; }
+.scroll-cue::after {
+  content: '';
+  display: block;
+  width: 1px; height: 3.5rem;
+  margin: var(--eo-dimension-12) auto 0;
+  background: linear-gradient(to bottom, var(--eo-color-border-default), transparent);
+}
+@keyframes cue { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+
+/* ---------- the manifesto ----------
+   One sentence, large, revealed word by word against scroll. The only place on
+   the dashboard that makes an argument rather than reporting a number, so it
+   gets the whole band and no card around it. */
+.manifesto { padding: clamp(6rem, 16vw, 14rem) 0; }
+.manifesto-text {
+  max-width: 24ch;
+  margin: 0 auto;
+  font-family: var(--eo-typography-headline-500-font-family);
+  font-size: clamp(1.75rem, 4.6vw, 3.5rem);
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  text-wrap: pretty;
+}
+.manifesto-text b { font-weight: 700; color: var(--eo-color-content-accent); }
+/* Word spans are created by motion.js, so with JS off the sentence is just a
+   sentence at full contrast. */
+.manifesto-text .w { display: inline-block; will-change: opacity; }
+
+/* ---------- loading sequence ---------- */
+.preloader {
+  position: fixed; inset: 0; z-index: 100;
+  display: grid; place-items: center;
+  background: var(--eo-color-surface-subtle);
+}
+.pre-inner { text-align: center; width: min(90vw, 28rem); }
+.pre-word {
+  margin: 0;
+  display: flex; justify-content: center;
+  font-family: var(--eo-typography-headline-700-font-family);
+  font-size: var(--eo-typography-headline-700-font-size);
+  letter-spacing: -0.02em;
+  overflow: hidden;
+}
+.pre-word span { display: inline-block; }
+.pre-word .pre-space { width: 0.32em; }
+.pre-meta {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-top: var(--eo-dimension-16);
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--eo-color-content-subtle);
   opacity: 0;
-  animation: cf-in 0.9s cubic-bezier(.22,1,.36,1) var(--d) forwards;
 }
-@keyframes cf-draw { to { stroke-dashoffset: 0; } }
-@keyframes cf-in   { to { opacity: 0.30; } }
-@keyframes cf-breathe {
-  0%, 100% { opacity: 0.10; }
-  50%      { opacity: 0.24; }
+/* Not tabular-nums: it widens the slash and the digits drift apart mid-count. */
+.pre-count-n { color: var(--eo-color-content-accent); font-weight: 700; }
+.pre-bar {
+  margin-top: var(--eo-dimension-12);
+  height: 2px;
+  background: var(--eo-color-border-subtle);
+  overflow: hidden;
 }
+.pre-bar span {
+  display: block; height: 100%; width: 100%;
+  background: var(--eo-color-content-accent);
+  transform: scaleX(0); transform-origin: left;
+}
+/* If the module never loads, the preloader must not become a wall. */
+.no-js .preloader { display: none; }
+
+/* ---------- token cursor ----------
+   The ring is painted in the accent token and names the token under it. Fine
+   pointers only, overview only, and never when reduced motion is requested. */
+.cursor { position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: 0; }
+.cursor.is-active { opacity: 1; }
+/* The other five tabs are the technical read. No cursor, no cascade, no
+   parallax — they are meant to be screenshot, read and lifted into Notion. */
+body:not([data-tab-state="overview"]) .cursor { display: none; }
+.cursor-dot, .cursor-ring {
+  position: absolute; top: 0; left: 0;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+.cursor-dot {
+  width: 6px; height: 6px; margin: -3px 0 0 -3px;
+  border-radius: var(--eo-dimension-border-radius-round);
+  background: var(--eo-color-content-accent);
+}
+.cursor-ring {
+  width: 34px; height: 34px; margin: -17px 0 0 -17px;
+  border: 1px solid var(--eo-color-border-accent);
+  border-radius: var(--eo-dimension-border-radius-round);
+  display: grid; place-items: center;
+  transition: width 0.28s var(--ease-out), height 0.28s var(--ease-out),
+              margin 0.28s var(--ease-out), background-color 0.28s var(--ease-out);
+}
+.cursor.is-hover .cursor-ring {
+  width: 54px; height: 54px; margin: -27px 0 0 -27px;
+  background: color-mix(in srgb, var(--eo-color-content-accent) 10%, transparent);
+}
+.cursor.is-down .cursor-ring { width: 26px; height: 26px; margin: -13px 0 0 -13px; }
+.cursor-label {
+  position: absolute; top: 100%; left: 50%;
+  transform: translate(-50%, 8px);
+  white-space: nowrap;
+  font-family: var(--eo-typography-code-100-font-family, monospace);
+  font-size: 0.6875rem;
+  letter-spacing: 0.02em;
+  color: var(--eo-color-content-on-emphasized);
+  background: var(--eo-color-surface-emphasized);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--eo-dimension-border-radius-small);
+  opacity: 0;
+  transition: opacity 0.2s var(--ease-out);
+}
+.cursor.has-token .cursor-label { opacity: 1; }
+/* The real pointer stays hidden only where the custom one is actually running. */
+body[data-tab-state="overview"].cursor-on,
+body[data-tab-state="overview"].cursor-on * { cursor: none; }
+
+@media (pointer: coarse) { .cursor { display: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .cf-link { animation: none; stroke-dashoffset: 0; opacity: 0.14; }
-  .cf-node { animation: none; opacity: 0.26; }
+  .cursor, .preloader { display: none; }
+  .scroll-cue span { animation: none; }
 }

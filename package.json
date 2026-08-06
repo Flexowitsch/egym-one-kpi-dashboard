@@ -2,7 +2,7 @@
   "name": "egym-one-kpi-dashboard",
   "version": "0.1.0",
   "private": true,
-  "description": "EGYM One Design System \u2014 KPI dashboard. Built with the real design system packages and token system.",
+  "description": "EGYM One Design System — KPI dashboard. Built with the real design system packages and token system.",
   "type": "module",
   "scripts": {
     "vendor": "node scripts/vendor-ds.mjs",
@@ -17,6 +17,7 @@
   "dependencies": {
     "@egym-private/egym-one-design-system-icons": "0.1.25",
     "@egym-private/egym-one-design-system-web": "0.1.25",
-    "gsap": "^3.15.0"
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.26"
   }
 }

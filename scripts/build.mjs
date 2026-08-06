@@ -84,11 +84,11 @@ const dimN = designVsCode ? designVsCode.dimensions.length : 0;
 /* ══════════════════════════════════════════════════════════════ OVERVIEW ═══ */
 const overview = `
 <section class="hero">
-  <div class="cascade-wrap">${cascadeField()}</div>
-  <p class="eyebrow">Design system health · inspection ${esc(inspection?.date ?? meta.asOf)}</p>
-  <h1>The state of EGYM One,<br>on one screen</h1>
-  <p class="standfirst">One number for the system, ten stations behind it, and the delivery data that explains why it sits where it does.</p>
-  <div class="score-hero">
+  <div class="hero-inner">
+  <p class="eyebrow" data-token="--eo-color-content-accent">Design system health · inspection ${esc(inspection?.date ?? meta.asOf)}</p>
+  <h1 data-token="--eo-typography-headline-700">The state of EGYM One,<br>on one screen</h1>
+  <p class="standfirst" data-token="--eo-color-content-subtle">One number for the system, ten stations behind it, and the delivery data that explains why it sits where it does.</p>
+  <div class="score-hero" data-token="--eo-typography-headline-800">
     <span class="n"${inspection ? ` data-count="${inspection.shippedTotal}" data-tpl="__"` : ''}>${
       inspection?.shippedTotal ?? '—'
     }</span><span class="d">/100</span>
@@ -102,6 +102,20 @@ const overview = `
     ${chip(`${cv.gitTags} tagged releases`, 'negative')}
     ${chip(`${cv.externalContributors} external contributors`, 'positive')}
   </div>
+  </div>
+  <p class="scroll-cue" aria-hidden="true"><span>Scroll</span></p>
+</section>
+
+<!-- The finding, in one sentence, revealed word by word as you scroll past it.
+     It is the only place on the dashboard that argues rather than reports, so it
+     gets the whole viewport and no chrome. -->
+<section class="band manifesto">
+  <p class="manifesto-text" data-scrub-text>
+    Across roughly 480 components and 1,619 variables, the entire design-side
+    defect list is <b>two broken token aliases, one broken component set and
+    three property inconsistencies</b>. The code side has not moved in six days,
+    across five inspections. <b>The gap is not quality. It is throughput.</b>
+  </p>
 </section>
 
 <section class="band tight">
@@ -589,13 +603,41 @@ const html = `<!doctype html>
 <link rel="stylesheet" href="./vendor/egym-one-tokens.css">
 <style>${css}</style>
 </head>
-<body>
+<body data-tab-state="overview">
+
+<!-- Overview is the promotional face of the system; the other five tabs are the
+     working dashboard. Everything in this block belongs to the overview and is
+     switched off the moment another tab is selected. -->
+
+<!-- The four-tier token cascade, fixed behind the whole page. Scroll draws it:
+     Core resolves first, Appearance last. Marked up once, not per section. -->
+<div class="cascade-field" aria-hidden="true"><div class="cascade-track">${cascadeField()}</div></div>
+
+<!-- Loading sequence. Plays once per session and removes itself after 2.4s no
+     matter what, because a KPI page must never be held behind an animation. -->
+<div id="preloader" class="preloader" aria-hidden="true">
+  <div class="pre-inner">
+    <p class="pre-word"><span>E</span><span>G</span><span>Y</span><span>M</span><span class="pre-space"></span><span>O</span><span>n</span><span>e</span></p>
+    <div class="pre-meta">
+      <span class="pre-label">Design system</span>
+      <span class="pre-count"><span class="pre-count-n">0</span>/100</span>
+    </div>
+    <div class="pre-bar"><span></span></div>
+  </div>
+</div>
+
+<!-- Token cursor. The ring is the accent token; hovering anything carrying a
+     data-token attribute names the token it is painted with, so the page
+     teaches the system while you read it. Pointer-fine only. -->
+<div class="cursor" aria-hidden="true">
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"><span class="cursor-label"></span></div>
+</div>
 
 <nav class="nav">
   <div class="nav-inner">
     <a class="wordmark" href="#overview" aria-label="EGYM One design system dashboard">
       <span class="mark">${LOGO_SVG}<span class="one">One</span></span>
-      <span class="sub">Design System</span>
     </a>
     <div class="tabs" role="tablist" aria-label="Dashboard sections">
       ${TABS.map(
@@ -651,6 +693,9 @@ const html = `<!doctype html>
       p.toggleAttribute('hidden', !on);
     });
     if (push) history.replaceState(null, '', '#' + id);
+    // The promotional layer — cascade, cursor, parallax — is scoped to overview.
+    // The other tabs are the technical read, and the fragments come off them.
+    document.body.dataset.tabState = id;
     window.scrollTo({ top: 0, behavior: 'instant' });
     window.__dashTabIn && window.__dashTabIn(document.getElementById('panel-' + id));
   };

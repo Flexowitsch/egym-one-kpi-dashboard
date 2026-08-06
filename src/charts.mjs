@@ -243,57 +243,90 @@ export function pipeline(segments, { width = 520, height = 40 } = {}) {
    produces the same field and diffs stay clean. Drawn once with
    stroke-dashoffset, then it breathes very slowly. Sits far back, at low
    opacity, in a colour taken from the system. */
-export function cascadeField({ width = 1440, height = 720, seed = 7 } = {}) {
+export function cascadeField({ width = 1440, height = 2700, seed = 7, cycles = 2 } = {}) {
   // small deterministic PRNG — Math.random is unavailable and would churn diffs
   let s = seed;
   const rnd = () => ((s = (s * 1664525 + 1013904223) % 4294967296) / 4294967296);
 
-  const cols = [
-    { x: 0.13, n: 9, r: 3.4 },   // Core
-    { x: 0.38, n: 16, r: 2.6 },  // Brand
-    { x: 0.63, n: 7, r: 3.0 },   // Breakpoint
-    { x: 0.86, n: 4, r: 3.8 },   // Appearance
+  // Tiers run top to bottom, not left to right, so scrolling the page is
+  // literally descending through the cascade. The canvas is several viewports
+  // tall and the whole cascade repeats down it, so there is always a full,
+  // fully-drawn slice on screen rather than a partly-drawn one.
+  const TIERS = [
+    { n: 22, r: 2.6 }, // Core
+    { n: 34, r: 2.0 }, // Brand
+    { n: 24, r: 2.4 }, // Breakpoint
+    { n: 11, r: 3.2 }, // Appearance
   ];
+  const total = TIERS.length * cycles + 1;
+  const rows = Array.from({ length: total }, (_, i) => ({
+    ...TIERS[i % TIERS.length],
+    y: 0.02 + (0.96 * i) / (total - 1),
+  }));
 
-  const nodes = cols.map((c) =>
-    Array.from({ length: c.n }, (_, i) => ({
-      x: c.x * width + (rnd() - 0.5) * width * 0.05,
-      y: height * (0.12 + (0.76 * (i + 0.5)) / c.n) + (rnd() - 0.5) * height * 0.06,
-      r: c.r,
-    }))
+  // t is each node's normalised position along its row. Keeping it on the node
+  // is what makes the field read as a cascade rather than a hairball: a link
+  // may only reach a node at a similar t, so the strands stay roughly parallel
+  // and cross a little instead of a lot. An alias in the real system resolves
+  // into its neighbouring tier, not to an arbitrary variable, so this is also
+  // the truer picture.
+  const nodes = rows.map((c) =>
+    Array.from({ length: c.n }, (_, i) => {
+      const t = (i + 0.5) / c.n;
+      return {
+        t,
+        x: width * (0.02 + 0.96 * t) + (rnd() - 0.5) * width * 0.03,
+        y: c.y * height + (rnd() - 0.5) * height * 0.012,
+        r: c.r,
+      };
+    })
   );
 
-  // each node in a column links forward to one or two in the next
   const links = [];
   for (let c = 0; c < nodes.length - 1; c++) {
+    const next = nodes[c + 1];
     nodes[c].forEach((a) => {
-      const next = nodes[c + 1];
-      const count = rnd() > 0.55 ? 2 : 1;
-      for (let k = 0; k < count; k++) {
-        const b = next[Math.floor(rnd() * next.length)];
-        const mx = (a.x + b.x) / 2;
+      // candidates within a band of a's own position, nearest first
+      const near = next
+        .map((b) => ({ b, dist: Math.abs(b.t - a.t) }))
+        .sort((p, q) => p.dist - q.dist)
+        .slice(0, 3);
+      const count = rnd() > 0.62 ? 2 : 1;
+      for (let k = 0; k < count && k < near.length; k++) {
+        const b = near[k === 0 ? 0 : 1 + Math.floor(rnd() * (near.length - 1))].b;
+        // gentle S-curve: control points at 42% and 58% of the drop, so lines
+        // leave and arrive vertically and never kink
+        const dy = b.y - a.y;
         links.push({
-          d: `M${a.x.toFixed(1)},${a.y.toFixed(1)} C${mx.toFixed(1)},${a.y.toFixed(1)} ${mx.toFixed(1)},${b.y.toFixed(1)} ${b.x.toFixed(1)},${b.y.toFixed(1)}`,
-          delay: (c * 0.35 + rnd() * 0.5).toFixed(2),
-          dur: (2.6 + rnd() * 1.6).toFixed(2),
+          d:
+            `M${a.x.toFixed(1)},${a.y.toFixed(1)} ` +
+            `C${a.x.toFixed(1)},${(a.y + dy * 0.42).toFixed(1)} ` +
+            `${b.x.toFixed(1)},${(a.y + dy * 0.58).toFixed(1)} ` +
+            `${b.x.toFixed(1)},${b.y.toFixed(1)}`,
+          tier: c,
         });
       }
     });
   }
 
+  // Tier index rides along on each element so the scroll scrub can draw the
+  // cascade in resolution order: Core first, Appearance last.
   const paths = links
-    .map((l) => `<path class="cf-link" d="${l.d}" style="--d:${l.delay}s;--t:${l.dur}s"/>`)
+    .map((l) => `<path class="cf-link" data-tier="${l.tier}" d="${l.d}"/>`)
     .join('');
   const dots = nodes
-    .flat()
-    .map(
-      (n, i) =>
-        `<circle class="cf-node" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${n.r}" style="--d:${(
-          0.4 + (i % 11) * 0.09
-        ).toFixed(2)}s"/>`
+    .map((col, c) =>
+      col
+        .map(
+          (n) =>
+            `<circle class="cf-node" data-tier="${c}" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(
+              1
+            )}" r="${n.r}"/>`
+        )
+        .join('')
     )
     .join('');
 
-  return `<svg class="cascade" viewBox="0 0 ${width} ${height}" preserveAspectRatio="xMidYMid slice"
+  return `<svg class="cascade" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none"
     aria-hidden="true" focusable="false">${paths}${dots}</svg>`;
 }

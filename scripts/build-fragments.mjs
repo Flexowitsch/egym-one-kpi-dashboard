@@ -310,7 +310,7 @@ console.log('  visual: coverage-rings, now, stations');
 const cascadeFragment = () => visPage(
   'Token cascade',
   `<div class="v-frag" style="position:relative;overflow:hidden;min-height:280px">
-     <div class="cf-bg">${cascadeField({ width: 900, height: 420, seed: 11 })}</div>
+     <div class="cf-bg">${cascadeField({ width: 900, height: 420, seed: 11, cycles: 1 })}</div>
      <div style="position:relative;z-index:1">
        <p class="v-eyebrow">Token system</p>
        <p class="v-title">${data.tokenAudit.variables.toLocaleString('en-GB')} variables, four tiers</p>
@@ -318,16 +318,26 @@ const cascadeFragment = () => visPage(
      </div>
      <p class="v-meta" style="position:relative;z-index:1"><span>Full read of the token system</span><span>Updated ${esc(fmt(fragments.updated))}</span></p>
    </div>`,
+  /* The text sits left, so the field is masked away there and carries the right
+     half of the card. Same idea as the dashboard: the cascade frames the
+     reading area rather than running under it. */
   `.cf-bg{position:absolute;inset:0;pointer-events:none;
-    -webkit-mask-image:radial-gradient(ellipse 75% 70% at 55% 50%,#000 30%,transparent 80%);
-            mask-image:radial-gradient(ellipse 75% 70% at 55% 50%,#000 30%,transparent 80%)}
+    -webkit-mask-image:linear-gradient(to right,transparent 0,transparent 38%,#000 78%,#000 100%);
+            mask-image:linear-gradient(to right,transparent 0,transparent 38%,#000 78%,#000 100%)}
    .cf-bg svg{width:100%;height:100%;display:block}
+   /* Delay comes off the tier the element belongs to, so the cascade resolves
+      Core → Brand → Breakpoint → Appearance. No JS: this fragment is an iframe
+      in Notion and has to animate on its own. */
    .cf-link{fill:none;stroke:var(--eo-color-content-accent);stroke-width:1;opacity:.16;
      stroke-dasharray:1400;stroke-dashoffset:1400;
-     animation:cf-draw 2.2s cubic-bezier(.22,1,.36,1) var(--d) forwards,
-               cf-breathe var(--t) ease-in-out calc(var(--d) + 2.2s) infinite}
+     animation:cf-draw 1.8s cubic-bezier(.22,1,.36,1) var(--d,0s) forwards,
+               cf-breathe 3.4s ease-in-out calc(var(--d,0s) + 1.8s) infinite}
    .cf-node{fill:var(--eo-color-content-accent);opacity:0;
-     animation:cf-in .9s cubic-bezier(.22,1,.36,1) var(--d) forwards}
+     animation:cf-in .9s cubic-bezier(.22,1,.36,1) var(--d,0s) forwards}
+   [data-tier="0"]{--d:.15s}
+   [data-tier="1"]{--d:.75s}
+   [data-tier="2"]{--d:1.35s}
+   [data-tier="3"]{--d:1.95s}
    @keyframes cf-draw{to{stroke-dashoffset:0}}
    @keyframes cf-in{to{opacity:.30}}
    @keyframes cf-breathe{0%,100%{opacity:.10}50%{opacity:.24}}
