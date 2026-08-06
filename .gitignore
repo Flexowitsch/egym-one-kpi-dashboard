@@ -2,3 +2,7 @@ node_modules/
 .ds-entry.js
 .vendor-tmp/
 .DS_Store
+
+# Never commit secrets. This repo is public and serves GitHub Pages from it.
+.env
+.env.local
