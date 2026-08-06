@@ -718,12 +718,12 @@
         "illustrative-empty-state has conflicting variant combinations, so Figma cannot read its properties at all."
       ],
       [
-        "13 icons spell isFilled differently",
-        "isFilled is canonical across 320 sets; 13 use \"is filled\", \"isfilled\" or \"IsFilled\", including all four chevrons and checkmark. Renaming a variant property is breaking, so this needs a versioned change rather than a quiet fix."
-      ],
-      [
         "One icon breaks hyphen-case",
         "\"genius weekly target\" uses spaces where all 347 others use hyphens."
+      ],
+      [
+        "3 public properties still disagree",
+        "Intent on two date components, isLoading on card-class, and is user filled on input-text and input-unit. Renaming these is breaking, so it needs the scheduled track and a migration note rather than a quiet fix."
       ]
     ]
   },
@@ -918,5 +918,79 @@
       }
     },
     "note": "A consumer switching an icon to filled has to know which of four spellings that particular icon uses. The four chevrons and checkmark are among the most-used icons in the set."
+  },
+  "deepScan": {
+    "measuredAt": "2026-08-06",
+    "source": "Full traversal of all three design files via the Figma plugin bridge",
+    "localStyles": {
+      "uiKit": 0,
+      "icons": 0,
+      "note": "Zero local paint, text, effect or grid styles in either library. Everything runs through variables — the legacy style path has been fully retired."
+    },
+    "autoLayout": {
+      "framesScanned": 43551,
+      "withAutoLayout": 25964,
+      "pct": 60,
+      "absolutePositioned": 4181,
+      "weakest": [
+        "logo 0%",
+        "cluster 0%",
+        "focus-outline 0%",
+        "loading-spinner 0%",
+        "utility/selection-indicator 0%",
+        "pagination-dots 25%",
+        "segmented-control 26%"
+      ],
+      "note": "Several of the 0% cases are legitimately static artwork — logo, focus-outline and loading-spinner are single-shape components. segmented-control at 26% across 1,680 frames is the one worth looking at."
+    },
+    "propertyNaming": {
+      "uiKitDistinctProperties": 304,
+      "inconsistentConceptsBefore": 14,
+      "inconsistentConceptsAfter": 3,
+      "fixedInternal": 28,
+      "remainingPublic": [
+        {
+          "concept": "intent",
+          "majority": "intent (57 sets)",
+          "outlier": "Intent",
+          "on": [
+            "Month unit: Mobile",
+            "Data picker: Mobile"
+          ]
+        },
+        {
+          "concept": "is loading",
+          "majority": "is loading (2 sets)",
+          "outlier": "isLoading",
+          "on": [
+            "card-class"
+          ]
+        },
+        {
+          "concept": "is user-filled",
+          "majority": "is user-filled (3 sets)",
+          "outlier": "is user filled",
+          "on": [
+            "input-unit",
+            "input-text"
+          ]
+        }
+      ],
+      "note": "The form family is the worst of these: input-comment, input-password and textarea say is user-filled while input-unit and input-text say is user filled. Sibling components disagreeing is exactly what makes an API hard to learn."
+    },
+    "iconsPropertyNaming": {
+      "before": {
+        "isFilled": 320,
+        "divergent": 13,
+        "checkedConcept": 2
+      },
+      "after": {
+        "isFilled": 333,
+        "isAccentColor": 9,
+        "isChecked": 2,
+        "divergent": 0
+      },
+      "note": "All 13 isFilled spellings aligned, and the two organisation components now agree on isChecked."
+    }
   }
 }
