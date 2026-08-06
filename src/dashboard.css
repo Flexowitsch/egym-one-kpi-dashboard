@@ -6,8 +6,18 @@
    small uppercase accent eyebrows, a big stat row, and a dark closing band.
 
    Every colour, type step, radius and spacing value resolves to an --eo-* token
-   from the published design system. Where a token does not exist, it is called
-   out in a comment rather than papered over with a literal.
+   from the published design system.
+
+   Spacing follows the semantic scale, not the primitives underneath it:
+     gap / row-gap / column-gap  ->  --eo-dimension-gap-*
+     padding                     ->  --eo-dimension-padding-block-* / -inline-*
+
+   Three things still sit on primitives, because the token system has no
+   semantic equivalent for them yet — worth raising:
+     margin        no semantic margin scale exists
+     bar heights   these are sizes, not spacing
+     band rhythm   the padding scale stops at 2rem; the vertical rhythm between
+                   sections needs 2.5-7rem, so those use clamp()
    --------------------------------------------------------------------------- */
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -45,8 +55,8 @@ body {
 }
 .nav-inner {
   max-width: 1180px; margin: 0 auto;
-  padding: var(--eo-dimension-16) var(--gutter);
-  display: flex; align-items: center; gap: var(--eo-dimension-24); flex-wrap: wrap;
+  padding: var(--eo-dimension-padding-block-medium) var(--gutter);
+  display: flex; align-items: center; gap: var(--eo-dimension-gap-largest); flex-wrap: wrap;
 }
 .wordmark {
   font-family: var(--eo-typography-action-label-100-font-family);
@@ -57,14 +67,14 @@ body {
 }
 .wordmark span { display: block; color: var(--eo-color-content-accent); }
 
-.tabs { display: flex; gap: var(--eo-dimension-4); flex-wrap: wrap; margin-left: auto; }
+.tabs { display: flex; gap: var(--eo-dimension-gap-small); flex-wrap: wrap; margin-left: auto; }
 .tab {
   appearance: none; border: 0; cursor: pointer;
   background: transparent;
   color: var(--eo-color-content-subtle);
   font-family: var(--eo-typography-body-100-font-family);
   font-size: var(--eo-typography-body-50-font-size);
-  padding: var(--eo-dimension-8) var(--eo-dimension-16);
+  padding: var(--eo-dimension-padding-block-default) var(--eo-dimension-padding-inline-default);
   border-radius: var(--eo-dimension-border-radius-round);
 }
 .tab:hover { background: var(--eo-color-surface-default); color: var(--eo-color-content-emphasized); }
@@ -134,7 +144,7 @@ body {
 
 .score-hero {
   display: flex; align-items: baseline; justify-content: center;
-  gap: var(--eo-dimension-8);
+  gap: var(--eo-dimension-gap-default);
   margin-top: var(--eo-dimension-32);
 }
 .score-hero .n {
@@ -155,7 +165,7 @@ body {
 }
 .score-sub b { color: var(--eo-color-content-emphasized); }
 
-.pill-row { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--eo-dimension-8); margin-top: var(--eo-dimension-24); }
+.pill-row { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--eo-dimension-gap-default); margin-top: var(--eo-dimension-24); }
 
 /* ===========================================================================
    STAT ROW — the "20k / 700k / 2.2m / 4.8" treatment
@@ -172,7 +182,7 @@ body {
   .stat-row > * + * { border-left: 0; border-top: 1px solid var(--eo-color-border-subtle); }
 }
 /* eo-card paints the surface and radius; this only lays out its slotted content */
-.stat-in { padding: clamp(1.5rem, 3vw, 2.5rem) var(--eo-dimension-20); text-align: center; }
+.stat-in { padding: clamp(1.5rem, 3vw, 2.5rem) var(--eo-dimension-padding-inline-large); text-align: center; }
 .stat { display: block; }
 .stat-in .v {
   font-family: var(--eo-typography-headline-500-font-family);
@@ -191,9 +201,9 @@ body {
 /* ===========================================================================
    BENTO — alternating content / visual cards
    =========================================================================== */
-.bento { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--eo-dimension-16); }
+.bento { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--eo-dimension-gap-extra-large); }
 .tile { grid-column: span 12; min-width: 0; display: block; }
-.tile-in { padding: var(--eo-dimension-24); display: flex; flex-direction: column; gap: var(--eo-dimension-12); }
+.tile-in { padding: var(--eo-dimension-padding-block-large); display: flex; flex-direction: column; gap: var(--eo-dimension-gap-large); }
 
 .tile-in h3 {
   margin: 0;
@@ -241,8 +251,8 @@ body {
 .c-donut-sub   { fill: var(--eo-color-content-subtle); font-size: 11px; }
 
 /* horizontal station bars */
-.sbars { display: grid; gap: var(--eo-dimension-8); }
-.sbar { display: grid; grid-template-columns: 1.5rem minmax(120px, 1fr) 2fr 2.2rem; gap: var(--eo-dimension-8); align-items: center; font-size: var(--eo-typography-body-50-font-size); }
+.sbars { display: grid; gap: var(--eo-dimension-gap-default); }
+.sbar { display: grid; grid-template-columns: 1.5rem minmax(120px, 1fr) 2fr 2.2rem; gap: var(--eo-dimension-gap-default); align-items: center; font-size: var(--eo-typography-body-50-font-size); }
 .sbar .i { color: var(--eo-color-content-hinted); font-variant-numeric: tabular-nums; }
 .sbar .nm { color: var(--eo-color-content-subtle); overflow-wrap: break-word; }
 .sbar .track { height: var(--eo-dimension-8); border-radius: var(--eo-dimension-border-radius-round); background: var(--eo-color-surface-subtle); position: relative; overflow: hidden; }
@@ -254,8 +264,8 @@ body {
 .sbar .sc { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* bar rows (status distributions) */
-.bars { display: grid; gap: var(--eo-dimension-8); margin: 0; }
-.bar-row { display: grid; grid-template-columns: minmax(140px, auto) 1fr 2.5rem; align-items: center; gap: var(--eo-dimension-12); font-size: var(--eo-typography-body-50-font-size); }
+.bars { display: grid; gap: var(--eo-dimension-gap-default); margin: 0; }
+.bar-row { display: grid; grid-template-columns: minmax(140px, auto) 1fr 2.5rem; align-items: center; gap: var(--eo-dimension-gap-large); font-size: var(--eo-typography-body-50-font-size); }
 .bar-row .label { color: var(--eo-color-content-subtle); }
 .bar-row .count { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
 .bar-track { height: var(--eo-dimension-12); border-radius: var(--eo-dimension-border-radius-small); background: var(--eo-color-surface-subtle); overflow: hidden; }
@@ -273,11 +283,11 @@ body {
 /* ===========================================================================
    SHARED BITS
    =========================================================================== */
-.chips { display: flex; flex-wrap: wrap; gap: var(--eo-dimension-4); margin: 0; padding: 0; list-style: none; }
+.chips { display: flex; flex-wrap: wrap; gap: var(--eo-dimension-gap-small); margin: 0; padding: 0; list-style: none; }
 .chips li { display: block; }
 
-.facts { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--eo-dimension-8); }
-.facts li { display: flex; justify-content: space-between; gap: var(--eo-dimension-12); padding-bottom: var(--eo-dimension-8); border-bottom: 1px solid var(--eo-color-border-subtle); font-size: var(--eo-typography-body-50-font-size); }
+.facts { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--eo-dimension-gap-default); }
+.facts li { display: flex; justify-content: space-between; gap: var(--eo-dimension-gap-large); padding-bottom: var(--eo-dimension-padding-block-default); border-bottom: 1px solid var(--eo-color-border-subtle); font-size: var(--eo-typography-body-50-font-size); }
 .facts li:last-child { border-bottom: 0; padding-bottom: 0; }
 .facts .k { color: var(--eo-color-content-subtle); }
 /* No tabular-nums: these values mix figures with punctuation ("174, 152, 104 d"),
@@ -289,8 +299,8 @@ body {
 
 .table-scroll { overflow-x: auto; }
 table { width: 100%; min-width: 600px; border-collapse: collapse; font-size: var(--eo-typography-body-50-font-size); }
-thead th { text-align: left; padding: var(--eo-dimension-8); border-bottom: 1px solid var(--eo-color-border-hinted); color: var(--eo-color-content-subtle); font-weight: 700; white-space: nowrap; }
-tbody td { padding: var(--eo-dimension-8); border-bottom: 1px solid var(--eo-color-border-subtle); vertical-align: top; }
+thead th { text-align: left; padding: var(--eo-dimension-padding-block-default); border-bottom: 1px solid var(--eo-color-border-hinted); color: var(--eo-color-content-subtle); font-weight: 700; white-space: nowrap; }
+tbody td { padding: var(--eo-dimension-padding-block-default); border-bottom: 1px solid var(--eo-color-border-subtle); vertical-align: top; }
 tbody tr:last-child td { border-bottom: 0; }
 /* No tabular-nums on keys: in Helvetica Now Display the tabular feature widens the
    hyphen, rendering "DSC-100" as "DSC - 100". These are identifiers. */
@@ -298,10 +308,10 @@ td.key { white-space: nowrap; font-weight: 700; }
 td.age { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 td.age.stale { color: var(--eo-color-content-utility-negative); font-weight: 700; }
 
-.ticket-list { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--eo-dimension-4); }
+.ticket-list { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--eo-dimension-gap-small); }
 .ticket-list li {
   font-size: var(--eo-typography-body-50-font-size); font-weight: 700;
-  padding: var(--eo-dimension-2) var(--eo-dimension-8);
+  padding: var(--eo-dimension-padding-block-smallest) var(--eo-dimension-padding-inline-small);
   border-radius: var(--eo-dimension-border-radius-small);
   background: var(--eo-color-surface-subtle); color: var(--eo-color-content-subtle);
 }
@@ -322,7 +332,7 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
   color: var(--eo-color-content-on-emphasized-subtle);
   position: relative; overflow: hidden;
 }
-.closer-inner { max-width: 1180px; margin: 0 auto; padding: var(--eo-dimension-48) var(--eo-dimension-24) var(--eo-dimension-32); position: relative; z-index: 1; }
+.closer-inner { max-width: 1180px; margin: 0 auto; padding: var(--eo-dimension-48) var(--eo-dimension-padding-inline-large) var(--eo-dimension-padding-block-largest); position: relative; z-index: 1; }
 .closer h2 {
   margin: 0 0 var(--eo-dimension-16);
   color: var(--eo-color-content-on-emphasized);
@@ -344,7 +354,7 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
 }
 
 @media (max-width: 640px) {
-  .bar-row { grid-template-columns: 1fr; gap: var(--eo-dimension-4); }
+  .bar-row { grid-template-columns: 1fr; gap: var(--eo-dimension-gap-small); }
   .bar-row .count { text-align: left; }
   .sbar { grid-template-columns: 1.5rem 1fr 2.2rem; }
   .sbar .track { grid-column: 1 / -1; }
@@ -357,9 +367,9 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
 .matrix { display: grid; gap: 0; }
 .matrix-head, .matrix-row {
   display: grid; grid-template-columns: 1fr 5.5rem 5.5rem;
-  gap: var(--eo-dimension-12); align-items: center;
+  gap: var(--eo-dimension-gap-large); align-items: center;
 }
-.matrix-head { padding-bottom: var(--eo-dimension-8); border-bottom: 1px solid var(--eo-color-border-hinted); }
+.matrix-head { padding-bottom: var(--eo-dimension-padding-block-default); border-bottom: 1px solid var(--eo-color-border-hinted); }
 .matrix-head .mh {
   text-align: center;
   font-family: var(--eo-typography-action-label-100-font-family);
@@ -385,7 +395,7 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
 }
 .cell.absent > span { background: transparent; box-shadow: inset 0 0 0 2px var(--eo-color-border-utility-negative); }
 .matrix-detail {
-  display: grid; grid-template-columns: 1fr 1fr; gap: var(--eo-dimension-16);
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--eo-dimension-gap-extra-large);
   padding: 0 0 var(--eo-dimension-12);
   border-bottom: 1px solid var(--eo-color-border-subtle);
   font-size: var(--eo-typography-body-50-font-size);
@@ -393,12 +403,12 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
 }
 .matrix-detail b { color: var(--eo-color-content-emphasized); }
 @media (max-width: 760px) {
-  .matrix-detail { grid-template-columns: 1fr; gap: var(--eo-dimension-4); }
+  .matrix-detail { grid-template-columns: 1fr; gap: var(--eo-dimension-gap-small); }
   .matrix-head, .matrix-row { grid-template-columns: 1fr 3.5rem 3.5rem; }
 }
 
-.legend { display: flex; flex-wrap: wrap; gap: var(--eo-dimension-16); font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-subtle); }
-.legend span { display: flex; align-items: center; gap: var(--eo-dimension-8); }
+.legend { display: flex; flex-wrap: wrap; gap: var(--eo-dimension-gap-extra-large); font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-subtle); }
+.legend span { display: flex; align-items: center; gap: var(--eo-dimension-gap-default); }
 
 /* ---------- slope chart ---------- */
 .sl { stroke-width: 2; fill: none; }
@@ -425,9 +435,9 @@ eo-card > * { width: 100%; }
 .tabs eo-button { display: inline-block; }
 
 /* design-side open items */
-.openlist { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--eo-dimension-12); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.openlist { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--eo-dimension-gap-large); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
 .openlist li {
-  display: grid; gap: var(--eo-dimension-2);
+  display: grid; gap: var(--eo-dimension-gap-smallest);
   padding-left: var(--eo-dimension-12);
   border-left: 2px solid var(--eo-color-border-utility-warning);
   font-size: var(--eo-typography-body-50-font-size);
@@ -436,11 +446,11 @@ eo-card > * { width: 100%; }
 .openlist span { color: var(--eo-color-content-subtle); }
 
 /* ---------- change list (replaces the slope chart) ---------- */
-.changes { display: grid; gap: var(--eo-dimension-4); }
+.changes { display: grid; gap: var(--eo-dimension-gap-small); }
 .change-head, .change-row {
   display: grid;
   grid-template-columns: minmax(120px, 1.4fr) 2rem 1fr 3.5rem;
-  gap: var(--eo-dimension-12); align-items: center;
+  gap: var(--eo-dimension-gap-large); align-items: center;
 }
 .change-head span {
   font-family: var(--eo-typography-action-label-100-font-family);
@@ -473,7 +483,7 @@ eo-card > * { width: 100%; }
   margin: var(--eo-dimension-12) 0 0;
   font-size: var(--eo-typography-body-50-font-size);
   color: var(--eo-color-content-hinted);
-  display: inline-flex; align-items: center; gap: var(--eo-dimension-8);
+  display: inline-flex; align-items: center; gap: var(--eo-dimension-gap-default);
 }
 .stamp .dot { width: 6px; height: 6px; border-radius: var(--eo-dimension-border-radius-round); flex: none; }
 .stamp .dot.live { background: var(--eo-color-surface-utility-positive); }

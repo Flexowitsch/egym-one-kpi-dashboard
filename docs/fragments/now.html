@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en" class="brand-egym light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>In progress — EGYM One</title>
+<link rel="stylesheet" href="../vendor/egym-one-tokens.css">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:transparent}
+body{font-family:var(--eo-typography-body-100-font-family);color:var(--eo-color-content-emphasized);-webkit-font-smoothing:antialiased}
+.v-frag{background:var(--eo-color-surface-default);border-radius:var(--eo-dimension-border-radius-large);padding: var(--eo-dimension-padding-block-large);min-height:100%;display:flex;flex-direction:column;gap:var(--eo-dimension-gap-large)}
+.v-eyebrow{margin:0;font-family:var(--eo-typography-action-label-100-font-family);font-size:var(--eo-typography-body-50-font-size);letter-spacing:.1em;text-transform:uppercase;color:var(--eo-color-content-accent);font-weight:700}
+.v-title{margin:0;font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-typography-headline-300-font-size);line-height:1.2}
+.v-note{margin:0;font-size:var(--eo-typography-body-50-font-size);line-height:var(--eo-typography-body-50-line-height);color:var(--eo-color-content-subtle)}
+.v-meta{margin:auto 0 0;padding-top:var(--eo-dimension-12);border-top:1px solid var(--eo-color-border-subtle);font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-hinted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:var(--eo-dimension-gap-small)}
+svg{display:block;max-width:100%;height:auto}
+/* rings draw themselves in */
+.ring{fill:none;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%}
+.ring.track{stroke:var(--eo-color-surface-subtle)}
+.ring.fill{animation:draw 1.4s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:var(--off)}}
+.bar-fill{animation:grow 1.1s cubic-bezier(.22,1,.36,1) forwards;transform-origin:left center}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.pop{animation:pop .5s cubic-bezier(.22,1,.36,1) backwards}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.ring.fill,.bar-fill,.pop{animation:none}.ring.fill{stroke-dashoffset:var(--off)}.bar-fill{transform:none}}
+.rows{display:grid;gap:var(--eo-dimension-gap-default);margin:0;padding:0;list-style:none}
+.row{display:flex;align-items:baseline;gap:var(--eo-dimension-gap-default);font-size:var(--eo-typography-body-50-font-size)}
+.row .k{font-weight:700;font-variant-numeric:tabular-nums;color:var(--eo-color-content-accent);white-space:nowrap}
+.row .t{color:var(--eo-color-content-emphasized)}
+.row .w{margin-left:auto;color:var(--eo-color-content-hinted);white-space:nowrap}
+</style>
+</head>
+<body><div class="v-frag">
+      <p class="v-eyebrow">Right now</p>
+      <p class="v-title">6 things are moving</p>
+      <p class="v-note" style="margin-top:calc(var(--eo-dimension-4) * -1)">Ready for release</p>
+      <ul class="rows">
+        <li class="row pop" style="animation-delay:0s">
+              <span class="k">DSC-37</span><span class="t">Avatar</span>
+              <span class="w">shipping</span></li><li class="row pop" style="animation-delay:0.05s">
+              <span class="k">DSC-172</span><span class="t">Countdown</span>
+              <span class="w">shipping</span></li>
+      </ul>
+      <p class="v-note">In development</p>
+      <ul class="rows">
+        <li class="row pop" style="animation-delay:0.1s">
+              <span class="k">DSC-188</span><span class="t">Form - Search Filter</span>
+              <span class="w">Youssef Elassri</span></li><li class="row pop" style="animation-delay:0.15000000000000002s">
+              <span class="k">DSC-101</span><span class="t">Alert - Snackbar / Toast</span>
+              <span class="w">Alex Wu Fan</span></li><li class="row pop" style="animation-delay:0.2s">
+              <span class="k">DSC-209</span><span class="t">Introduce AGENTS.md</span>
+              <span class="w">Luis Torres</span></li><li class="row pop" style="animation-delay:0.25s">
+              <span class="k">DSC-201</span><span class="t">iOS hover effect triggers incorrectly on ripple/button</span>
+              <span class="w">unassigned</span></li>
+      </ul>
+      <p class="v-meta"><span>Jira DSC board</span><span>Updated 6 Aug 2026</span></p>
+    </div></body>
+</html>

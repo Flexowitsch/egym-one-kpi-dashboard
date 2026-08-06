@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" class="brand-egym light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stations — EGYM One</title>
+<link rel="stylesheet" href="../vendor/egym-one-tokens.css">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:transparent}
+body{font-family:var(--eo-typography-body-100-font-family);color:var(--eo-color-content-emphasized);-webkit-font-smoothing:antialiased}
+.v-frag{background:var(--eo-color-surface-default);border-radius:var(--eo-dimension-border-radius-large);padding: var(--eo-dimension-padding-block-large);min-height:100%;display:flex;flex-direction:column;gap:var(--eo-dimension-gap-large)}
+.v-eyebrow{margin:0;font-family:var(--eo-typography-action-label-100-font-family);font-size:var(--eo-typography-body-50-font-size);letter-spacing:.1em;text-transform:uppercase;color:var(--eo-color-content-accent);font-weight:700}
+.v-title{margin:0;font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-typography-headline-300-font-size);line-height:1.2}
+.v-note{margin:0;font-size:var(--eo-typography-body-50-font-size);line-height:var(--eo-typography-body-50-line-height);color:var(--eo-color-content-subtle)}
+.v-meta{margin:auto 0 0;padding-top:var(--eo-dimension-12);border-top:1px solid var(--eo-color-border-subtle);font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-hinted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:var(--eo-dimension-gap-small)}
+svg{display:block;max-width:100%;height:auto}
+/* rings draw themselves in */
+.ring{fill:none;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%}
+.ring.track{stroke:var(--eo-color-surface-subtle)}
+.ring.fill{animation:draw 1.4s cubic-bezier(.22,1,.36,1) forwards}
+@keyframes draw{from{stroke-dashoffset:var(--len)}to{stroke-dashoffset:var(--off)}}
+.bar-fill{animation:grow 1.1s cubic-bezier(.22,1,.36,1) forwards;transform-origin:left center}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.pop{animation:pop .5s cubic-bezier(.22,1,.36,1) backwards}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.ring.fill,.bar-fill,.pop{animation:none}.ring.fill{stroke-dashoffset:var(--off)}.bar-fill{transform:none}}
+.rows{display:grid;gap:var(--eo-dimension-gap-default);margin:0;padding:0;list-style:none}
+.row{display:flex;align-items:baseline;gap:var(--eo-dimension-gap-default);font-size:var(--eo-typography-body-50-font-size)}
+.row .k{font-weight:700;font-variant-numeric:tabular-nums;color:var(--eo-color-content-accent);white-space:nowrap}
+.row .t{color:var(--eo-color-content-emphasized)}
+.row .w{margin-left:auto;color:var(--eo-color-content-hinted);white-space:nowrap}
+.strip{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--eo-dimension-gap-default)}
+     @media(min-width:560px){.strip{grid-template-columns:repeat(10,1fr)}}
+     .cell{text-align:center}
+     .sc{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-typography-headline-300-font-size);line-height:1.1;font-variant-numeric:tabular-nums}
+     .sc.red{color:var(--eo-color-content-utility-negative)}
+     .sc.yellow{color:var(--eo-color-content-utility-warning)}
+     .sc.green{color:var(--eo-color-content-utility-positive)}
+     .nm{font-size:.68rem;line-height:1.2;color:var(--eo-color-content-subtle);overflow-wrap:break-word}</style>
+</head>
+<body><div class="v-frag">
+      <p class="v-eyebrow">Inspection 6 Aug 2026</p>
+      <p class="v-title">55<span style="font-size:.5em;color:var(--eo-color-content-hinted)">/100</span> · ten stations</p>
+      <div class="strip"><div class="cell pop" style="animation-delay:0s">
+        <div class="sc red">3</div>
+        <div class="nm">Coverage &amp; gaps</div>
+      </div><div class="cell pop" style="animation-delay:0.04s">
+        <div class="sc green">8</div>
+        <div class="nm">Best practices</div>
+      </div><div class="cell pop" style="animation-delay:0.08s">
+        <div class="sc yellow">5</div>
+        <div class="nm">Accessibility</div>
+      </div><div class="cell pop" style="animation-delay:0.12s">
+        <div class="sc green">8</div>
+        <div class="nm">Shared language</div>
+      </div><div class="cell pop" style="animation-delay:0.16s">
+        <div class="sc yellow">4</div>
+        <div class="nm">Testing &amp; validation</div>
+      </div><div class="cell pop" style="animation-delay:0.2s">
+        <div class="sc yellow">6</div>
+        <div class="nm">Orchestration</div>
+      </div><div class="cell pop" style="animation-delay:0.24s">
+        <div class="sc yellow">6</div>
+        <div class="nm">Governance</div>
+      </div><div class="cell pop" style="animation-delay:0.28s">
+        <div class="sc yellow">5</div>
+        <div class="nm">Feedback &amp; adoption</div>
+      </div><div class="cell pop" style="animation-delay:0.32s">
+        <div class="sc yellow">6</div>
+        <div class="nm">Machine-readable docs</div>
+      </div><div class="cell pop" style="animation-delay:0.36s">
+        <div class="sc yellow">4</div>
+        <div class="nm">Agent access</div>
+      </div></div>
+      <p class="v-note">1 red · 7 yellow · 2 green</p>
+      <p class="v-meta"><span>Design system inspection</span><span>Updated 6 Aug 2026</span></p>
+    </div></body>
+</html>
