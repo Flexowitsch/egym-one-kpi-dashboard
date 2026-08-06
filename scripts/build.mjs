@@ -749,33 +749,6 @@ const html = `<!doctype html>
     <a class="wordmark" href="#overview" aria-label="EGYM One design system dashboard">
       <span class="mark">${LOGO_SVG}<span class="one">One</span></span>
     </a>
-    <!-- Palette switch. The published token stylesheet already ships both
-         brands as .brand-egym and .brand-wellpass, so this changes one class
-         on <html> and the entire page re-colours — nav, charts, cascade,
-         cursor, everything. Nothing here re-themes anything by hand; if a
-         value did not come from a token it simply would not move, which makes
-         this the most honest test of the cascade on the whole dashboard. -->
-    <div class="palette">
-      <eo-button class="palette-btn" size="small" hierarchy="tertiary" intent="neutral"
-        aria-expanded="false" aria-controls="palette-menu"
-        data-token="eo-button · tertiary/neutral">Palette</eo-button>
-      <div class="palette-menu" id="palette-menu" hidden>
-        <p class="palette-head">Brand tier</p>
-        ${[
-          ['egym', 'EGYM', 'orange-700'],
-          ['wellpass', 'Wellpass', 'aqua-800'],
-        ]
-          .map(
-            ([id, label, tok]) => `<button class="palette-opt" data-brand="${id}" type="button">
-              <span class="sw ${id}"></span>
-              <span class="nm">${label}</span>
-              <span class="tk">--eo-color-${tok}</span>
-            </button>`
-          )
-          .join('')}
-        <p class="palette-note">One class on the root. Every colour on this page resolves through the token cascade, so nothing is re-themed by hand.</p>
-      </div>
-    </div>
     <div class="tabs" role="tablist" aria-label="Dashboard sections">
       ${TABS.map(
         ([id, label], i) =>
@@ -786,6 +759,18 @@ const html = `<!doctype html>
              data-token="eo-button · ${i === 0 ? 'primary/brand' : 'tertiary/neutral'}">${esc(label)}</eo-button>`
       ).join('')}
     </div>
+    <!-- Brand switch. One icon-only button, no menu: the dropdown it replaced
+         could not be clicked at all, because eo-button re-emits its click from
+         the shadow root and the outside-click handler closed the menu on the
+         same gesture that opened it. A toggle has no such surface. -->
+    <eo-button class="brand-toggle" size="small" hierarchy="tertiary" intent="neutral"
+      content="icon" data-token="eo-button · content=icon"
+      aria-label="Switch brand — currently EGYM" title="Switch brand">
+      <svg slot="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="8" fill="var(--eo-color-content-accent)"/>
+        <path d="M12 4a8 8 0 0 1 0 16z" fill="var(--eo-color-content-emphasized)" opacity=".18"/>
+      </svg>
+    </eo-button>
   </div>
 </nav>
 
@@ -856,41 +841,32 @@ const html = `<!doctype html>
     tabs[n].focus();
     show(tabs[n].dataset.tab, true);
   });
-  /* ---- palette switch ---------------------------------------------------
+  /* ---- brand switch ------------------------------------------------------
      The published token stylesheet ships .brand-egym and .brand-wellpass, so
-     switching brands is one class on the root element. Persisted, because a
-     dashboard that forgets your choice on every visit is an annoyance rather
-     than a feature. */
+     this is one class on the root element. Everything on the page re-colours
+     through the cascade; nothing is re-themed by hand, which makes it the most
+     honest test on the dashboard — whatever does not move was not on a token. */
   const BRANDS = ['egym', 'wellpass'];
+  const LABEL = { egym: 'EGYM', wellpass: 'Wellpass' };
+  const toggle = document.querySelector('.brand-toggle');
   const applyBrand = (b) => {
     document.documentElement.classList.remove(...BRANDS.map((x) => 'brand-' + x));
     document.documentElement.classList.add('brand-' + b);
-    document.querySelectorAll('.palette-opt').forEach((o) =>
-      o.setAttribute('aria-current', String(o.dataset.brand === b))
-    );
+    const next = LABEL[BRANDS[(BRANDS.indexOf(b) + 1) % BRANDS.length]];
+    // Plain concatenation, not a template literal: this script is itself
+    // inside a template literal in the builder, so backtick interpolation
+    // would be evaluated at build time instead of shipped to the browser.
+    toggle?.setAttribute('aria-label', 'Brand: ' + LABEL[b] + '. Switch to ' + next);
+    toggle?.setAttribute('title', 'Brand: ' + LABEL[b] + ' — switch to ' + next);
     try { localStorage.setItem('eo-dash-brand', b); } catch (e) {}
   };
-  let saved = 'egym';
-  try { saved = localStorage.getItem('eo-dash-brand') || 'egym'; } catch (e) {}
-  if (BRANDS.includes(saved)) applyBrand(saved);
-
-  const palBtn = document.querySelector('.palette-btn');
-  const palMenu = document.querySelector('.palette-menu');
-  const closePal = () => { palMenu.hidden = true; palBtn.setAttribute('aria-expanded', 'false'); };
-  palBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const open = palMenu.hidden;
-    palMenu.hidden = !open;
-    palBtn.setAttribute('aria-expanded', String(open));
-  });
-  document.querySelectorAll('.palette-opt').forEach((o) =>
-    o.addEventListener('click', () => { applyBrand(o.dataset.brand); closePal(); })
-  );
-  document.addEventListener('click', (e) => {
-    if (palMenu && !palMenu.hidden && !e.target.closest('.palette')) closePal();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && palMenu && !palMenu.hidden) { closePal(); palBtn.focus(); }
+  let brand = 'egym';
+  try { brand = localStorage.getItem('eo-dash-brand') || 'egym'; } catch (e) {}
+  if (!BRANDS.includes(brand)) brand = 'egym';
+  applyBrand(brand);
+  toggle?.addEventListener('click', () => {
+    brand = BRANDS[(BRANDS.indexOf(brand) + 1) % BRANDS.length];
+    applyBrand(brand);
   });
 
   const initial = location.hash.slice(1);

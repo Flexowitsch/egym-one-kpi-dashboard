@@ -314,6 +314,26 @@ function reveals() {
     });
   });
 
+  // Every repeating run of rows on every tab, not just the ones on the
+  // overview. Delivery is almost entirely tables and bar rows, so without
+  // this it was the one tab that arrived fully formed with nothing to watch.
+  $$('.bars, .tbl tbody, .keys, .legend, .pill-row').forEach((group) => {
+    const rows = $$(':scope > .bar-row, :scope > tr, :scope > li, :scope > *', group);
+    if (rows.length < 2) return;
+    gsap.fromTo(
+      rows,
+      { opacity: 0, y: 10 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        stagger: 0.05,
+        ease: 'siteOut',
+        scrollTrigger: { trigger: group, start: 'top 90%', once: true },
+      }
+    );
+  });
+
   // Lists inside a card build row by row against their own scroll position,
   // not the card's. On the long cards — the design/code matrix, the open-items
   // list, the fact tables — the card enters the viewport long before its last
@@ -741,7 +761,8 @@ function failsafe() {
   const SELECTOR =
     '.band-head, .bento > eo-card, .stat-row > eo-card, .tile, .stat, .panel, .hero-inner > *, ' +
     '.manifesto-text, .tile-in > *, .stat-in > *, .openlist li, .facts li, .matrix-detail, ' +
-    '.prov tbody tr, .change-row, .matrix-row .mname, .matrix-detail span';
+    '.prov tbody tr, .change-row, .matrix-row .mname, .matrix-detail span, ' +
+    '.bars .bar-row, .tbl tbody tr, .keys > *, .legend > *, .pill-row > *';
   const clear = () => {
     $$(SELECTOR).forEach((el) => {
       if (el.closest('.panel[hidden]')) return; // genuinely hidden tabs stay hidden
@@ -772,6 +793,19 @@ function failsafe() {
 /* ------------------------------------------------------------------ init --- */
 function init() {
   smoothScroll();
+
+  // ORDER MATTERS, and getting it wrong is why several sections looked
+  // un-animated. Pinning the KPI rail adds roughly four viewport heights to
+  // the document. Every ScrollTrigger created before it computed its start
+  // against the shorter page; the pin then invalidated all of those positions,
+  // and on the next refresh they were already "past" their start, so instead
+  // of animating they snapped straight to the end state. The reveal was set up
+  // correctly and simply never got to play.
+  //
+  // So: the pinned trigger is created first, everything else measures against
+  // the final layout, and the sort below puts them in scroll order regardless.
+  kpiRail();
+
   $$('[data-count]').forEach((el) => countUp(el, el.closest('eo-card') || el));
   drawCharts();
   matrixReveal();
@@ -783,15 +817,18 @@ function init() {
   // reveals immediately.
   if (!preloader(() => heroTl?.play())) heroTl?.play();
   cascade();
-  kpiRail();
   manifesto();
   cursor();
   velocity();
   failsafe();
-  // Charts and web components settle after fonts and custom elements upgrade.
-  window.addEventListener('load', () => ScrollTrigger.refresh());
-  if (document.fonts?.ready) document.fonts.ready.then(() => ScrollTrigger.refresh());
-  customElements.whenDefined('eo-card').then(() => ScrollTrigger.refresh());
+
+  // Pinned triggers have to be evaluated before the ones that sit after them,
+  // or a later refresh reintroduces exactly the problem above.
+  const settle = () => { ScrollTrigger.sort(); ScrollTrigger.refresh(); };
+  settle();
+  window.addEventListener('load', settle);
+  if (document.fonts?.ready) document.fonts.ready.then(settle);
+  customElements.whenDefined('eo-card').then(settle);
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

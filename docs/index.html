@@ -966,67 +966,13 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
 }
 
 /* ===========================================================================
-   PALETTE SWITCH
-   The token stylesheet ships both brand tiers. This flips one class on <html>
-   and the whole page re-colours through the cascade — which is also the point:
-   anything that did not move was not on a token.
+   BRAND SWITCH
+   One icon-only button at the right end of the nav. The token stylesheet ships
+   both brand tiers, so switching is a class on the root — the whole page
+   re-colours through the cascade with nothing re-themed by hand.
    =========================================================================== */
-.palette { position: relative; }
-.palette-menu {
-  position: absolute; top: calc(100% + var(--eo-dimension-gap-small)); left: 0;
-  z-index: 30;
-  min-width: 17rem;
-  background: var(--eo-color-surface-default);
-  border: 1px solid var(--eo-color-border-subtle);
-  border-radius: var(--eo-dimension-border-radius-default);
-  box-shadow: 0 12px 32px rgb(0 0 0 / 0.12);
-  padding: var(--eo-dimension-padding-block-default);
-  display: grid; gap: var(--eo-dimension-gap-smallest);
-}
-.palette-menu[hidden] { display: none; }
-.palette-head, .palette-note {
-  margin: 0;
-  font-family: var(--eo-typography-action-label-100-font-family);
-  font-size: var(--eo-typography-body-50-font-size);
-  color: var(--eo-color-content-hinted);
-}
-.palette-head { letter-spacing: 0.12em; text-transform: uppercase; padding: 0 0 var(--eo-dimension-4); }
-.palette-note {
-  padding-top: var(--eo-dimension-8);
-  margin-top: var(--eo-dimension-4);
-  border-top: 1px solid var(--eo-color-border-subtle);
-  line-height: 1.45; letter-spacing: 0;
-  text-transform: none;
-}
-.palette-opt {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: var(--eo-dimension-gap-default);
-  width: 100%;
-  padding: var(--eo-dimension-padding-block-default) var(--eo-dimension-padding-inline-default);
-  border: 0; border-radius: var(--eo-dimension-border-radius-small);
-  background: transparent; cursor: pointer; text-align: left;
-  font-family: inherit; color: var(--eo-color-content-emphasized);
-}
-.palette-opt:hover { background: var(--eo-color-surface-subtle); }
-.palette-opt[aria-current="true"] { background: var(--eo-color-surface-subtle); font-weight: 600; }
-.palette-opt:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offset: -2px; }
-.palette-opt .sw {
-  width: 1.25rem; height: 1.25rem;
-  border-radius: var(--eo-dimension-border-radius-round);
-}
-/* The two swatches are the only literal colours in this stylesheet, and they
-   have to be: a swatch that inherits the current brand would show the same
-   hue on both rows and the menu could not tell you what you are choosing. */
-.palette-opt .sw.egym     { background: #b34700; }
-.palette-opt .sw.wellpass { background: #036874; }
-.palette-opt .nm { font-size: var(--eo-typography-body-100-font-size); }
-.palette-opt .tk {
-  font-family: var(--eo-typography-code-100-font-family, monospace);
-  font-size: 0.6875rem;
-  color: var(--eo-color-content-hinted);
-}
+.brand-toggle { margin-left: var(--eo-dimension-gap-small); cursor: pointer; }
+.brand-toggle svg { display: block; }
 </style>
 </head>
 <body data-tab-state="overview">
@@ -1074,30 +1020,6 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
   <path d="M106.598 0.249252H103.948L97.2087 11.6927L90.3439 0.249252H87.6941V17.5087H90.7606V6.23178L96.4365 15.5496H97.8766L103.551 6.08608L103.572 17.5087H106.64L106.598 0.249252Z"/>
 </svg><span class="one">One</span></span>
     </a>
-    <!-- Palette switch. The published token stylesheet already ships both
-         brands as .brand-egym and .brand-wellpass, so this changes one class
-         on <html> and the entire page re-colours — nav, charts, cascade,
-         cursor, everything. Nothing here re-themes anything by hand; if a
-         value did not come from a token it simply would not move, which makes
-         this the most honest test of the cascade on the whole dashboard. -->
-    <div class="palette">
-      <eo-button class="palette-btn" size="small" hierarchy="tertiary" intent="neutral"
-        aria-expanded="false" aria-controls="palette-menu"
-        data-token="eo-button · tertiary/neutral">Palette</eo-button>
-      <div class="palette-menu" id="palette-menu" hidden>
-        <p class="palette-head">Brand tier</p>
-        <button class="palette-opt" data-brand="egym" type="button">
-              <span class="sw egym"></span>
-              <span class="nm">EGYM</span>
-              <span class="tk">--eo-color-orange-700</span>
-            </button><button class="palette-opt" data-brand="wellpass" type="button">
-              <span class="sw wellpass"></span>
-              <span class="nm">Wellpass</span>
-              <span class="tk">--eo-color-aqua-800</span>
-            </button>
-        <p class="palette-note">One class on the root. Every colour on this page resolves through the token cascade, so nothing is re-themed by hand.</p>
-      </div>
-    </div>
     <div class="tabs" role="tablist" aria-label="Dashboard sections">
       <eo-button class="tab" role="tab" id="tab-overview" aria-controls="panel-overview"
              aria-selected="true" data-tab="overview" size="small" content="text"
@@ -1125,6 +1047,18 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
              intent="neutral"
              data-token="eo-button · tertiary/neutral">Roadmap</eo-button>
     </div>
+    <!-- Brand switch. One icon-only button, no menu: the dropdown it replaced
+         could not be clicked at all, because eo-button re-emits its click from
+         the shadow root and the outside-click handler closed the menu on the
+         same gesture that opened it. A toggle has no such surface. -->
+    <eo-button class="brand-toggle" size="small" hierarchy="tertiary" intent="neutral"
+      content="icon" data-token="eo-button · content=icon"
+      aria-label="Switch brand — currently EGYM" title="Switch brand">
+      <svg slot="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+        <circle cx="12" cy="12" r="8" fill="var(--eo-color-content-accent)"/>
+        <path d="M12 4a8 8 0 0 1 0 16z" fill="var(--eo-color-content-emphasized)" opacity=".18"/>
+      </svg>
+    </eo-button>
   </div>
 </nav>
 
@@ -1969,41 +1903,32 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
     tabs[n].focus();
     show(tabs[n].dataset.tab, true);
   });
-  /* ---- palette switch ---------------------------------------------------
+  /* ---- brand switch ------------------------------------------------------
      The published token stylesheet ships .brand-egym and .brand-wellpass, so
-     switching brands is one class on the root element. Persisted, because a
-     dashboard that forgets your choice on every visit is an annoyance rather
-     than a feature. */
+     this is one class on the root element. Everything on the page re-colours
+     through the cascade; nothing is re-themed by hand, which makes it the most
+     honest test on the dashboard — whatever does not move was not on a token. */
   const BRANDS = ['egym', 'wellpass'];
+  const LABEL = { egym: 'EGYM', wellpass: 'Wellpass' };
+  const toggle = document.querySelector('.brand-toggle');
   const applyBrand = (b) => {
     document.documentElement.classList.remove(...BRANDS.map((x) => 'brand-' + x));
     document.documentElement.classList.add('brand-' + b);
-    document.querySelectorAll('.palette-opt').forEach((o) =>
-      o.setAttribute('aria-current', String(o.dataset.brand === b))
-    );
+    const next = LABEL[BRANDS[(BRANDS.indexOf(b) + 1) % BRANDS.length]];
+    // Plain concatenation, not a template literal: this script is itself
+    // inside a template literal in the builder, so backtick interpolation
+    // would be evaluated at build time instead of shipped to the browser.
+    toggle?.setAttribute('aria-label', 'Brand: ' + LABEL[b] + '. Switch to ' + next);
+    toggle?.setAttribute('title', 'Brand: ' + LABEL[b] + ' — switch to ' + next);
     try { localStorage.setItem('eo-dash-brand', b); } catch (e) {}
   };
-  let saved = 'egym';
-  try { saved = localStorage.getItem('eo-dash-brand') || 'egym'; } catch (e) {}
-  if (BRANDS.includes(saved)) applyBrand(saved);
-
-  const palBtn = document.querySelector('.palette-btn');
-  const palMenu = document.querySelector('.palette-menu');
-  const closePal = () => { palMenu.hidden = true; palBtn.setAttribute('aria-expanded', 'false'); };
-  palBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const open = palMenu.hidden;
-    palMenu.hidden = !open;
-    palBtn.setAttribute('aria-expanded', String(open));
-  });
-  document.querySelectorAll('.palette-opt').forEach((o) =>
-    o.addEventListener('click', () => { applyBrand(o.dataset.brand); closePal(); })
-  );
-  document.addEventListener('click', (e) => {
-    if (palMenu && !palMenu.hidden && !e.target.closest('.palette')) closePal();
-  });
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && palMenu && !palMenu.hidden) { closePal(); palBtn.focus(); }
+  let brand = 'egym';
+  try { brand = localStorage.getItem('eo-dash-brand') || 'egym'; } catch (e) {}
+  if (!BRANDS.includes(brand)) brand = 'egym';
+  applyBrand(brand);
+  toggle?.addEventListener('click', () => {
+    brand = BRANDS[(BRANDS.indexOf(brand) + 1) % BRANDS.length];
+    applyBrand(brand);
   });
 
   const initial = location.hash.slice(1);
