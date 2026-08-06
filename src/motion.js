@@ -188,15 +188,74 @@ function drawCharts() {
 // Design column fills in first, then code. The pause between them is the point.
 function matrixReveal() {
   const rows = $$('.matrix-row');
+  if (!rows.length || reduce) return;
+
+  // Per row, against that row's own scroll position. The card is nine rows and
+  // several viewports tall, so a single timeline on the card meant everything
+  // below the first screen had already played somewhere above the fold and
+  // arrived static — the reveal was only ever seen for the top two rows.
+  rows.forEach((row) => {
+    const cells = $$('.cell', row);
+    const name = $('.mname', row);
+    const detail = row.nextElementSibling?.classList.contains('matrix-detail')
+      ? row.nextElementSibling
+      : null;
+
+    gsap.set(cells, { scale: 0, transformOrigin: '50% 50%' });
+
+    const tl = gsap.timeline({ scrollTrigger: { trigger: row, start: 'top 88%', once: true } });
+    if (name) tl.fromTo(name, { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.45, ease: 'siteOut' }, 0);
+    // Design lands first, then code. The pause between them is the finding, so
+    // it survives the move to per-row timing.
+    if (cells[0]) tl.to(cells[0], { scale: 1, duration: 0.4, ease: 'back.out(2.2)' }, 0.12);
+    if (cells[1]) tl.to(cells[1], { scale: 1, duration: 0.4, ease: 'back.out(2.2)' }, 0.42);
+    if (detail) {
+      tl.fromTo(
+        $$('span', detail),
+        { opacity: 0, y: 8 },
+        { opacity: 1, y: 0, duration: 0.45, stagger: 0.09, ease: 'siteOut' },
+        0.2
+      );
+    }
+  });
+}
+
+/* ------------------------------------------------------- what actually moved --- */
+// Rows arrive one at a time and their bars grow out of the centre line, so the
+// direction of each move is the first thing read. The unchanged rows animate
+// too — six of ten not moving is the finding, and a row that stays still while
+// its neighbours build reads as missing rather than as flat.
+function changeReveal() {
+  const list = $('.changes');
+  if (!list || reduce) return;
+  const rows = $$('.change-row', list);
   if (!rows.length) return;
-  const design = rows.map((r) => $$('.cell', r)[0]).filter(Boolean);
-  const code = rows.map((r) => $$('.cell', r)[1]).filter(Boolean);
-  if (reduce) return;
-  gsap.set([...design, ...code], { scale: 0, transformOrigin: '50% 50%' });
-  gsap
-    .timeline({ scrollTrigger: { trigger: $('.matrix'), start: 'top 78%', once: true } })
-    .to(design, { scale: 1, duration: 0.45, stagger: 0.06, ease: 'back.out(2.2)' })
-    .to(code, { scale: 1, duration: 0.45, stagger: 0.06, ease: 'back.out(2.2)' }, '+=0.25');
+
+  gsap.fromTo(
+    rows,
+    { opacity: 0, x: -16 },
+    {
+      opacity: 1,
+      x: 0,
+      duration: 0.5,
+      stagger: 0.07,
+      ease: 'siteOut',
+      scrollTrigger: { trigger: list, start: 'top 85%', once: true },
+    }
+  );
+  $$('.c-prev, .c-now', list).forEach((el, i) => {
+    gsap.fromTo(
+      el,
+      { opacity: 0 },
+      {
+        opacity: 1,
+        duration: 0.4,
+        delay: 0.25 + Math.floor(i / 2) * 0.07,
+        ease: 'none',
+        scrollTrigger: { trigger: list, start: 'top 85%', once: true },
+      }
+    );
+  });
 }
 
 /* --------------------------------------------------------------- reveals --- */
@@ -681,7 +740,8 @@ window.__dashTabIn = (panel) => {
 function failsafe() {
   const SELECTOR =
     '.band-head, .bento > eo-card, .stat-row > eo-card, .tile, .stat, .panel, .hero-inner > *, ' +
-    '.manifesto-text, .tile-in > *, .stat-in > *, .openlist li, .facts li, .matrix-detail, .prov tbody tr';
+    '.manifesto-text, .tile-in > *, .stat-in > *, .openlist li, .facts li, .matrix-detail, ' +
+    '.prov tbody tr, .change-row, .matrix-row .mname, .matrix-detail span';
   const clear = () => {
     $$(SELECTOR).forEach((el) => {
       if (el.closest('.panel[hidden]')) return; // genuinely hidden tabs stay hidden
@@ -715,6 +775,7 @@ function init() {
   $$('[data-count]').forEach((el) => countUp(el, el.closest('eo-card') || el));
   drawCharts();
   matrixReveal();
+  changeReveal();
   reveals();
   const heroTl = hero();
   // The loading sequence owns when the hero reveals. If it does not play — a

@@ -48,6 +48,22 @@ const cell = (s) => {
   return m ? Number(m[1]) : null;
 };
 
+// The matrix column headers are the authoritative labels for the history
+// array, because the history is read out of those same columns. Parsing them
+// here means a fourth inspection relabels the dashboard on its own — the
+// change list used to carry hard-coded "3 Aug / 5 Aug" headings while
+// comparing the last two columns, so it was labelling the wrong pair.
+let historyLabels = [];
+for (const line of md.split('\n')) {
+  const cells = line.split('|').map((c) => c.trim());
+  if (cells.length < 8) continue;
+  if (!/^#$/.test(cells[1])) continue;
+  historyLabels = [cells[3], cells[4], cells[5]].map((c) =>
+    c.replace(/\*\*/g, '').replace(/\s*shipped$/i, '').trim()
+  );
+  break;
+}
+
 const stations = [];
 for (const line of md.split('\n')) {
   // matrix rows start with a station number and have at least 7 pipe-separated cells
@@ -99,6 +115,7 @@ const inspection = {
   yellows: stations.filter((s) => s.light === 'yellow').length,
   greens: stations.filter((s) => s.light === 'green').length,
   trend: [...priorTotals, shippedTotal].filter((v) => v !== null),
+  historyLabels,
   stations,
 };
 

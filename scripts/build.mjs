@@ -304,7 +304,10 @@ const overview = `
 <section class="band tight">
   ${bandHead('Progress', 'What actually moved', 'Station scores between the last two full inspections. Six of ten did not move at all — that is the finding, not the exceptions.', inspection?.date)}
   <div class="bento">
-    ${tile('span-7', changeList(inspection?.stations ?? []))}
+    ${tile('span-7', changeList(inspection?.stations ?? [], {
+      prevLabel: inspection?.historyLabels?.[1] ?? '',
+      nowLabel: inspection?.historyLabels?.[2] ?? '',
+    }))}
     ${tile(
       'span-5',
       `<p class="eyebrow">Component pipeline</p>
@@ -746,6 +749,33 @@ const html = `<!doctype html>
     <a class="wordmark" href="#overview" aria-label="EGYM One design system dashboard">
       <span class="mark">${LOGO_SVG}<span class="one">One</span></span>
     </a>
+    <!-- Palette switch. The published token stylesheet already ships both
+         brands as .brand-egym and .brand-wellpass, so this changes one class
+         on <html> and the entire page re-colours — nav, charts, cascade,
+         cursor, everything. Nothing here re-themes anything by hand; if a
+         value did not come from a token it simply would not move, which makes
+         this the most honest test of the cascade on the whole dashboard. -->
+    <div class="palette">
+      <eo-button class="palette-btn" size="small" hierarchy="tertiary" intent="neutral"
+        aria-expanded="false" aria-controls="palette-menu"
+        data-token="eo-button · tertiary/neutral">Palette</eo-button>
+      <div class="palette-menu" id="palette-menu" hidden>
+        <p class="palette-head">Brand tier</p>
+        ${[
+          ['egym', 'EGYM', 'orange-700'],
+          ['wellpass', 'Wellpass', 'aqua-800'],
+        ]
+          .map(
+            ([id, label, tok]) => `<button class="palette-opt" data-brand="${id}" type="button">
+              <span class="sw ${id}"></span>
+              <span class="nm">${label}</span>
+              <span class="tk">--eo-color-${tok}</span>
+            </button>`
+          )
+          .join('')}
+        <p class="palette-note">One class on the root. Every colour on this page resolves through the token cascade, so nothing is re-themed by hand.</p>
+      </div>
+    </div>
     <div class="tabs" role="tablist" aria-label="Dashboard sections">
       ${TABS.map(
         ([id, label], i) =>
@@ -826,6 +856,43 @@ const html = `<!doctype html>
     tabs[n].focus();
     show(tabs[n].dataset.tab, true);
   });
+  /* ---- palette switch ---------------------------------------------------
+     The published token stylesheet ships .brand-egym and .brand-wellpass, so
+     switching brands is one class on the root element. Persisted, because a
+     dashboard that forgets your choice on every visit is an annoyance rather
+     than a feature. */
+  const BRANDS = ['egym', 'wellpass'];
+  const applyBrand = (b) => {
+    document.documentElement.classList.remove(...BRANDS.map((x) => 'brand-' + x));
+    document.documentElement.classList.add('brand-' + b);
+    document.querySelectorAll('.palette-opt').forEach((o) =>
+      o.setAttribute('aria-current', String(o.dataset.brand === b))
+    );
+    try { localStorage.setItem('eo-dash-brand', b); } catch (e) {}
+  };
+  let saved = 'egym';
+  try { saved = localStorage.getItem('eo-dash-brand') || 'egym'; } catch (e) {}
+  if (BRANDS.includes(saved)) applyBrand(saved);
+
+  const palBtn = document.querySelector('.palette-btn');
+  const palMenu = document.querySelector('.palette-menu');
+  const closePal = () => { palMenu.hidden = true; palBtn.setAttribute('aria-expanded', 'false'); };
+  palBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = palMenu.hidden;
+    palMenu.hidden = !open;
+    palBtn.setAttribute('aria-expanded', String(open));
+  });
+  document.querySelectorAll('.palette-opt').forEach((o) =>
+    o.addEventListener('click', () => { applyBrand(o.dataset.brand); closePal(); })
+  );
+  document.addEventListener('click', (e) => {
+    if (palMenu && !palMenu.hidden && !e.target.closest('.palette')) closePal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && palMenu && !palMenu.hidden) { closePal(); palBtn.focus(); }
+  });
+
   const initial = location.hash.slice(1);
   if (initial && tabs.some((t) => t.dataset.tab === initial)) show(initial, false);
 </script>

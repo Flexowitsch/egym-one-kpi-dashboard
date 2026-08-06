@@ -517,6 +517,10 @@ eo-card > * { width: 100%; }
 .d-bar { position: absolute; top: 2px; bottom: 2px; border-radius: var(--eo-dimension-border-radius-small); }
 .d-bar.up { background: var(--eo-color-surface-utility-positive); }
 .d-bar.down { background: var(--eo-color-surface-utility-negative); }
+/* Unchanged stations get a bar too, in a neutral tone. Six of ten not moving
+   is the finding on this card, so those rows carry the same visual weight as
+   the ones that did move — a bare dot read as missing data. */
+.d-bar.flat { background: var(--eo-color-border-default); }
 .d-zero {
   position: absolute; left: calc(50% - 3px); top: 50%; transform: translateY(-50%);
   width: 6px; height: 6px; border-radius: var(--eo-dimension-border-radius-round);
@@ -951,4 +955,67 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
 @media (prefers-reduced-motion: reduce) {
   .cursor, .preloader { display: none; }
   .scroll-cue span { animation: none; }
+}
+
+/* ===========================================================================
+   PALETTE SWITCH
+   The token stylesheet ships both brand tiers. This flips one class on <html>
+   and the whole page re-colours through the cascade — which is also the point:
+   anything that did not move was not on a token.
+   =========================================================================== */
+.palette { position: relative; }
+.palette-menu {
+  position: absolute; top: calc(100% + var(--eo-dimension-gap-small)); left: 0;
+  z-index: 30;
+  min-width: 17rem;
+  background: var(--eo-color-surface-default);
+  border: 1px solid var(--eo-color-border-subtle);
+  border-radius: var(--eo-dimension-border-radius-default);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.12);
+  padding: var(--eo-dimension-padding-block-default);
+  display: grid; gap: var(--eo-dimension-gap-smallest);
+}
+.palette-menu[hidden] { display: none; }
+.palette-head, .palette-note {
+  margin: 0;
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-hinted);
+}
+.palette-head { letter-spacing: 0.12em; text-transform: uppercase; padding: 0 0 var(--eo-dimension-4); }
+.palette-note {
+  padding-top: var(--eo-dimension-8);
+  margin-top: var(--eo-dimension-4);
+  border-top: 1px solid var(--eo-color-border-subtle);
+  line-height: 1.45; letter-spacing: 0;
+  text-transform: none;
+}
+.palette-opt {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--eo-dimension-gap-default);
+  width: 100%;
+  padding: var(--eo-dimension-padding-block-default) var(--eo-dimension-padding-inline-default);
+  border: 0; border-radius: var(--eo-dimension-border-radius-small);
+  background: transparent; cursor: pointer; text-align: left;
+  font-family: inherit; color: var(--eo-color-content-emphasized);
+}
+.palette-opt:hover { background: var(--eo-color-surface-subtle); }
+.palette-opt[aria-current="true"] { background: var(--eo-color-surface-subtle); font-weight: 600; }
+.palette-opt:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offset: -2px; }
+.palette-opt .sw {
+  width: 1.25rem; height: 1.25rem;
+  border-radius: var(--eo-dimension-border-radius-round);
+}
+/* The two swatches are the only literal colours in this stylesheet, and they
+   have to be: a swatch that inherits the current brand would show the same
+   hue on both rows and the menu could not tell you what you are choosing. */
+.palette-opt .sw.egym     { background: #b34700; }
+.palette-opt .sw.wellpass { background: #036874; }
+.palette-opt .nm { font-size: var(--eo-typography-body-100-font-size); }
+.palette-opt .tk {
+  font-family: var(--eo-typography-code-100-font-family, monospace);
+  font-size: 0.6875rem;
+  color: var(--eo-color-content-hinted);
 }

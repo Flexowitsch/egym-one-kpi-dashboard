@@ -525,6 +525,10 @@ eo-card > * { width: 100%; }
 .d-bar { position: absolute; top: 2px; bottom: 2px; border-radius: var(--eo-dimension-border-radius-small); }
 .d-bar.up { background: var(--eo-color-surface-utility-positive); }
 .d-bar.down { background: var(--eo-color-surface-utility-negative); }
+/* Unchanged stations get a bar too, in a neutral tone. Six of ten not moving
+   is the finding on this card, so those rows carry the same visual weight as
+   the ones that did move — a bare dot read as missing data. */
+.d-bar.flat { background: var(--eo-color-border-default); }
 .d-zero {
   position: absolute; left: calc(50% - 3px); top: 50%; transform: translateY(-50%);
   width: 6px; height: 6px; border-radius: var(--eo-dimension-border-radius-round);
@@ -960,6 +964,69 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
   .cursor, .preloader { display: none; }
   .scroll-cue span { animation: none; }
 }
+
+/* ===========================================================================
+   PALETTE SWITCH
+   The token stylesheet ships both brand tiers. This flips one class on <html>
+   and the whole page re-colours through the cascade — which is also the point:
+   anything that did not move was not on a token.
+   =========================================================================== */
+.palette { position: relative; }
+.palette-menu {
+  position: absolute; top: calc(100% + var(--eo-dimension-gap-small)); left: 0;
+  z-index: 30;
+  min-width: 17rem;
+  background: var(--eo-color-surface-default);
+  border: 1px solid var(--eo-color-border-subtle);
+  border-radius: var(--eo-dimension-border-radius-default);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 0.12);
+  padding: var(--eo-dimension-padding-block-default);
+  display: grid; gap: var(--eo-dimension-gap-smallest);
+}
+.palette-menu[hidden] { display: none; }
+.palette-head, .palette-note {
+  margin: 0;
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-hinted);
+}
+.palette-head { letter-spacing: 0.12em; text-transform: uppercase; padding: 0 0 var(--eo-dimension-4); }
+.palette-note {
+  padding-top: var(--eo-dimension-8);
+  margin-top: var(--eo-dimension-4);
+  border-top: 1px solid var(--eo-color-border-subtle);
+  line-height: 1.45; letter-spacing: 0;
+  text-transform: none;
+}
+.palette-opt {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--eo-dimension-gap-default);
+  width: 100%;
+  padding: var(--eo-dimension-padding-block-default) var(--eo-dimension-padding-inline-default);
+  border: 0; border-radius: var(--eo-dimension-border-radius-small);
+  background: transparent; cursor: pointer; text-align: left;
+  font-family: inherit; color: var(--eo-color-content-emphasized);
+}
+.palette-opt:hover { background: var(--eo-color-surface-subtle); }
+.palette-opt[aria-current="true"] { background: var(--eo-color-surface-subtle); font-weight: 600; }
+.palette-opt:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offset: -2px; }
+.palette-opt .sw {
+  width: 1.25rem; height: 1.25rem;
+  border-radius: var(--eo-dimension-border-radius-round);
+}
+/* The two swatches are the only literal colours in this stylesheet, and they
+   have to be: a swatch that inherits the current brand would show the same
+   hue on both rows and the menu could not tell you what you are choosing. */
+.palette-opt .sw.egym     { background: #b34700; }
+.palette-opt .sw.wellpass { background: #036874; }
+.palette-opt .nm { font-size: var(--eo-typography-body-100-font-size); }
+.palette-opt .tk {
+  font-family: var(--eo-typography-code-100-font-family, monospace);
+  font-size: 0.6875rem;
+  color: var(--eo-color-content-hinted);
+}
 </style>
 </head>
 <body data-tab-state="overview">
@@ -1007,6 +1074,30 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
   <path d="M106.598 0.249252H103.948L97.2087 11.6927L90.3439 0.249252H87.6941V17.5087H90.7606V6.23178L96.4365 15.5496H97.8766L103.551 6.08608L103.572 17.5087H106.64L106.598 0.249252Z"/>
 </svg><span class="one">One</span></span>
     </a>
+    <!-- Palette switch. The published token stylesheet already ships both
+         brands as .brand-egym and .brand-wellpass, so this changes one class
+         on <html> and the entire page re-colours — nav, charts, cascade,
+         cursor, everything. Nothing here re-themes anything by hand; if a
+         value did not come from a token it simply would not move, which makes
+         this the most honest test of the cascade on the whole dashboard. -->
+    <div class="palette">
+      <eo-button class="palette-btn" size="small" hierarchy="tertiary" intent="neutral"
+        aria-expanded="false" aria-controls="palette-menu"
+        data-token="eo-button · tertiary/neutral">Palette</eo-button>
+      <div class="palette-menu" id="palette-menu" hidden>
+        <p class="palette-head">Brand tier</p>
+        <button class="palette-opt" data-brand="egym" type="button">
+              <span class="sw egym"></span>
+              <span class="nm">EGYM</span>
+              <span class="tk">--eo-color-orange-700</span>
+            </button><button class="palette-opt" data-brand="wellpass" type="button">
+              <span class="sw wellpass"></span>
+              <span class="nm">Wellpass</span>
+              <span class="tk">--eo-color-aqua-800</span>
+            </button>
+        <p class="palette-note">One class on the root. Every colour on this page resolves through the token cascade, so nothing is re-themed by hand.</p>
+      </div>
+    </div>
     <div class="tabs" role="tablist" aria-label="Dashboard sections">
       <eo-button class="tab" role="tab" id="tab-overview" aria-controls="panel-overview"
              aria-selected="true" data-tab="overview" size="small" content="text"
@@ -1420,56 +1511,56 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
   <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Progress</p><h2 data-token="--eo-typography-headline-500">What actually moved</h2><p data-token="--eo-color-content-subtle">Station scores between the last two full inspections. Six of ten did not move at all — that is the finding, not the exceptions.</p><p class="stamp"><span class="dot live"></span>Updated 6 Aug 2026 · refreshes automatically</p></div>
   <div class="bento">
     <eo-card class="tile span-7" full-height data-token="eo-card · full-height"><div class="tile-in"><div class="changes">
-    <div class="change-head"><span></span><span>3 Aug</span><span></span><span>5 Aug</span></div>
-    <div class="change-row">
+    <div class="change-head"><span></span><span>Aug 5</span><span></span><span>Aug 6</span></div>
+    <div class="change-row up">
           <span class="c-name">Best practices</span>
           <span class="c-prev">7</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar up" style="width:50%;left:50%"></span></span>
           <span class="c-now up">8 <b>+1</b></span>
-        </div><div class="change-row">
+        </div><div class="change-row up">
           <span class="c-name">Shared language</span>
           <span class="c-prev">7</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar up" style="width:50%;left:50%"></span></span>
           <span class="c-now up">8 <b>+1</b></span>
-        </div><div class="change-row">
+        </div><div class="change-row up">
           <span class="c-name">Orchestration</span>
           <span class="c-prev">5</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar up" style="width:50%;left:50%"></span></span>
           <span class="c-now up">6 <b>+1</b></span>
-        </div><div class="change-row">
+        </div><div class="change-row up">
           <span class="c-name">Machine-readable docs</span>
           <span class="c-prev">5</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar up" style="width:50%;left:50%"></span></span>
           <span class="c-now up">6 <b>+1</b></span>
-        </div><div class="change-row">
+        </div><div class="change-row flat">
           <span class="c-name">Coverage &amp; gaps</span>
           <span class="c-prev">3</span>
-          <span class="c-track"><span class="c-mid"></span><span class="d-zero"></span></span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
           <span class="c-now flat">3</span>
-        </div><div class="change-row">
+        </div><div class="change-row flat">
           <span class="c-name">Accessibility</span>
           <span class="c-prev">5</span>
-          <span class="c-track"><span class="c-mid"></span><span class="d-zero"></span></span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
           <span class="c-now flat">5</span>
-        </div><div class="change-row">
+        </div><div class="change-row flat">
           <span class="c-name">Testing &amp; validation</span>
           <span class="c-prev">4</span>
-          <span class="c-track"><span class="c-mid"></span><span class="d-zero"></span></span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
           <span class="c-now flat">4</span>
-        </div><div class="change-row">
+        </div><div class="change-row flat">
           <span class="c-name">Governance</span>
           <span class="c-prev">6</span>
-          <span class="c-track"><span class="c-mid"></span><span class="d-zero"></span></span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
           <span class="c-now flat">6</span>
-        </div><div class="change-row">
+        </div><div class="change-row flat">
           <span class="c-name">Feedback &amp; adoption</span>
           <span class="c-prev">5</span>
-          <span class="c-track"><span class="c-mid"></span><span class="d-zero"></span></span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
           <span class="c-now flat">5</span>
-        </div><div class="change-row">
+        </div><div class="change-row flat">
           <span class="c-name">Agent access</span>
           <span class="c-prev">4</span>
-          <span class="c-track"><span class="c-mid"></span><span class="d-zero"></span></span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
           <span class="c-now flat">4</span>
         </div>
   </div></div></eo-card>
@@ -1878,6 +1969,43 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
     tabs[n].focus();
     show(tabs[n].dataset.tab, true);
   });
+  /* ---- palette switch ---------------------------------------------------
+     The published token stylesheet ships .brand-egym and .brand-wellpass, so
+     switching brands is one class on the root element. Persisted, because a
+     dashboard that forgets your choice on every visit is an annoyance rather
+     than a feature. */
+  const BRANDS = ['egym', 'wellpass'];
+  const applyBrand = (b) => {
+    document.documentElement.classList.remove(...BRANDS.map((x) => 'brand-' + x));
+    document.documentElement.classList.add('brand-' + b);
+    document.querySelectorAll('.palette-opt').forEach((o) =>
+      o.setAttribute('aria-current', String(o.dataset.brand === b))
+    );
+    try { localStorage.setItem('eo-dash-brand', b); } catch (e) {}
+  };
+  let saved = 'egym';
+  try { saved = localStorage.getItem('eo-dash-brand') || 'egym'; } catch (e) {}
+  if (BRANDS.includes(saved)) applyBrand(saved);
+
+  const palBtn = document.querySelector('.palette-btn');
+  const palMenu = document.querySelector('.palette-menu');
+  const closePal = () => { palMenu.hidden = true; palBtn.setAttribute('aria-expanded', 'false'); };
+  palBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = palMenu.hidden;
+    palMenu.hidden = !open;
+    palBtn.setAttribute('aria-expanded', String(open));
+  });
+  document.querySelectorAll('.palette-opt').forEach((o) =>
+    o.addEventListener('click', () => { applyBrand(o.dataset.brand); closePal(); })
+  );
+  document.addEventListener('click', (e) => {
+    if (palMenu && !palMenu.hidden && !e.target.closest('.palette')) closePal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && palMenu && !palMenu.hidden) { closePal(); palBtn.focus(); }
+  });
+
   const initial = location.hash.slice(1);
   if (initial && tabs.some((t) => t.dataset.tab === initial)) show(initial, false);
 </script>

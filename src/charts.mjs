@@ -186,7 +186,10 @@ export function splitMatrix(dimensions) {
    lines land, so you cannot tell which series is which. A diverging bar per
    station reads instantly and makes the real finding — that most stations did
    not move — obvious rather than hidden behind crossing lines. */
-export function changeList(stations, { prevLabel = '3 Aug', nowLabel = '5 Aug' } = {}) {
+export function changeList(stations, { prevLabel = '', nowLabel = '' } = {}) {
+  // Labels are passed in from the inspection's own column headers. They used to
+  // default to "3 Aug / 5 Aug" while the rows compared the last two columns —
+  // so the headings named the wrong pair of inspections.
   const rows = stations
     .map((s) => ({ ...s, prev: s.history?.[1] }))
     .filter((s) => s.prev != null)
@@ -201,13 +204,16 @@ export function changeList(stations, { prevLabel = '3 Aug', nowLabel = '5 Aug' }
       .map((r) => {
         const dir = r.delta > 0 ? 'up' : r.delta < 0 ? 'down' : 'flat';
         const w = (Math.abs(r.delta) / maxAbs) * 50;
+        // Unchanged stations get a neutral bar of their own rather than a dot.
+        // Six of ten not moving is the finding here, so those rows need the
+        // same visual weight as the ones that did — a dot read as "no data".
         const bar =
           r.delta === 0
-            ? `<span class="d-zero"></span>`
+            ? `<span class="d-bar flat" style="width:9%;left:45.5%"></span>`
             : `<span class="d-bar ${dir}" style="width:${r2(w)}%;${
                 r.delta > 0 ? 'left:50%' : `right:50%`
               }"></span>`;
-        return `<div class="change-row">
+        return `<div class="change-row ${dir}">
           <span class="c-name">${esc(r.name)}</span>
           <span class="c-prev">${r.prev}</span>
           <span class="c-track"><span class="c-mid"></span>${bar}</span>
