@@ -557,6 +557,18 @@ const roadmapTab = `
   </div>
 </section>`;
 
+/* The real EGYM wordmark, exported from the UI Kit logo component set
+   (🥇 EGYM One — UI Kit, node 20966:25412, the accent-E variant).
+   Path data is verbatim from Figma; only the fills are rebound — the E to
+   --eo-color-content-accent and GYM to currentColor — so the mark follows the
+   theme instead of carrying the baked #D15B05 / #160707 out of the export. */
+const LOGO_SVG = `<svg class="logo" viewBox="0 0 106.64 17.759" role="img" aria-label="EGYM" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <path class="logo-e" d="M3.0886 10.172H11.6423V7.46235H3.0886V2.9381H12.749V0.249268H0V17.5087H12.8741V14.8199H3.0886V10.172Z"/>
+  <path d="M35.9719 2.81372C37.8287 2.81372 39.3939 3.43941 40.7494 4.79362L42.7729 2.81372C41.1453 0.979539 38.7247 0 35.8248 0C30.421 0 26.4769 3.73082 26.4769 8.87952C26.4769 14.0282 30.4198 17.759 35.7831 17.759C38.2246 17.759 40.7494 17.0293 42.5437 15.5698V7.83631H36.0552V10.6709H39.5189V14.0686C38.3925 14.7151 37.1816 14.9441 35.9511 14.9441C32.2999 14.9441 29.7126 12.3801 29.7126 8.87829C29.7126 5.37644 32.2999 2.8125 35.9719 2.8125V2.81372Z"/>
+  <path d="M70.0852 0.249252L64.9706 8.67696L59.9235 0.249252H56.5015L63.3246 11.4919V17.5087H66.4132V11.5005L73.2572 0.249252H70.0852Z"/>
+  <path d="M106.598 0.249252H103.948L97.2087 11.6927L90.3439 0.249252H87.6941V17.5087H90.7606V6.23178L96.4365 15.5496H97.8766L103.551 6.08608L103.572 17.5087H106.64L106.598 0.249252Z"/>
+</svg>`;
+
 /* ══════════════════════════════════════════════════════════════ DOCUMENT ═══ */
 const TABS = [
   ['overview', 'Overview', overview],
@@ -582,8 +594,8 @@ const html = `<!doctype html>
 <nav class="nav">
   <div class="nav-inner">
     <a class="wordmark" href="#overview" aria-label="EGYM One design system dashboard">
-      <span class="mark"><span class="e">E</span>GYM</span>
-      <span class="sub">One · Design System</span>
+      <span class="mark">${LOGO_SVG}<span class="one">One</span></span>
+      <span class="sub">Design System</span>
     </a>
     <div class="tabs" role="tablist" aria-label="Dashboard sections">
       ${TABS.map(

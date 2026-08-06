@@ -58,10 +58,11 @@ body {
   padding: var(--eo-dimension-padding-block-medium) var(--gutter);
   display: flex; align-items: center; gap: var(--eo-dimension-gap-largest); flex-wrap: wrap;
 }
-/* The EGYM wordmark, set as type rather than an image: tracked capitals with
-   the leading E in the accent, matching the logo component in the UI Kit.
-   Reproducing it in type keeps it sharp at any size, follows the theme, and
-   uses the real accent token instead of a baked-in colour. */
+/* The EGYM wordmark: the real vector exported from the UI Kit logo component
+   set, with "One" set beside it in type. The SVG carries no colour of its own —
+   GYM inherits currentColor from .mark and the E takes the accent token — so
+   the lockup follows the theme rather than the hexes baked into the export.
+   "One" sits on --eo-color-content-emphasized, the darkest content token. */
 .wordmark {
   display: block;
   text-decoration: none;
@@ -69,14 +70,29 @@ body {
   white-space: nowrap;
 }
 .wordmark .mark {
-  display: block;
-  font-family: var(--eo-typography-headline-300-font-family);
-  font-size: var(--eo-typography-body-100-font-size);
-  font-weight: 700;
-  letter-spacing: 0.24em;
+  display: flex;
+  align-items: baseline;
+  gap: var(--eo-dimension-gap-default);
   color: var(--eo-color-content-emphasized);
 }
-.wordmark .mark .e { color: var(--eo-color-content-accent); }
+.wordmark .logo {
+  /* Sized off the cap height of the word beside it, not off a magic pixel
+     value: the export is 106.64 × 17.759, so height 0.72em keeps the two
+     optically level at any type scale. */
+  height: 0.72em;
+  width: auto;
+  font-size: var(--eo-typography-headline-200-font-size);
+  fill: currentColor;
+  align-self: center;
+  transform: translateY(0.02em);
+}
+.wordmark .logo-e { fill: var(--eo-color-content-accent); }
+.wordmark .one {
+  font-family: var(--eo-typography-headline-200-font-family);
+  font-size: var(--eo-typography-headline-200-font-size);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
 .wordmark .sub {
   display: block;
   font-family: var(--eo-typography-action-label-100-font-family);
@@ -85,7 +101,7 @@ body {
   color: var(--eo-color-content-subtle);
   margin-top: var(--eo-dimension-gap-smallest);
 }
-.wordmark:hover .mark { color: var(--eo-color-content-emphasized); }
+.wordmark:hover .sub { color: var(--eo-color-content-default); }
 .wordmark:focus-visible {
   outline: 2px solid var(--eo-color-border-accent);
   outline-offset: 4px;
@@ -180,7 +196,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .score-hero .d {
-  font-size: var(--eo-typography-headline-300-font-size);
+  font-size: var(--eo-typography-headline-200-font-size);
   color: var(--eo-color-content-hinted);
 }
 .score-sub {
@@ -216,7 +232,7 @@ body {
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
-.stat-in .v.small { font-size: var(--eo-typography-headline-300-font-size); }
+.stat-in .v.small { font-size: var(--eo-typography-headline-200-font-size); }
 .stat.good .stat-in .v { color: var(--eo-color-content-utility-positive); }
 .stat.warn .stat-in .v { color: var(--eo-color-content-utility-warning); }
 .stat.bad .stat-in .v { color: var(--eo-color-content-utility-negative); }
@@ -232,8 +248,8 @@ body {
 
 .tile-in h3 {
   margin: 0;
-  font-family: var(--eo-typography-headline-300-font-family);
-  font-size: var(--eo-typography-headline-300-font-size);
+  font-family: var(--eo-typography-headline-200-font-family);
+  font-size: var(--eo-typography-headline-200-font-size);
   line-height: 1.2;
   text-wrap: balance;
 }
