@@ -467,3 +467,35 @@ eo-card > * { width: 100%; }
 .c-now.up b { color: var(--eo-color-content-utility-positive); }
 .c-now.down b { color: var(--eo-color-content-utility-negative); }
 .c-now.flat { color: var(--eo-color-content-hinted); font-weight: 400; }
+
+/* ---------- dated stamps ---------- */
+.stamp {
+  margin: var(--eo-dimension-12) 0 0;
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-hinted);
+  display: inline-flex; align-items: center; gap: var(--eo-dimension-8);
+}
+.stamp .dot { width: 6px; height: 6px; border-radius: var(--eo-dimension-border-radius-round); flex: none; }
+.stamp .dot.live { background: var(--eo-color-surface-utility-positive); }
+.stamp .dot.manual { background: var(--eo-color-surface-utility-warning); }
+
+/* ---------- elapsed counters — the part that lands ---------- */
+.elapsed { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0;
+  border-top: 1px solid var(--eo-color-border-subtle); border-bottom: 1px solid var(--eo-color-border-subtle); }
+.elapsed > * + * { border-left: 1px solid var(--eo-color-border-subtle); }
+@media (max-width: 720px) { .elapsed > * + * { border-left: 0; border-top: 1px solid var(--eo-color-border-subtle); } }
+.el-item { padding: clamp(1.25rem, 2.5vw, 2rem) var(--eo-dimension-20); }
+.el-days {
+  font-family: var(--eo-typography-headline-500-font-family);
+  font-size: var(--eo-typography-headline-500-font-size);
+  line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+  color: var(--eo-color-content-utility-negative);
+}
+.el-days span { font-size: var(--eo-typography-body-100-font-size); color: var(--eo-color-content-hinted); font-family: var(--eo-typography-body-100-font-family); }
+.el-what { margin: var(--eo-dimension-8) 0 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-emphasized); }
+.el-since { margin: var(--eo-dimension-2) 0 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-hinted); }
+
+/* ---------- provenance table ---------- */
+.prov td:first-child { font-weight: 600; }
+.prov .when { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.prov .how { color: var(--eo-color-content-subtle); }

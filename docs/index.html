@@ -475,6 +475,38 @@ eo-card > * { width: 100%; }
 .c-now.up b { color: var(--eo-color-content-utility-positive); }
 .c-now.down b { color: var(--eo-color-content-utility-negative); }
 .c-now.flat { color: var(--eo-color-content-hinted); font-weight: 400; }
+
+/* ---------- dated stamps ---------- */
+.stamp {
+  margin: var(--eo-dimension-12) 0 0;
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-hinted);
+  display: inline-flex; align-items: center; gap: var(--eo-dimension-8);
+}
+.stamp .dot { width: 6px; height: 6px; border-radius: var(--eo-dimension-border-radius-round); flex: none; }
+.stamp .dot.live { background: var(--eo-color-surface-utility-positive); }
+.stamp .dot.manual { background: var(--eo-color-surface-utility-warning); }
+
+/* ---------- elapsed counters — the part that lands ---------- */
+.elapsed { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0;
+  border-top: 1px solid var(--eo-color-border-subtle); border-bottom: 1px solid var(--eo-color-border-subtle); }
+.elapsed > * + * { border-left: 1px solid var(--eo-color-border-subtle); }
+@media (max-width: 720px) { .elapsed > * + * { border-left: 0; border-top: 1px solid var(--eo-color-border-subtle); } }
+.el-item { padding: clamp(1.25rem, 2.5vw, 2rem) var(--eo-dimension-20); }
+.el-days {
+  font-family: var(--eo-typography-headline-500-font-family);
+  font-size: var(--eo-typography-headline-500-font-size);
+  line-height: 1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums;
+  color: var(--eo-color-content-utility-negative);
+}
+.el-days span { font-size: var(--eo-typography-body-100-font-size); color: var(--eo-color-content-hinted); font-family: var(--eo-typography-body-100-font-family); }
+.el-what { margin: var(--eo-dimension-8) 0 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-emphasized); }
+.el-since { margin: var(--eo-dimension-2) 0 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-hinted); }
+
+/* ---------- provenance table ---------- */
+.prov td:first-child { font-weight: 600; }
+.prov .when { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.prov .how { color: var(--eo-color-content-subtle); }
 </style>
 </head>
 <body>
@@ -529,7 +561,7 @@ eo-card > * { width: 100%; }
 </section>
 
 <section class="band">
-  <div class="band-head"><p class="eyebrow">Ten stations</p><h2>Where the system is strong, and where it is not</h2><p>Scored against the design system multi-point inspection. The dashed ring is a perfect score — the gap between the shape and the ring is the work left.</p></div>
+  <div class="band-head"><p class="eyebrow">Ten stations</p><h2>Where the system is strong, and where it is not</h2><p>Scored against the design system multi-point inspection. The dashed ring is a perfect score — the gap between the shape and the ring is the work left.</p><p class="stamp"><span class="dot live"></span>Updated 6 Aug 2026 · refreshes automatically</p></div>
   <div class="bento">
     <eo-card class="tile span-7"><div class="tile-in"><svg class="chart" viewBox="0 0 560 440" role="img"
     aria-label="Radar of ten inspection stations scored out of ten. Coverage & gaps 3, Best practices 8, Accessibility 5, Shared language 8, Testing & validation 4, Orchestration 6, Governance 6, Feedback & adoption 5, Machine-readable docs 6, Agent access 4.">
@@ -671,7 +703,7 @@ eo-card > * { width: 100%; }
 </section>
 
 <section class="band">
-  <div class="band-head"><p class="eyebrow">Two sides, two speeds</p><h2>The design system is in good shape. Getting it into code is the work.</h2><p>Each row attributes the inspection findings to the side of the system they belong to. Every cell rests on a measurement, not an opinion — including the two where the design side is only partial.</p></div>
+  <div class="band-head"><p class="eyebrow">Two sides, two speeds</p><h2>The design system is in good shape. Getting it into code is the work.</h2><p>Each row attributes the inspection findings to the side of the system they belong to. Every cell rests on a measurement, not an opinion — including the two where the design side is only partial.</p><p class="stamp"><span class="dot live"></span>Updated 6 Aug 2026 · refreshes automatically</p></div>
   <div class="bento">
     <eo-card class="tile span-12"><div class="tile-in"><div class="legend">
          <span><span class="cell in-place"><span></span></span> In place</span>
@@ -756,7 +788,7 @@ eo-card > * { width: 100%; }
 </section>
 
 <section class="band tight">
-  <div class="band-head"><p class="eyebrow">Progress</p><h2>What actually moved</h2><p>Station scores between the last two full inspections. Six of ten did not move at all — that is the finding, not the exceptions.</p></div>
+  <div class="band-head"><p class="eyebrow">Progress</p><h2>What actually moved</h2><p>Station scores between the last two full inspections. Six of ten did not move at all — that is the finding, not the exceptions.</p><p class="stamp"><span class="dot live"></span>Updated 6 Aug 2026 · refreshes automatically</p></div>
   <div class="bento">
     <eo-card class="tile span-7"><div class="tile-in"><div class="changes">
     <div class="change-head"><span></span><span>3 Aug</span><span></span><span>5 Aug</span></div>
@@ -820,6 +852,77 @@ eo-card > * { width: 100%; }
        <p class="tile-text">Design coverage for Wellpass is at 100%. The pipeline above is the code side of the same set.</p></div></eo-card>
   </div>
 </section>
+
+<section class="band">
+  <div class="band-head"><p class="eyebrow">Elapsed</p><h2>How long these have been true</h2><p>Each of these was reported in writing on the date shown. None has been closed.</p><p class="stamp"><span class="dot live"></span>Updated 6 Aug 2026 · refreshes automatically</p></div>
+  <div class="elapsed">
+    <div class="el-item">
+          <div class="el-days">198<span> days</span></div>
+          <p class="el-what">PR #84 open as an unreviewed draft</p>
+          <p class="el-since">Since 20 Jan 2026</p>
+        </div><div class="el-item">
+          <div class="el-days">6<span> days</span></div>
+          <p class="el-what">vitest.config.ts typos unfixed</p>
+          <p class="el-since">Since 31 Jul 2026 · reported in 5 inspections</p>
+        </div><div class="el-item">
+          <div class="el-days">6<span> days</span></div>
+          <p class="el-what">Accessibility gate left at test: todo</p>
+          <p class="el-since">Since 31 Jul 2026 · reported in 5 inspections</p>
+        </div><div class="el-item">
+          <div class="el-days">371<span> days</span></div>
+          <p class="el-what">Zero git tags</p>
+          <p class="el-since">Since 31 Jul 2025 · since the repository was created</p>
+        </div><div class="el-item">
+          <div class="el-days">297<span> days</span></div>
+          <p class="el-what">Oldest unassigned ticket waiting</p>
+          <p class="el-since">Since 13 Oct 2025</p>
+        </div><div class="el-item">
+          <div class="el-days">6<span> days</span></div>
+          <p class="el-what">Patrick&#39;s contrast report unanswered</p>
+          <p class="el-since">Since 31 Jul 2026</p>
+        </div>
+  </div>
+  <p class="tile-text" style="margin-top:var(--eo-dimension-24);text-align:center;max-width:70ch;margin-left:auto;margin-right:auto">
+    In the 6 days and 5 inspections since the baseline: One PR merged, after 151 days open. Every other finding from the first inspection is still true.
+  </p>
+</section>
+
+<section class="band tight">
+  <div class="band-head"><p class="eyebrow">Provenance</p><h2>Where every number on this page comes from</h2><p>Nothing here is undated, and nothing is an estimate unless it says so.</p><p class="stamp"><span class="dot live"></span>Updated 6 Aug 2026 · refreshes automatically</p></div>
+  <div class="bento">
+    <eo-card class="tile span-12"><div class="tile-in"><div class="table-scroll"><table class="prov">
+        <thead><tr><th>Measurement</th><th>Updated</th><th>How</th></tr></thead>
+        <tbody><tr><td>Inspection station scores</td>
+              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small">auto</eo-label></td>
+              <td class="how">Parsed from ds-inspection/reports/2026-08-06-inspection.md</td></tr><tr><td>UI Kit craft — binding, layers, detached instances</td>
+              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small">auto</eo-label></td>
+              <td class="how">Full traversal of 109,402 layers via the Figma plugin bridge</td></tr><tr><td>UI Kit auto-layout coverage</td>
+              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small">auto</eo-label></td>
+              <td class="how">Full traversal of 43,551 frames</td></tr><tr><td>Token system — variables, descriptions, cascade</td>
+              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small">auto</eo-label></td>
+              <td class="how">Full read of 1,619 variables across 5 collections</td></tr><tr><td>WCAG contrast ratios</td>
+              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small">auto</eo-label></td>
+              <td class="how">Computed from resolved token values across both brand modes</td></tr><tr><td>Focus-state coverage</td>
+              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small">auto</eo-label></td>
+              <td class="how">Variant options across 92 in-scope component sets</td></tr><tr><td>Icon library documentation</td>
+              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small">auto</eo-label></td>
+              <td class="how">Full read of 348 public components</td></tr><tr><td>Property naming consistency</td>
+              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small">auto</eo-label></td>
+              <td class="how">All property definitions across UI Kit and Icons</td></tr><tr><td>Components in code, PR ages, tags, contributors</td>
+              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small">auto</eo-label></td>
+              <td class="how">GitHub API</td></tr><tr><td>Consumer adoption — legacy deps, raw inputs</td>
+              <td class="when">3 Aug 2026 <eo-label intent="warning" size="small">manual</eo-label></td>
+              <td class="how">Org-wide GitHub code search, by hand</td></tr><tr><td>Jira DSC queue</td>
+              <td class="when">6 Aug 2026 <eo-label intent="warning" size="small">manual</eo-label></td>
+              <td class="how">Manual export — no unattended token</td></tr><tr><td>BMA build plan</td>
+              <td class="when">6 Aug 2026 <eo-label intent="warning" size="small">manual</eo-label></td>
+              <td class="how">Manual read from Notion</td></tr><tr><td>Figma library analytics</td>
+              <td class="when">5 Aug 2026 <eo-label intent="warning" size="small">manual</eo-label></td>
+              <td class="how">Cited from the AI-Readiness plan</td></tr></tbody>
+      </table></div></div></eo-card>
+  </div>
+</section>
+
 </div><div class="panel " id="panel-coverage" role="tabpanel" aria-labelledby="tab-coverage" hidden>
 <section class="band">
   <div class="band-head"><p class="eyebrow">Station 01 · red</p><h2>Coverage &amp;amp; gaps</h2><p>15 of 37 in code; the form-control hole is unchanged</p></div>
@@ -862,7 +965,7 @@ eo-card > * { width: 100%; }
 
 
 <section class="band">
-  <div class="band-head"><p class="eyebrow">Accessibility</p><h2>Specified, measured, and passing — on the design side</h2><p>The design system defines WCAG 2.2 AA, and every colour pair it governs measurably passes. The code that implements it has never run a single accessibility check.</p></div>
+  <div class="band-head"><p class="eyebrow">Accessibility</p><h2>Specified, measured, and passing — on the design side</h2><p>The design system defines WCAG 2.2 AA, and every colour pair it governs measurably passes. The code that implements it has never run a single accessibility check.</p><p class="stamp"><span class="dot live"></span>Updated 6 Aug 2026 · refreshes automatically</p></div>
   <div class="stat-row">
     <div class="stat good"><div class="stat-in"><div class="v " data-count="18" data-tpl="__/20">18/20</div><p class="k">Token pairs passing WCAG AA</p><p class="t">the other two are disabled text, which WCAG exempts</p></div></div>
     <div class="stat good"><div class="stat-in"><div class="v " data-count="11" data-tpl="__/20">11/20</div><p class="k">Reaching AAA</p><p class="t">well beyond the requirement</p></div></div>
@@ -912,7 +1015,7 @@ eo-card > * { width: 100%; }
   </div>
 </section></div><div class="panel " id="panel-delivery" role="tabpanel" aria-labelledby="tab-delivery" hidden>
 <section class="band">
-  <div class="band-head"><p class="eyebrow">Delivery</p><h2>A queue waiting on capacity, not decisions</h2><p>Everything in “Ready for Development” already has a spec and a priority.</p></div>
+  <div class="band-head"><p class="eyebrow">Delivery</p><h2>A queue waiting on capacity, not decisions</h2><p>Everything in “Ready for Development” already has a spec and a priority.</p><p class="stamp"><span class="dot manual"></span>Updated 6 Aug 2026 · read by hand</p></div>
   <div class="bento">
     <eo-card class="tile span-6"><div class="tile-in"><p class="eyebrow">All open DSC issues</p><h3>117 open</h3><div class="bars"><div class="bar-row"><span class="label">Neu</span>
       <span class="bar-track neutral"><span style="width:100%"></span></span>
@@ -1075,7 +1178,7 @@ eo-card > * { width: 100%; }
     <p>Jira and Notion figures are as last reviewed — they need tokens this build does not have, and are not presented as live.</p>
     <p>Built with the real design system: <code>@egym-private/egym-one-design-system-web@0.1.25</code> — eo-card, eo-label, eo-alert, eo-button, eo-divider, eo-tooltip — styled entirely from the 988 published <code>--eo-*</code> tokens. Charts are hand-built from those tokens because the system has no chart or progress component in code yet (DSC-100).</p>
     <p><strong>Sources.</strong> <a href="https://egym.atlassian.net/jira/software/c/projects/DSC/boards/1072" rel="noreferrer">jiraBoard</a> · <a href="https://egym.github.io/lib-egym-one-design-system/" rel="noreferrer">storybook</a> · <a href="https://app.notion.com/p/2f4d894dd22a809980e3c19fa6c3edb3" rel="noreferrer">bmaBuildPlan</a> · <a href="https://app.notion.com/p/38fd894dd22a81f59f84e91978ad88f9" rel="noreferrer">coreComponentsMetadata</a> · <a href="https://app.notion.com/p/DS-Engineering-Rollout-12-Week-Detailed-Plan-2-Engineers-3b4d894dd22a8138af03fe4c3192ba19" rel="noreferrer">rolloutPlan</a> · governanceReport · deck</p>
-    <p>Data as of 2026-08-06 · generated 2026-08-06</p>
+    <p>Data as of 6 Aug 2026 · page generated 6 Aug 2026 · inspection 6 Aug 2026</p>
   </div>
   <div class="ghost-mark" aria-hidden="true">EGYM One</div>
 </footer>

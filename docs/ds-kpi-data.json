@@ -1011,5 +1011,165 @@
       },
       "note": "All 13 isFilled spellings aligned, and the two organisation components now agree on isChecked."
     }
+  },
+  "provenance": {
+    "generatedAt": "2026-08-06",
+    "note": "Every figure on this dashboard carries the date it was taken and the method used. Nothing here is undated, and nothing is an estimate unless it says so.",
+    "measurements": [
+      {
+        "what": "Inspection station scores",
+        "date": "2026-08-06",
+        "method": "Parsed from ds-inspection/reports/2026-08-06-inspection.md",
+        "live": true
+      },
+      {
+        "what": "UI Kit craft — binding, layers, detached instances",
+        "date": "2026-08-06",
+        "method": "Full traversal of 109,402 layers via the Figma plugin bridge",
+        "live": true
+      },
+      {
+        "what": "UI Kit auto-layout coverage",
+        "date": "2026-08-06",
+        "method": "Full traversal of 43,551 frames",
+        "live": true
+      },
+      {
+        "what": "Token system — variables, descriptions, cascade",
+        "date": "2026-08-06",
+        "method": "Full read of 1,619 variables across 5 collections",
+        "live": true
+      },
+      {
+        "what": "WCAG contrast ratios",
+        "date": "2026-08-06",
+        "method": "Computed from resolved token values across both brand modes",
+        "live": true
+      },
+      {
+        "what": "Focus-state coverage",
+        "date": "2026-08-06",
+        "method": "Variant options across 92 in-scope component sets",
+        "live": true
+      },
+      {
+        "what": "Icon library documentation",
+        "date": "2026-08-06",
+        "method": "Full read of 348 public components",
+        "live": true
+      },
+      {
+        "what": "Property naming consistency",
+        "date": "2026-08-06",
+        "method": "All property definitions across UI Kit and Icons",
+        "live": true
+      },
+      {
+        "what": "Components in code, PR ages, tags, contributors",
+        "date": "2026-08-06",
+        "method": "GitHub API",
+        "live": true
+      },
+      {
+        "what": "Consumer adoption — legacy deps, raw inputs",
+        "date": "2026-08-03",
+        "method": "Org-wide GitHub code search, by hand",
+        "live": false
+      },
+      {
+        "what": "Jira DSC queue",
+        "date": "2026-08-06",
+        "method": "Manual export — no unattended token",
+        "live": false
+      },
+      {
+        "what": "BMA build plan",
+        "date": "2026-08-06",
+        "method": "Manual read from Notion",
+        "live": false
+      },
+      {
+        "what": "Figma library analytics",
+        "date": "2026-08-05",
+        "method": "Cited from the AI-Readiness plan",
+        "live": false
+      }
+    ]
+  },
+  "timeline": {
+    "note": "Five inspections in seven days. What moved, and what did not.",
+    "inspections": [
+      {
+        "date": "2026-07-31",
+        "score": 47,
+        "label": "Baseline",
+        "note": "Station 8 not inspected; pro-rated"
+      },
+      {
+        "date": "2026-08-03",
+        "score": 47,
+        "label": "Full re-run",
+        "note": "Station 8 measured for the first time, and scored red"
+      },
+      {
+        "date": "2026-08-05",
+        "score": 51,
+        "label": "Evidence surfaces opened",
+        "note": "Slack, GitHub API and Notion inspected for the first time"
+      },
+      {
+        "date": "2026-08-06",
+        "score": 55,
+        "label": "Full-population measurement",
+        "note": "All three design files counted rather than estimated"
+      }
+    ],
+    "elapsed": [
+      {
+        "what": "PR #84 open as an unreviewed draft",
+        "since": "2026-01-20",
+        "days": 198,
+        "tone": "bad"
+      },
+      {
+        "what": "vitest.config.ts typos unfixed",
+        "since": "2026-07-31",
+        "days": 6,
+        "inspections": 5,
+        "tone": "bad"
+      },
+      {
+        "what": "Accessibility gate left at test: todo",
+        "since": "2026-07-31",
+        "days": 6,
+        "inspections": 5,
+        "tone": "bad"
+      },
+      {
+        "what": "Zero git tags",
+        "since": "2025-07-31",
+        "days": 371,
+        "tone": "bad",
+        "note": "since the repository was created"
+      },
+      {
+        "what": "Oldest unassigned ticket waiting",
+        "since": "2025-10-13",
+        "days": 297,
+        "tone": "bad"
+      },
+      {
+        "what": "Patrick's contrast report unanswered",
+        "since": "2026-07-31",
+        "days": 6,
+        "tone": "bad"
+      }
+    ],
+    "codeSideChanges": {
+      "since": "2026-07-31",
+      "days": 6,
+      "inspections": 5,
+      "changes": "One PR merged, after 151 days open. Every other finding from the first inspection is still true."
+    }
   }
 }

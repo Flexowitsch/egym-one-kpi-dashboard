@@ -56,12 +56,21 @@ const bars = (obj, tone = 'neutral') => {
     )
     .join('')}</div>`;
 };
-const bandHead = (eyebrow, title, sub) =>
+// Every band carries the date its numbers were taken, and whether that number
+// refreshes on its own or was last read by hand.
+const fmt = (iso) =>
+  new Date(iso + 'T00:00:00Z').toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+const stamp = (date, live = true) =>
+  `<p class="stamp"><span class="dot ${live ? 'live' : 'manual'}"></span>Updated ${esc(fmt(date))} · ${
+    live ? 'refreshes automatically' : 'read by hand'
+  }</p>`;
+
+const bandHead = (eyebrow, title, sub, date, live = true) =>
   `<div class="band-head"><p class="eyebrow">${esc(eyebrow)}</p><h2>${esc(title)}</h2>${
     sub ? `<p>${sub}</p>` : ''
-  }</div>`;
+  }${date ? stamp(date, live) : ''}</div>`;
 
-const { coverage, jira, bmaBuildPlan, communityVelocity, ask, kpis, roadmap, meta, inspection, designVsCode, accessibility, designOpen } = data;
+const { coverage, jira, bmaBuildPlan, communityVelocity, ask, kpis, roadmap, meta, inspection, designVsCode, accessibility, designOpen, provenance, timeline } = data;
 const rfd = jira.readyForDevelopment;
 const cv = communityVelocity;
 const gap = inspection ? inspection.potentialTotal - inspection.shippedTotal : 0;
@@ -105,7 +114,7 @@ const overview = `
 </section>
 
 <section class="band">
-  ${bandHead('Ten stations', 'Where the system is strong, and where it is not', 'Scored against the design system multi-point inspection. The dashed ring is a perfect score — the gap between the shape and the ring is the work left.')}
+  ${bandHead('Ten stations', 'Where the system is strong, and where it is not', 'Scored against the design system multi-point inspection. The dashed ring is a perfect score — the gap between the shape and the ring is the work left.', inspection?.date)}
   <div class="bento">
     ${tile('span-7', radar(inspection?.stations ?? []))}
     ${tile(
@@ -155,7 +164,8 @@ const overview = `
   ${bandHead(
     'Two sides, two speeds',
     'The design system is in good shape. Getting it into code is the work.',
-    'Each row attributes the inspection findings to the side of the system they belong to. Every cell rests on a measurement, not an opinion — including the two where the design side is only partial.'
+    'Each row attributes the inspection findings to the side of the system they belong to. Every cell rests on a measurement, not an opinion — including the two where the design side is only partial.',
+    '2026-08-06'
   )}
   <div class="bento">
     ${tile(
@@ -180,7 +190,7 @@ const overview = `
 </section>
 
 <section class="band tight">
-  ${bandHead('Progress', 'What actually moved', 'Station scores between the last two full inspections. Six of ten did not move at all — that is the finding, not the exceptions.')}
+  ${bandHead('Progress', 'What actually moved', 'Station scores between the last two full inspections. Six of ten did not move at all — that is the finding, not the exceptions.', inspection?.date)}
   <div class="bento">
     ${tile('span-7', changeList(inspection?.stations ?? []))}
     ${tile(
@@ -207,6 +217,49 @@ const overview = `
     )}
   </div>
 </section>
+
+<section class="band">
+  ${bandHead(
+    'Elapsed',
+    'How long these have been true',
+    'Each of these was reported in writing on the date shown. None has been closed.',
+    provenance.generatedAt
+  )}
+  <div class="elapsed">
+    ${timeline.elapsed
+      .map(
+        (e) => `<div class="el-item">
+          <div class="el-days">${e.days}<span> days</span></div>
+          <p class="el-what">${esc(e.what)}</p>
+          <p class="el-since">Since ${esc(fmt(e.since))}${e.inspections ? ` · reported in ${e.inspections} inspections` : ''}${e.note ? ` · ${esc(e.note)}` : ''}</p>
+        </div>`
+      )
+      .join('')}
+  </div>
+  <p class="tile-text" style="margin-top:var(--eo-dimension-24);text-align:center;max-width:70ch;margin-left:auto;margin-right:auto">
+    In the ${timeline.codeSideChanges.days} days and ${timeline.codeSideChanges.inspections} inspections since the baseline: ${esc(timeline.codeSideChanges.changes)}
+  </p>
+</section>
+
+<section class="band tight">
+  ${bandHead('Provenance', 'Where every number on this page comes from', 'Nothing here is undated, and nothing is an estimate unless it says so.', provenance.generatedAt)}
+  <div class="bento">
+    ${tile(
+      'span-12',
+      `<div class="table-scroll"><table class="prov">
+        <thead><tr><th>Measurement</th><th>Updated</th><th>How</th></tr></thead>
+        <tbody>${provenance.measurements
+          .map(
+            (m) => `<tr><td>${esc(m.what)}</td>
+              <td class="when">${esc(fmt(m.date))} ${chip(m.live ? 'auto' : 'manual', m.live ? 'positive' : 'warning')}</td>
+              <td class="how">${esc(m.method)}</td></tr>`
+          )
+          .join('')}</tbody>
+      </table></div>`
+    )}
+  </div>
+</section>
+
 `;
 
 
@@ -258,7 +311,8 @@ const qualityTab = `
   ${bandHead(
     'Accessibility',
     'Specified, measured, and passing — on the design side',
-    'The design system defines WCAG 2.2 AA, and every colour pair it governs measurably passes. The code that implements it has never run a single accessibility check.'
+    'The design system defines WCAG 2.2 AA, and every colour pair it governs measurably passes. The code that implements it has never run a single accessibility check.',
+    accessibility.measuredAt
   )}
   <div class="stat-row">
     ${stat(`${accessibility.designSide.contrast.aaPass}/20`, 'Token pairs passing WCAG AA', 'the other two are disabled text, which WCAG exempts', 'good')}
@@ -354,7 +408,7 @@ const queueRows = rfd.tickets
 
 const deliveryTab = `
 <section class="band">
-  ${bandHead('Delivery', 'A queue waiting on capacity, not decisions', 'Everything in “Ready for Development” already has a spec and a priority.')}
+  ${bandHead('Delivery', 'A queue waiting on capacity, not decisions', 'Everything in “Ready for Development” already has a spec and a priority.', meta.asOf, false)}
   <div class="bento">
     ${tile('span-6', `<p class="eyebrow">All open DSC issues</p><h3>${jira.openIssuesTotal} open</h3>${bars(jira.byStatus)}`)}
     ${tile(
@@ -529,7 +583,7 @@ const html = `<!doctype html>
     <p><strong>Sources.</strong> ${Object.entries(meta.sources)
       .map(([k, v]) => (String(v).startsWith('http') ? `<a href="${esc(v)}" rel="noreferrer">${esc(k)}</a>` : esc(k)))
       .join(' · ')}</p>
-    <p>Data as of ${esc(meta.asOf)} · generated ${new Date().toISOString().slice(0, 10)}</p>
+    <p>Data as of ${esc(fmt(meta.asOf))} · page generated ${esc(fmt(provenance.generatedAt))} · inspection ${esc(fmt(inspection?.date ?? meta.asOf))}</p>
   </div>
   <div class="ghost-mark" aria-hidden="true">EGYM One</div>
 </footer>
