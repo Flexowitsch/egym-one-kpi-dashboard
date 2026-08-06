@@ -308,14 +308,25 @@ function cascade() {
     ease: 'power2.out',
     stagger: { each: 0.004, from: 'start' },
   });
-  // A very slow lateral sway on top of the scroll travel, so the field is
-  // alive even when the page is not being scrolled.
-  gsap.to(nodes.length ? $('.cascade', field) : [], {
-    xPercent: 1.2,
-    duration: 14,
-    ease: 'sine.inOut',
-    yoyo: true,
-    repeat: -1,
+  // Once the strands are drawn, the field starts moving. Each vertical band
+  // sways on its own period and phase, so the connections drift against each
+  // other rather than the whole picture sliding as one sheet — that relative
+  // motion is what makes it read as something live rather than a texture on a
+  // slow pan. Amplitudes are a fraction of a percent; any more and the eye
+  // starts tracking the background instead of the page.
+  const bands = $$('.cf-band', field);
+  const drawnAfter = 0.2 + 1.4 + links.length * 0.004;
+  bands.forEach((band, i) => {
+    const dir = i % 2 ? 1 : -1;
+    gsap.to(band, {
+      xPercent: dir * (0.22 + (i % 3) * 0.16),
+      yPercent: dir * 0.12,
+      duration: 9 + (i % 4) * 2.5,
+      ease: 'sine.inOut',
+      yoyo: true,
+      repeat: -1,
+      delay: drawnAfter + i * 0.35,
+    });
   });
 
   // The travel. Two thirds of the track is off-screen; scrolling the document
@@ -464,8 +475,13 @@ function cursor() {
   // One delegated listener rather than per-element handlers, so it keeps
   // working for anything rendered later.
   document.addEventListener('mouseover', (e) => {
-    const t = e.target.closest?.('[data-token]');
     const hot = e.target.closest?.('a, button, eo-button, eo-card, .tab');
+    // The token labels are the marketing half of this: they belong on the
+    // overview, where the page is arguing for the system. On the working tabs
+    // the cursor stays — it is part of the product now — but it stops
+    // annotating, because a label popping over every number gets in the way of
+    // reading them.
+    const t = onOverview() ? e.target.closest?.('[data-token]') : null;
     root.classList.toggle('is-hover', Boolean(hot || t));
     root.classList.toggle('has-token', Boolean(t));
     if (t && label) label.textContent = t.dataset.token;
@@ -500,6 +516,95 @@ function hero() {
     scrollTrigger: { trigger: '.hero', start: 'top top', end: '30% top', scrub: true },
   });
   return tl;
+}
+
+/* ------------------------------------------------------- the KPI run ---
+   Five full-viewport panels driven sideways while the section is pinned, so
+   vertical scrolling reads as travelling along a sequence. Two details do the
+   work: the pin distance is derived from viewport width rather than hard-coded,
+   so the panels always move at the same rate whatever the screen; and each
+   panel's body counter-parallaxes against the track through containerAnimation,
+   which is what stops the run feeling like a slideshow of flat cards.
+
+   Pinned only above 900px. On a phone a horizontal track fights the browser's
+   own gesture, so the panels stack and reveal one at a time instead. */
+function kpiRail() {
+  const pin = $('.kpi-pin');
+  if (!pin || reduce) return;
+  const mm = gsap.matchMedia();
+
+  mm.add('(min-width: 901px)', () => {
+    const track = $('.kpi-track');
+    const panels = $$('.kpi-panel');
+    const progress = $('.kpi-progress span');
+    if (!track || panels.length < 2) return;
+
+    const tween = gsap.to(track, {
+      xPercent: (-100 * (panels.length - 1)) / panels.length,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.kpi-rail',
+        start: 'top top',
+        end: () => '+=' + window.innerWidth * (panels.length - 1) * 0.85,
+        pin: '.kpi-pin',
+        scrub: 0.8,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate: (self) => {
+          if (progress) progress.style.transform = `scaleX(${self.progress})`;
+        },
+      },
+    });
+
+    panels.forEach((panel) => {
+      // containerAnimation lets a ScrollTrigger read horizontal position inside
+      // the pinned track, so each body can drift against its own panel.
+      gsap.fromTo(
+        $('.kpi-body', panel),
+        { x: 70 },
+        {
+          x: -70,
+          ease: 'none',
+          scrollTrigger: { containerAnimation: tween, trigger: panel, start: 'left right', end: 'right left', scrub: true },
+        }
+      );
+      gsap.fromTo(
+        $('.kpi-ghost', panel),
+        { x: -50 },
+        {
+          x: 50,
+          ease: 'none',
+          scrollTrigger: { containerAnimation: tween, trigger: panel, start: 'left right', end: 'right left', scrub: true },
+        }
+      );
+      // The number counts as its panel arrives, not on page load.
+      const v = $('.kpi-value', panel);
+      if (v) {
+        ScrollTrigger.create({
+          containerAnimation: tween,
+          trigger: panel,
+          start: 'left 70%',
+          once: true,
+          onEnter: () => countUp(v, panel),
+        });
+      }
+    });
+  });
+
+  mm.add('(max-width: 900px)', () => {
+    $$('.kpi-panel').forEach((panel) => {
+      gsap.fromTo(
+        $('.kpi-body', panel),
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1, y: 0, duration: 0.9, ease: 'siteOut',
+          scrollTrigger: { trigger: panel, start: 'top 85%', once: true },
+        }
+      );
+      const v = $('.kpi-value', panel);
+      if (v) countUp(v, panel);
+    });
+  });
 }
 
 /* --------------------------------------------------------- velocity skew ---
@@ -582,6 +687,7 @@ function init() {
   // reveals immediately.
   if (!preloader(() => heroTl?.play())) heroTl?.play();
   cascade();
+  kpiRail();
   manifesto();
   cursor();
   velocity();

@@ -629,8 +629,28 @@ body[data-tab-state="overview"] .cascade-field { opacity: 1; }
   0%, 100% { opacity: 0.18; transform: scale(0.82); }
   50%      { opacity: 0.42; transform: scale(1.12); }
 }
+
+/* Data moving through the cascade: a short dash travelling the length of a
+   strand. Only every fourth strand carries one — all of them at once is a
+   light show, sparse traffic on a few reads as a system doing work. The path
+   length is measured at build time so the pulse runs at a constant speed
+   whatever the length of the strand it is on, and so this needs no JavaScript
+   (which is what lets the same effect ship inside a Notion embed). */
+.cf-flow {
+  fill: none;
+  stroke: var(--eo-color-content-accent);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+  opacity: 0.55;
+  stroke-dasharray: 16 var(--len);
+  stroke-dashoffset: 0;
+  animation: cf-flow var(--fd, 6s) linear var(--fp, 0s) infinite;
+}
+@keyframes cf-flow { to { stroke-dashoffset: var(--sweep); } }
+
 @media (prefers-reduced-motion: reduce) {
   .cf-link, .cf-node { animation: none; }
+  .cf-flow { display: none; }
 }
 
 /* keep page content above the field */
@@ -656,6 +676,145 @@ body[data-tab-state="overview"] .cascade-field { opacity: 1; }
   background: linear-gradient(to bottom, var(--eo-color-border-default), transparent);
 }
 @keyframes cue { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+
+/* ---------- the pinned KPI run ----------
+   Five numbers as full-viewport panels that move sideways while the page is
+   pinned. Dark ground, because this is the one section that is arguing rather
+   than reporting and it needs to read as a different register to the cards
+   above and below it — and because the turn from design to code lands harder
+   against it. Both colours are tokens; there is no bespoke dark theme here. */
+.kpi-rail {
+  /* full-bleed out of .shell's max-width and gutter */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background: var(--eo-color-surface-emphasized);
+  color: var(--eo-color-content-on-emphasized);
+}
+.kpi-pin {
+  position: relative;
+  min-height: 100svh;
+  display: flex; flex-direction: column; justify-content: center;
+  overflow: hidden;
+}
+.kpi-head {
+  position: absolute;
+  top: clamp(5rem, 11vh, 7rem);
+  left: var(--gutter); right: var(--gutter);
+  display: flex; align-items: baseline; gap: var(--eo-dimension-gap-small);
+  z-index: 3;
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+.kpi-index { color: var(--eo-color-content-accent); }
+.kpi-hint { margin-left: auto; letter-spacing: 0.16em; opacity: 0.55; }
+
+.kpi-track { display: flex; width: max-content; will-change: transform; }
+.kpi-panel {
+  position: relative;
+  width: 100vw;
+  min-height: 100svh;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 46rem) 1fr;
+  align-items: center;
+  padding: clamp(7rem, 15vh, 10rem) var(--gutter);
+  border-left: 1px solid color-mix(in srgb, var(--eo-color-content-on-emphasized) 14%, transparent);
+}
+.kpi-panel:first-child { border-left: 0; }
+
+/* The outline numeral is a position marker, not decoration: it says which of
+   the five you are on while the panel itself is mid-slide. */
+.kpi-ghost {
+  position: absolute;
+  right: clamp(0.5rem, 4vw, 4rem);
+  bottom: -0.14em;
+  font-family: var(--eo-typography-headline-800-font-family);
+  font-size: clamp(11rem, 34vh, 24rem);
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--eo-color-content-on-emphasized) 20%, transparent);
+  user-select: none;
+}
+.kpi-body { grid-column: 2; position: relative; z-index: 2; }
+.kpi-kicker {
+  display: inline-block;
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--eo-color-content-accent);
+  margin-bottom: var(--eo-dimension-24);
+}
+.kpi-value {
+  font-family: var(--eo-typography-headline-800-font-family);
+  font-size: clamp(4.5rem, 13vw, 10rem);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  /* No tabular-nums here. In Helvetica Now Display it widens the comma to a
+     digit slot, so 1,619 sets as "1 , 619". These are single display figures,
+     not a column that needs to align. */
+}
+/* The turn is carried in colour: the three measured design numbers are
+   positive, the two code numbers are not. */
+.kpi-panel.design .kpi-value { color: var(--eo-color-content-utility-positive); }
+.kpi-panel.code   .kpi-value { color: var(--eo-color-content-utility-negative); }
+.kpi-body h2 {
+  margin: var(--eo-dimension-16) 0 0;
+  font-family: var(--eo-typography-headline-400-font-family);
+  font-size: var(--eo-typography-headline-400-font-size);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+.kpi-body p {
+  max-width: 34rem;
+  margin: var(--eo-dimension-16) 0 0;
+  line-height: 1.65;
+  color: color-mix(in srgb, var(--eo-color-content-on-emphasized) 78%, transparent);
+  text-wrap: pretty;
+}
+.kpi-tags {
+  display: flex; flex-wrap: wrap;
+  gap: var(--eo-dimension-gap-small) var(--eo-dimension-gap-large);
+  margin-top: clamp(1.8rem, 4vh, 2.6rem);
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--eo-color-content-on-emphasized) 50%, transparent);
+}
+.kpi-progress {
+  position: absolute;
+  left: var(--gutter); right: var(--gutter);
+  bottom: clamp(2rem, 5vh, 3.5rem);
+  height: 1px;
+  background: color-mix(in srgb, var(--eo-color-content-on-emphasized) 16%, transparent);
+  z-index: 3;
+}
+.kpi-progress span {
+  display: block; height: 100%; width: 100%;
+  background: var(--eo-color-content-accent);
+  transform: scaleX(0); transform-origin: left;
+}
+
+/* Below the pin breakpoint the panels simply stack. A horizontal track on a
+   phone is a fight with the browser's own gesture. */
+@media (max-width: 900px) {
+  .kpi-pin { min-height: 0; display: block; }
+  .kpi-track { display: block; width: auto; }
+  .kpi-panel {
+    width: auto; min-height: 0;
+    grid-template-columns: 1fr;
+    padding: clamp(4rem, 12vh, 6rem) var(--gutter);
+    border-left: 0;
+    border-top: 1px solid color-mix(in srgb, var(--eo-color-content-on-emphasized) 14%, transparent);
+  }
+  .kpi-body { grid-column: 1; }
+  .kpi-head, .kpi-progress { position: static; margin: 0 var(--gutter); padding-top: 2rem; }
+  .kpi-ghost { font-size: 8rem; }
+}
 
 /* ---------- the manifesto ----------
    One sentence, large, revealed word by word against scroll. The only place on
@@ -743,9 +902,9 @@ body[data-tab-state="overview"] .cascade-field { opacity: 1; }
    pointers only, overview only, and never when reduced motion is requested. */
 .cursor { position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: 0; }
 .cursor.is-active { opacity: 1; }
-/* The other five tabs are the technical read. No cursor, no cascade, no
-   parallax — they are meant to be screenshot, read and lifted into Notion. */
-body:not([data-tab-state="overview"]) .cursor { display: none; }
+/* The cursor runs on every tab — it is part of the product, not a landing-page
+   trick. What is scoped to the overview is the token annotation, handled in
+   motion.js, and the cascade behind the page. */
 .cursor-dot, .cursor-ring {
   position: absolute; top: 0; left: 0;
   transform: translate(-50%, -50%);

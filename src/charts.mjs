@@ -142,7 +142,11 @@ export function stationBars(stations, { max = 10 } = {}) {
           ${s.potential ? `<span class="ghost" style="width:${(s.potential / max) * 100}%"></span>` : ''}
           <span class="${s.light}" style="width:${(s.score / max) * 100}%"></span>
         </span>
-        <span class="sc">${s.score}${s.potential ? `<span class="c-label"> → ${s.potential}</span>` : ''}</span>
+        <!-- Score only. The "6 → 7" second figure that used to sit here read as
+             a range rather than a projection, and ten rows of two numbers made
+             the column restless. The lighter bar behind the fill carries the
+             same information calmly, and the footnote says what it means. -->
+        <span class="sc">${s.score}</span>
       </div>`
     )
     .join('')}</div>`;
@@ -304,6 +308,7 @@ export function cascadeField({ width = 1440, height = 2700, seed = 7, cycles = 2
             `${b.x.toFixed(1)},${(a.y + dy * 0.58).toFixed(1)} ` +
             `${b.x.toFixed(1)},${b.y.toFixed(1)}`,
           tier: c,
+          t: (a.t + b.t) / 2,
         });
       }
     });
@@ -313,25 +318,73 @@ export function cascadeField({ width = 1440, height = 2700, seed = 7, cycles = 2
   // order: Core first, Appearance last. --p is a per-element phase offset, so
   // the ambient pulse never beats in unison — that is what stops the field
   // reading as a repeating pattern.
-  const paths = links
-    .map(
-      (l, i) =>
-        `<path class="cf-link" data-tier="${l.tier}" style="--p:${(-(i % 37) * 0.31).toFixed(2)}s" d="${l.d}"/>`
-    )
-    .join('');
-  const dots = nodes
-    .map((col, c) =>
-      col
-        .map(
-          (n, i) =>
-            `<circle class="cf-node" data-tier="${c}" style="--p:${(-((i * 3 + c * 5) % 29) * 0.29).toFixed(
-              2
-            )}s" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${n.r}"/>`
-        )
-        .join('')
-    )
-    .join('');
+  //
+  // Everything is then filed into vertical bands by horizontal position. Each
+  // band is a <g> that sways on its own phase, which is what gives the strands
+  // movement relative to each other rather than the whole field sliding as one
+  // sheet. Links sit in the band of their midpoint; because a link only ever
+  // reaches a node at a similar position, its two ends stay within a band or
+  // one either side, and at these amplitudes the couple of pixels of drift
+  // between a strand and its node reads as slack in the line, not as a break.
+  const BANDS = 9;
+  const bandOf = (t) => Math.min(BANDS - 1, Math.max(0, Math.floor(t * BANDS)));
+
+  // Flat-sampled cubic length. Exact enough to time a travelling dash, and it
+  // has to be known at build time because the pulse below is pure CSS.
+  const curveLen = (d) => {
+    const p = d.match(/-?[\d.]+/g).map(Number);
+    const [x0, y0, x1, y1, x2, y2, x3, y3] = p;
+    const at = (t, a, b, c, dd) => {
+      const u = 1 - t;
+      return u * u * u * a + 3 * u * u * t * b + 3 * u * t * t * c + t * t * t * dd;
+    };
+    let len = 0, px = x0, py = y0;
+    for (let i = 1; i <= 16; i++) {
+      const t = i / 16;
+      const x = at(t, x0, x1, x2, x3);
+      const y = at(t, y0, y1, y2, y3);
+      len += Math.hypot(x - px, y - py);
+      px = x; py = y;
+    }
+    return len;
+  };
+
+  const linkBands = Array.from({ length: BANDS }, () => []);
+  links.forEach((l, i) => {
+    const band = bandOf(l.t);
+    linkBands[band].push(
+      `<path class="cf-link" data-tier="${l.tier}" style="--p:${(-(i % 37) * 0.31).toFixed(2)}s" d="${l.d}"/>`
+    );
+    // Every fourth strand carries a pulse that travels its length — data moving
+    // through the cascade. Every strand at once would be a light show; sparse
+    // traffic on a few of them reads as a system doing work.
+    if (i % 4 === 0) {
+      const len = curveLen(l.d);
+      const DASH = 16;
+      linkBands[band].push(
+        `<path class="cf-flow" style="--len:${len.toFixed(1)};--sweep:${(-(len + DASH)).toFixed(
+          1
+        )};--fd:${(len / 42 + 1.5).toFixed(2)}s;--fp:${(1.8 + ((i * 0.7) % 11)).toFixed(2)}s" d="${l.d}"/>`
+      );
+    }
+  });
+
+  const nodeBands = Array.from({ length: BANDS }, () => []);
+  nodes.forEach((row, c) =>
+    row.forEach((n, i) => {
+      nodeBands[bandOf(n.t)].push(
+        `<circle class="cf-node" data-tier="${c}" style="--p:${(-((i * 3 + c * 5) % 29) * 0.29).toFixed(
+          2
+        )}s" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${n.r}"/>`
+      );
+    })
+  );
+
+  const bands = Array.from(
+    { length: BANDS },
+    (_, i) => `<g class="cf-band" data-band="${i}">${linkBands[i].join('')}${nodeBands[i].join('')}</g>`
+  ).join('');
 
   return `<svg class="cascade" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none"
-    aria-hidden="true" focusable="false">${paths}${dots}</svg>`;
+    aria-hidden="true" focusable="false">${bands}</svg>`;
 }

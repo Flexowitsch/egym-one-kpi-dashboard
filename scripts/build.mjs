@@ -89,7 +89,7 @@ const bandHead = (eyebrow, title, sub, date, live = true) =>
     sub ? `<p data-token="--eo-color-content-subtle">${sub}</p>` : ''
   }${date ? stamp(date, live) : ''}</div>`;
 
-const { coverage, jira, bmaBuildPlan, communityVelocity, ask, kpis, roadmap, meta, inspection, designVsCode, accessibility, designOpen, provenance, timeline, fragments, readiness } = data;
+const { coverage, jira, tokenAudit, bmaBuildPlan, communityVelocity, ask, kpis, roadmap, meta, inspection, designVsCode, accessibility, designOpen, provenance, timeline, fragments, readiness } = data;
 const rfd = jira.readyForDevelopment;
 const cv = communityVelocity;
 const gap = inspection ? inspection.potentialTotal - inspection.shippedTotal : 0;
@@ -123,6 +123,78 @@ const overview = `
   </div>
   </div>
   <p class="scroll-cue" aria-hidden="true"><span>Scroll</span></p>
+</section>
+
+<!-- The five numbers that carry the argument, as a pinned horizontal run.
+     Deliberately ordered as a turn: three measurements where the design side is
+     excellent, then the two where code is the constraint. Scrolling down drives
+     the track sideways, and each panel's body counter-parallaxes against it. -->
+<section class="kpi-rail" aria-label="Key numbers">
+  <div class="kpi-pin">
+    <div class="kpi-head">
+      <span class="kpi-section">The numbers</span>
+      <span class="kpi-index">— 01</span>
+      <span class="kpi-hint" aria-hidden="true">Keep scrolling →</span>
+    </div>
+    <div class="kpi-track">
+      ${[
+        {
+          v: '100%',
+          k: 'Wellpass design coverage',
+          p: 'Every surface Wellpass needs has a finished, reviewed design in the UI Kit. Nothing on the design side is blocking that programme.',
+          tags: ['Measured', 'Full population', 'Design'],
+          side: 'design',
+        },
+        {
+          v: String(tokenAudit?.variables ?? 1619),
+          k: 'Token variables, four tiers',
+          p: `Core → Brand → Breakpoint → Appearance, with ${tokenAudit?.aliasPct ?? 72}% of values resolving through an alias rather than a literal. One change reaches every brand and breakpoint at once.`,
+          tags: ['Core', 'Brand', 'Breakpoint', 'Appearance'],
+          side: 'design',
+        },
+        {
+          v: '96%',
+          k: 'Fills bound to design tokens',
+          p: 'Counted across all 109,402 layers, not sampled — 98.6% excluding icon placeholders, 100% of strokes, and zero detached instances anywhere.',
+          tags: ['109,402 layers', 'Zero detached', 'Zero local styles'],
+          side: 'design',
+        },
+        {
+          v: `${coverage.inCodePct}%`,
+          k: 'Of the core set exists in code',
+          p: `${coverage.inCode} of ${coverage.coreSetTotal} components are built. Every one of the rest already has a finished design waiting on engineering capacity.`,
+          tags: ['Form controls absent', '36 hand-rolled inputs'],
+          side: 'code',
+        },
+        {
+          v: String(rfd.count),
+          k: 'Tickets ready, unstarted',
+          p: `Each one already carries a spec and a priority; ${rfd.unassigned} have nobody assigned. This is a queue waiting on capacity, not on decisions.`,
+          tags: ['Specced', 'Prioritised', 'Unassigned'],
+          side: 'code',
+        },
+      ]
+        .map(
+          (p, i, all) => `
+        <article class="kpi-panel ${p.side}">
+          <span class="kpi-ghost" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
+          <div class="kpi-body">
+            <span class="kpi-kicker">${p.side === 'design' ? 'Design side' : 'Code side'} · ${String(
+              i + 1
+            ).padStart(2, '0')} / ${String(all.length).padStart(2, '0')}</span>
+            <div class="kpi-value"${countAttrs(p.v)}>${esc(p.v)}</div>
+            <h2>${esc(p.k)}</h2>
+            <p>${esc(p.p)}</p>
+            <div class="kpi-tags" aria-hidden="true">${p.tags
+              .map((t) => `<span>[ ${esc(t)} ]</span>`)
+              .join('')}</div>
+          </div>
+        </article>`
+        )
+        .join('')}
+    </div>
+    <div class="kpi-progress" aria-hidden="true"><span></span></div>
+  </div>
 </section>
 
 <!-- The finding, in one sentence, revealed word by word as you scroll past it.
@@ -674,7 +746,8 @@ const html = `<!doctype html>
           `<eo-button class="tab" role="tab" id="tab-${id}" aria-controls="panel-${id}"
              aria-selected="${i === 0}" data-tab="${id}" size="small" content="text"
              hierarchy="${i === 0 ? 'primary' : 'tertiary'}"
-             intent="${i === 0 ? 'brand' : 'neutral'}">${esc(label)}</eo-button>`
+             intent="${i === 0 ? 'brand' : 'neutral'}"
+             data-token="eo-button · ${i === 0 ? 'primary/brand' : 'tertiary/neutral'}">${esc(label)}</eo-button>`
       ).join('')}
     </div>
   </div>
@@ -717,6 +790,8 @@ const html = `<!doctype html>
       // rather than layering a CSS class over a design system component
       t.setAttribute('hierarchy', on ? 'primary' : 'tertiary');
       t.setAttribute('intent', on ? 'brand' : 'neutral');
+      // the cursor reads this, so it has to follow the state it describes
+      t.setAttribute('data-token', 'eo-button · ' + (on ? 'primary/brand' : 'tertiary/neutral'));
     });
     document.querySelectorAll('.panel').forEach((p) => {
       const on = p.id === 'panel-' + id;

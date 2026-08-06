@@ -334,6 +334,13 @@ const cascadeFragment = () => visPage(
                cf-breathe 3.4s ease-in-out calc(var(--d,0s) + 1.8s) infinite}
    .cf-node{fill:var(--eo-color-content-accent);opacity:0;
      animation:cf-in .9s cubic-bezier(.22,1,.36,1) var(--d,0s) forwards}
+   /* the travelling pulse — same effect as the dashboard, and it works here
+      because the path length is measured at build time, so no JS is needed */
+   .cf-flow{fill:none;stroke:var(--eo-color-content-accent);stroke-width:1.4;
+     stroke-linecap:round;opacity:.5;
+     stroke-dasharray:16 var(--len);
+     animation:cf-flow var(--fd,6s) linear var(--fp,0s) infinite}
+   @keyframes cf-flow{to{stroke-dashoffset:var(--sweep)}}
    [data-tier="0"]{--d:.15s}
    [data-tier="1"]{--d:.75s}
    [data-tier="2"]{--d:1.35s}
