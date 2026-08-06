@@ -704,6 +704,14 @@
       [
         "One open contrast report",
         "Brand-on-dark AA failure on free and secondary buttons, unanswered since 31 July."
+      ],
+      [
+        "2 broken variable aliases",
+        "dimension/size/icon/default points at deleted variables in both Smart Strength modes, so icon sizing falls back on that hardware. Specific and quick to repoint."
+      ],
+      [
+        "35 undescribed variables",
+        "All recent component-level additions. The other 1,584 are described — 98% coverage."
       ]
     ]
   },
@@ -747,5 +755,89 @@
       "setsScanned": 92
     },
     "note": "Icon glyphs carry a placeholder fill that the consuming component overrides, so they are counted separately rather than as drift. The largest remaining block is the logo component brand marks, which are arguably correct as literals."
+  },
+  "tokenAudit": {
+    "measuredAt": "2026-08-06",
+    "source": "Live audit of the EGYM One Token System via the Figma plugin bridge",
+    "variables": 1619,
+    "described": 1584,
+    "bare": 35,
+    "describedPct": 98,
+    "collections": [
+      {
+        "name": "1 Core",
+        "variables": 335,
+        "modes": [
+          "Mode 1"
+        ]
+      },
+      {
+        "name": "2 Brand",
+        "variables": 1111,
+        "modes": [
+          "EGYM",
+          "Wellpass"
+        ]
+      },
+      {
+        "name": "3 Breakpoint",
+        "variables": 165,
+        "modes": [
+          "mobile",
+          "desktop",
+          "fitness hub",
+          "smart strength 141ppi",
+          "smart strength 96ppi"
+        ]
+      },
+      {
+        "name": "4 Appearance",
+        "variables": 7,
+        "modes": [
+          "light",
+          "dark"
+        ]
+      },
+      {
+        "name": "5 Deprecation",
+        "variables": 1,
+        "modes": [
+          "default",
+          "check mode"
+        ]
+      }
+    ],
+    "byType": {
+      "FLOAT": 1122,
+      "COLOR": 386,
+      "STRING": 107,
+      "BOOLEAN": 4
+    },
+    "aliasValues": 2437,
+    "rawValues": 961,
+    "aliasPct": 72,
+    "cascadeDepth": {
+      "0": 637,
+      "1": 783,
+      "2": 191,
+      "3": 8
+    },
+    "brokenAliases": [
+      {
+        "collection": "3 Breakpoint",
+        "variable": "dimension/size/icon/default",
+        "mode": "smart strength 141ppi"
+      },
+      {
+        "collection": "3 Breakpoint",
+        "variable": "dimension/size/icon/default",
+        "mode": "smart strength 96ppi"
+      }
+    ],
+    "notes": [
+      "Dark mode carries 7 variables against 1,111 in Brand — it is scaffolding holding the shape, not a shipped appearance.",
+      "The 35 undescribed variables are all recent component-level additions: radio-button, navigation item, list-contained, list-item studio-service, workout-progress and logo.",
+      "radio-button/selection-marker and navigation/item/padding/inline appear here but not in the v0.0.24 export the code pipeline is pinned to — which is exactly the drift the component validator flagged."
+    ]
   }
 }
