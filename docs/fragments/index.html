@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en" class="brand-egym light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quality fragments — EGYM One</title>
+<link rel="stylesheet" href="../vendor/egym-one-tokens.css">
+<style>
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;background:transparent}
+body{
+  font-family:var(--eo-typography-body-100-font-family);
+  color:var(--eo-color-content-emphasized);
+  -webkit-font-smoothing:antialiased;
+}
+.frag{
+  background:var(--eo-color-surface-default);
+  border-radius:var(--eo-dimension-border-radius-large);
+  padding:var(--eo-dimension-24);
+  display:flex;flex-direction:column;gap:var(--eo-dimension-8);
+  min-height:100%;
+  border-top:3px solid var(--eo-color-border-hinted);
+}
+.frag.good{border-top-color:var(--eo-color-border-utility-positive)}
+.frag.bad{border-top-color:var(--eo-color-border-utility-negative)}
+.frag.warn{border-top-color:var(--eo-color-border-utility-warning)}
+.v{
+  font-family:var(--eo-typography-headline-500-font-family);
+  font-size:var(--eo-typography-headline-500-font-size);
+  line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+}
+.frag.good .v{color:var(--eo-color-content-utility-positive)}
+.frag.bad .v{color:var(--eo-color-content-utility-negative)}
+.frag.warn .v{color:var(--eo-color-content-utility-warning)}
+.l{margin:0;font-size:var(--eo-typography-body-100-font-size);font-weight:600}
+.p{margin:0;font-size:var(--eo-typography-body-50-font-size);line-height:var(--eo-typography-body-50-line-height);color:var(--eo-color-content-subtle)}
+.m{
+  margin:auto 0 0;padding-top:var(--eo-dimension-12);
+  border-top:1px solid var(--eo-color-border-subtle);
+  font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-hinted);
+  display:flex;flex-wrap:wrap;gap:var(--eo-dimension-4) var(--eo-dimension-8);justify-content:space-between;
+}
+
+body{background:var(--eo-color-surface-subtle);padding:var(--eo-dimension-40) clamp(1.25rem,4vw,4rem)}
+h1{font-family:var(--eo-typography-headline-500-font-family);font-size:var(--eo-typography-headline-500-font-size);line-height:1.1;margin:0 0 var(--eo-dimension-8)}
+.lede{margin:0 0 var(--eo-dimension-8);color:var(--eo-color-content-subtle);max-width:70ch}
+.stamp{margin:0 0 var(--eo-dimension-40);color:var(--eo-color-content-hinted);font-size:var(--eo-typography-body-50-font-size)}
+h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-typography-headline-300-font-size);margin:var(--eo-dimension-40) 0 var(--eo-dimension-16)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--eo-dimension-16)}
+.cell{margin:0}
+.cell iframe{width:100%;height:230px;border:0;display:block;background:var(--eo-color-surface-default);border-radius:var(--eo-dimension-border-radius-large)}
+figcaption{margin-top:var(--eo-dimension-8)}
+figcaption code{font-size:.72rem;color:var(--eo-color-content-hinted);word-break:break-all}
+</style>
+</head>
+<body>
+  <h1>Quality fragments</h1>
+  <p class="lede">One fragment per quality bar. Each is self-contained and independently embeddable — designed to sit in the UI Kit, in Notion, or in a deck without needing the rest of the dashboard around it.</p>
+  <p class="stamp">Updated 6 Aug 2026 · paste any URL below into Notion, FigJam or Confluence and choose Embed</p>
+
+  <h2>Ready — design side</h2>
+  <div class="grid">
+  <figure class="cell">
+    <iframe src="./wellpass-coverage.html" title="Wellpass design coverage" loading="lazy"></iframe>
+    <figcaption>
+      <code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/wellpass-coverage.html</code>
+    </figcaption>
+  </figure>
+  <figure class="cell">
+    <iframe src="./ui-kit.html" title="Components in the UI Kit" loading="lazy"></iframe>
+    <figcaption>
+      <code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/ui-kit.html</code>
+    </figcaption>
+  </figure>
+  <figure class="cell">
+    <iframe src="./bma.html" title="BMA integration at or past design QA" loading="lazy"></iframe>
+    <figcaption>
+      <code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/bma.html</code>
+    </figcaption>
+  </figure>
+  <figure class="cell">
+    <iframe src="./contrast.html" title="Colour pairs passing WCAG AA" loading="lazy"></iframe>
+    <figcaption>
+      <code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/contrast.html</code>
+    </figcaption>
+  </figure>
+  <figure class="cell">
+    <iframe src="./binding.html" title="Fills bound to design tokens" loading="lazy"></iframe>
+    <figcaption>
+      <code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/binding.html</code>
+    </figcaption>
+  </figure>
+  <figure class="cell">
+    <iframe src="./icons.html" title="Icons documented to convention" loading="lazy"></iframe>
+    <figcaption>
+      <code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/icons.html</code>
+    </figcaption>
+  </figure>
+  <figure class="cell">
+    <iframe src="./tokens.html" title="Token variables described" loading="lazy"></iframe>
+    <figcaption>
+      <code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/tokens.html</code>
+    </figcaption>
+  </figure>
+  <figure class="cell">
+    <iframe src="./hygiene.html" title="Generic layer names" loading="lazy"></iframe>
+    <figcaption>
+      <code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/hygiene.html</code>
+    </figcaption>
+  </figure>
+  <figure class="cell">
+    <iframe src="./focus.html" title="Stateful components with a focus state" loading="lazy"></iframe>
+    <figcaption>
+      <code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/focus.html</code>
+    </figcaption>
+  </figure></div>
+
+  <h2>Lagging — code side</h2>
+  <div class="grid">
+  <figure class="cell">
+    <iframe src="./code-coverage.html" title="Core set built in code" loading="lazy"></iframe>
+    <figcaption>
+      <code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/code-coverage.html</code>
+    </figcaption>
+  </figure>
+  <figure class="cell">
+    <iframe src="./code-a11y.html" title="Accessibility assertions in code" loading="lazy"></iframe>
+    <figcaption>
+      <code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/code-a11y.html</code>
+    </figcaption>
+  </figure>
+  <figure class="cell">
+    <iframe src="./queue.html" title="Specified tickets waiting, unstarted" loading="lazy"></iframe>
+    <figcaption>
+      <code>https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments/queue.html</code>
+    </figcaption>
+  </figure></div>
+</body>
+</html>

@@ -1171,5 +1171,139 @@
       "inspections": 5,
       "changes": "One PR merged, after 151 days open. Every other finding from the first inspection is still true."
     }
+  },
+  "fragments": {
+    "note": "One fragment per quality bar. Each is self-contained and independently embeddable — designed to sit in the UI Kit, in Notion, or in a deck without needing the rest of the dashboard around it.",
+    "updated": "2026-08-06",
+    "items": [
+      {
+        "id": "wellpass-coverage",
+        "value": "100%",
+        "label": "Wellpass design coverage",
+        "proof": "Every Wellpass surface has a design system component behind it.",
+        "tone": "good",
+        "date": "2026-08-06",
+        "source": "Design coverage review"
+      },
+      {
+        "id": "ui-kit",
+        "value": "128",
+        "label": "Components in the UI Kit",
+        "proof": "2,889 variants across two brands and five breakpoints. The basic kit is complete and shipping.",
+        "tone": "good",
+        "date": "2026-08-06",
+        "source": "Full traversal of the UI Kit"
+      },
+      {
+        "id": "bma",
+        "value": "72%",
+        "label": "BMA integration at or past design QA",
+        "proof": "28 of 39 in-scope items. Only 6 remain in backlog, all Low or Medium impact.",
+        "tone": "good",
+        "date": "2026-08-06",
+        "source": "Notion BMA build plan"
+      },
+      {
+        "id": "contrast",
+        "value": "18/20",
+        "label": "Colour pairs passing WCAG AA",
+        "proof": "11 reach AAA. The two below are disabled text, which WCAG exempts — so every governed pair passes.",
+        "tone": "good",
+        "date": "2026-08-06",
+        "source": "Computed from resolved token values, both brands"
+      },
+      {
+        "id": "binding",
+        "value": "96%",
+        "label": "Fills bound to design tokens",
+        "proof": "98.6% excluding icon placeholders. Strokes are at 100%. Zero local styles remain.",
+        "tone": "good",
+        "date": "2026-08-06",
+        "source": "Full traversal of 109,402 layers"
+      },
+      {
+        "id": "icons",
+        "value": "348/348",
+        "label": "Icons documented to convention",
+        "proof": "Every public icon carries tags, description, use case and category. 69,182 characters.",
+        "tone": "good",
+        "date": "2026-08-06",
+        "source": "Full read of the icon library"
+      },
+      {
+        "id": "tokens",
+        "value": "98%",
+        "label": "Token variables described",
+        "proof": "1,584 of 1,619 across the four-tier cascade. 72% resolve through aliases.",
+        "tone": "good",
+        "date": "2026-08-06",
+        "source": "Full read of the token system"
+      },
+      {
+        "id": "hygiene",
+        "value": "0.54%",
+        "label": "Generic layer names",
+        "proof": "591 of 109,402 layers, and zero detached instances anywhere.",
+        "tone": "good",
+        "date": "2026-08-06",
+        "source": "Full traversal of the UI Kit"
+      },
+      {
+        "id": "focus",
+        "value": "94%",
+        "label": "Stateful components with a focus state",
+        "proof": "32 of 34. Accessibility is a required phase in the contribution checklist, not a review note.",
+        "tone": "good",
+        "date": "2026-08-06",
+        "source": "Variant options across 92 component sets"
+      },
+      {
+        "id": "code-coverage",
+        "value": "41%",
+        "label": "Core set built in code",
+        "proof": "15 of 37. The design is finished for all of them — this is the gap.",
+        "tone": "bad",
+        "date": "2026-08-06",
+        "source": "GitHub API"
+      },
+      {
+        "id": "code-a11y",
+        "value": "0",
+        "label": "Accessibility assertions in code",
+        "proof": "Storybook accessibility tests have never run — two typos in vitest.config.ts.",
+        "tone": "bad",
+        "date": "2026-08-06",
+        "source": "GitHub API"
+      },
+      {
+        "id": "queue",
+        "value": "25",
+        "label": "Specified tickets waiting, unstarted",
+        "proof": "24 unassigned. Nine have been waiting 297 days with finished designs.",
+        "tone": "bad",
+        "date": "2026-08-06",
+        "source": "Jira DSC board"
+      }
+    ]
+  },
+  "readiness": {
+    "headline": "The design system is ready. What is missing is implementation.",
+    "ready": [
+      "wellpass-coverage",
+      "ui-kit",
+      "bma",
+      "contrast",
+      "binding",
+      "icons",
+      "tokens",
+      "hygiene",
+      "focus"
+    ],
+    "lagging": [
+      "code-coverage",
+      "code-a11y",
+      "queue"
+    ],
+    "summary": "9 of 12 quality bars are green, and every one of them is on the design side. All three that are red are code."
   }
 }

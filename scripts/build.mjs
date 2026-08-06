@@ -70,7 +70,7 @@ const bandHead = (eyebrow, title, sub, date, live = true) =>
     sub ? `<p>${sub}</p>` : ''
   }${date ? stamp(date, live) : ''}</div>`;
 
-const { coverage, jira, bmaBuildPlan, communityVelocity, ask, kpis, roadmap, meta, inspection, designVsCode, accessibility, designOpen, provenance, timeline } = data;
+const { coverage, jira, bmaBuildPlan, communityVelocity, ask, kpis, roadmap, meta, inspection, designVsCode, accessibility, designOpen, provenance, timeline, fragments, readiness } = data;
 const rfd = jira.readyForDevelopment;
 const cv = communityVelocity;
 const gap = inspection ? inspection.potentialTotal - inspection.shippedTotal : 0;
@@ -216,6 +216,35 @@ const overview = `
        <p class="tile-text">Design coverage for Wellpass is at ${coverage.designCoverageWellpassPct}%. The pipeline above is the code side of the same set.</p>`
     )}
   </div>
+</section>
+
+<section class="band">
+  ${bandHead(
+    'Ready',
+    'What is finished, and what it rests on',
+    esc(readiness.summary),
+    fragments.updated
+  )}
+  <div class="stat-row">
+    ${fragments.items
+      .filter((f) => readiness.ready.slice(0, 4).includes(f.id))
+      .map((f) => stat(f.value, f.label, '', 'good'))
+      .join('')}
+  </div>
+  <div class="bento" style="margin-top:var(--eo-dimension-16)">
+    ${fragments.items
+      .filter((f) => readiness.ready.slice(4).includes(f.id))
+      .map((f) =>
+        tile('span-4', `<p class="eyebrow">${esc(f.label)}</p>
+          <p class="metric is-good"><span class="value">${esc(f.value)}</span></p>
+          <p class="tile-text">${esc(f.proof)}</p>`)
+      )
+      .join('')}
+  </div>
+  <p class="tile-text" style="text-align:center;max-width:70ch;margin:var(--eo-dimension-24) auto 0">
+    Each of these is also available as a standalone card you can embed on its own —
+    <a href="./fragments/">see the fragment gallery</a>.
+  </p>
 </section>
 
 <section class="band">
