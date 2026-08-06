@@ -254,6 +254,41 @@ function reveals() {
       );
     });
   });
+
+  // Lists inside a card build row by row against their own scroll position,
+  // not the card's. On the long cards — the design/code matrix, the open-items
+  // list, the fact tables — the card enters the viewport long before its last
+  // row does, so tying the rows to the card meant the bottom half had already
+  // animated somewhere above the fold and arrived static.
+  $$('.openlist, .facts, .prov tbody, .rows').forEach((list) => {
+    const rows = $$(':scope > li, :scope > tr', list);
+    if (rows.length < 2) return;
+    gsap.fromTo(
+      rows,
+      { opacity: 0, x: -14 },
+      {
+        opacity: 1,
+        x: 0,
+        duration: 0.55,
+        ease: 'siteOut',
+        stagger: 0.06,
+        scrollTrigger: { trigger: list, start: 'top 88%', once: true },
+      }
+    );
+  });
+
+  // The matrix detail rows reveal on their own row, so scrolling the card
+  // walks down the argument a dimension at a time.
+  $$('.matrix-detail').forEach((row) => {
+    gsap.fromTo(
+      row,
+      { opacity: 0, y: 8 },
+      {
+        opacity: 1, y: 0, duration: 0.5, ease: 'siteOut',
+        scrollTrigger: { trigger: row, start: 'top 92%', once: true },
+      }
+    );
+  });
 }
 
 /* ------------------------------------------------ smooth scroll (Lenis) --- */
@@ -646,7 +681,7 @@ window.__dashTabIn = (panel) => {
 function failsafe() {
   const SELECTOR =
     '.band-head, .bento > eo-card, .stat-row > eo-card, .tile, .stat, .panel, .hero-inner > *, ' +
-    '.manifesto-text, .tile-in > *, .stat-in > *';
+    '.manifesto-text, .tile-in > *, .stat-in > *, .openlist li, .facts li, .matrix-detail, .prov tbody tr';
   const clear = () => {
     $$(SELECTOR).forEach((el) => {
       if (el.closest('.panel[hidden]')) return; // genuinely hidden tabs stay hidden

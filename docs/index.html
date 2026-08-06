@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>EGYM One Design System — Engineering Rollout KPI Data</title>
+<title>EGYM One Design System — the state of the system</title>
 <meta name="description" content="Live state of the EGYM One design system: inspection score, coverage, delivery queue, governance and community health.">
 <link rel="stylesheet" href="./vendor/egym-one-tokens.css">
 <style>/* ---------------------------------------------------------------------------
@@ -1058,73 +1058,6 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
   <p class="scroll-cue" aria-hidden="true"><span>Scroll</span></p>
 </section>
 
-<!-- The five numbers that carry the argument, as a pinned horizontal run.
-     Deliberately ordered as a turn: three measurements where the design side is
-     excellent, then the two where code is the constraint. Scrolling down drives
-     the track sideways, and each panel's body counter-parallaxes against it. -->
-<section class="kpi-rail" aria-label="Key numbers">
-  <div class="kpi-pin">
-    <div class="kpi-head">
-      <span class="kpi-section">The numbers</span>
-      <span class="kpi-index">— 01</span>
-      <span class="kpi-hint" aria-hidden="true">Keep scrolling →</span>
-    </div>
-    <div class="kpi-track">
-      
-        <article class="kpi-panel design">
-          <span class="kpi-ghost" aria-hidden="true">01</span>
-          <div class="kpi-body">
-            <span class="kpi-kicker">Design side · 01 / 05</span>
-            <div class="kpi-value" data-count="100" data-tpl="__%">100%</div>
-            <h2>Wellpass design coverage</h2>
-            <p>Every surface Wellpass needs has a finished, reviewed design in the UI Kit. Nothing on the design side is blocking that programme.</p>
-            <div class="kpi-tags" aria-hidden="true"><span>[ Measured ]</span><span>[ Full population ]</span><span>[ Design ]</span></div>
-          </div>
-        </article>
-        <article class="kpi-panel design">
-          <span class="kpi-ghost" aria-hidden="true">02</span>
-          <div class="kpi-body">
-            <span class="kpi-kicker">Design side · 02 / 05</span>
-            <div class="kpi-value" data-count="1619" data-tpl="__">1619</div>
-            <h2>Token variables, four tiers</h2>
-            <p>Core → Brand → Breakpoint → Appearance, with 72% of values resolving through an alias rather than a literal. One change reaches every brand and breakpoint at once.</p>
-            <div class="kpi-tags" aria-hidden="true"><span>[ Core ]</span><span>[ Brand ]</span><span>[ Breakpoint ]</span><span>[ Appearance ]</span></div>
-          </div>
-        </article>
-        <article class="kpi-panel design">
-          <span class="kpi-ghost" aria-hidden="true">03</span>
-          <div class="kpi-body">
-            <span class="kpi-kicker">Design side · 03 / 05</span>
-            <div class="kpi-value" data-count="96" data-tpl="__%">96%</div>
-            <h2>Fills bound to design tokens</h2>
-            <p>Counted across all 109,402 layers, not sampled — 98.6% excluding icon placeholders, 100% of strokes, and zero detached instances anywhere.</p>
-            <div class="kpi-tags" aria-hidden="true"><span>[ 109,402 layers ]</span><span>[ Zero detached ]</span><span>[ Zero local styles ]</span></div>
-          </div>
-        </article>
-        <article class="kpi-panel code">
-          <span class="kpi-ghost" aria-hidden="true">04</span>
-          <div class="kpi-body">
-            <span class="kpi-kicker">Code side · 04 / 05</span>
-            <div class="kpi-value" data-count="41" data-tpl="__%">41%</div>
-            <h2>Of the core set exists in code</h2>
-            <p>15 of 37 components are built. Every one of the rest already has a finished design waiting on engineering capacity.</p>
-            <div class="kpi-tags" aria-hidden="true"><span>[ Form controls absent ]</span><span>[ 36 hand-rolled inputs ]</span></div>
-          </div>
-        </article>
-        <article class="kpi-panel code">
-          <span class="kpi-ghost" aria-hidden="true">05</span>
-          <div class="kpi-body">
-            <span class="kpi-kicker">Code side · 05 / 05</span>
-            <div class="kpi-value" data-count="25" data-tpl="__">25</div>
-            <h2>Tickets ready, unstarted</h2>
-            <p>Each one already carries a spec and a priority; 24 have nobody assigned. This is a queue waiting on capacity, not on decisions.</p>
-            <div class="kpi-tags" aria-hidden="true"><span>[ Specced ]</span><span>[ Prioritised ]</span><span>[ Unassigned ]</span></div>
-          </div>
-        </article>
-    </div>
-    <div class="kpi-progress" aria-hidden="true"><span></span></div>
-  </div>
-</section>
 
 <!-- The finding, in one sentence, revealed word by word as you scroll past it.
      It is the only place on the dashboard that argues rather than reports, so it
@@ -1294,6 +1227,74 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
   </div>
 </section>
 
+<!-- The five numbers that carry the argument, as a pinned horizontal run.
+     Deliberately ordered as a turn: three measurements where the design side is
+     excellent, then the two where code is the constraint. Scrolling down drives
+     the track sideways, and each panel's body counter-parallaxes against it. -->
+<section class="kpi-rail" aria-label="Key numbers">
+  <div class="kpi-pin">
+    <div class="kpi-head">
+      <span class="kpi-section">The numbers</span>
+      <span class="kpi-index">— 01</span>
+      <span class="kpi-hint" aria-hidden="true">Keep scrolling →</span>
+    </div>
+    <div class="kpi-track">
+      
+        <article class="kpi-panel design">
+          <span class="kpi-ghost" aria-hidden="true">01</span>
+          <div class="kpi-body">
+            <span class="kpi-kicker">Design side · 01 / 05</span>
+            <div class="kpi-value" data-count="100" data-tpl="__%">100%</div>
+            <h2>Wellpass design coverage</h2>
+            <p>Every surface Wellpass needs has a finished, reviewed design in the UI Kit. Nothing on the design side is blocking that programme.</p>
+            <div class="kpi-tags" aria-hidden="true"><span>[ Measured ]</span><span>[ Full population ]</span><span>[ Design ]</span></div>
+          </div>
+        </article>
+        <article class="kpi-panel design">
+          <span class="kpi-ghost" aria-hidden="true">02</span>
+          <div class="kpi-body">
+            <span class="kpi-kicker">Design side · 02 / 05</span>
+            <div class="kpi-value" data-count="1619" data-tpl="__">1619</div>
+            <h2>Token variables, four tiers</h2>
+            <p>Core → Brand → Breakpoint → Appearance, with 72% of values resolving through an alias rather than a literal. One change reaches every brand and breakpoint at once.</p>
+            <div class="kpi-tags" aria-hidden="true"><span>[ Core ]</span><span>[ Brand ]</span><span>[ Breakpoint ]</span><span>[ Appearance ]</span></div>
+          </div>
+        </article>
+        <article class="kpi-panel design">
+          <span class="kpi-ghost" aria-hidden="true">03</span>
+          <div class="kpi-body">
+            <span class="kpi-kicker">Design side · 03 / 05</span>
+            <div class="kpi-value" data-count="96" data-tpl="__%">96%</div>
+            <h2>Fills bound to design tokens</h2>
+            <p>Counted across all 109,402 layers, not sampled — 98.6% excluding icon placeholders, 100% of strokes, and zero detached instances anywhere.</p>
+            <div class="kpi-tags" aria-hidden="true"><span>[ 109,402 layers ]</span><span>[ Zero detached ]</span><span>[ Zero local styles ]</span></div>
+          </div>
+        </article>
+        <article class="kpi-panel code">
+          <span class="kpi-ghost" aria-hidden="true">04</span>
+          <div class="kpi-body">
+            <span class="kpi-kicker">Code side · 04 / 05</span>
+            <div class="kpi-value" data-count="41" data-tpl="__%">41%</div>
+            <h2>Of the core set exists in code</h2>
+            <p>15 of 37 components are built. Every one of the rest already has a finished design waiting on engineering capacity.</p>
+            <div class="kpi-tags" aria-hidden="true"><span>[ Form controls absent ]</span><span>[ 36 hand-rolled inputs ]</span></div>
+          </div>
+        </article>
+        <article class="kpi-panel code">
+          <span class="kpi-ghost" aria-hidden="true">05</span>
+          <div class="kpi-body">
+            <span class="kpi-kicker">Code side · 05 / 05</span>
+            <div class="kpi-value" data-count="25" data-tpl="__">25</div>
+            <h2>Tickets ready, unstarted</h2>
+            <p>Each one already carries a spec and a priority; 24 have nobody assigned. This is a queue waiting on capacity, not on decisions.</p>
+            <div class="kpi-tags" aria-hidden="true"><span>[ Specced ]</span><span>[ Prioritised ]</span><span>[ Unassigned ]</span></div>
+          </div>
+        </article>
+    </div>
+    <div class="kpi-progress" aria-hidden="true"><span></span></div>
+  </div>
+</section>
+
 <section class="band tight">
   <div class="bento">
     <eo-card class="tile span-4" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Trend</p>
@@ -1325,7 +1326,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
   </svg></div></eo-card>
     <eo-card class="tile span-4" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Where the gap is</p>
        <h3>Design leads, code follows</h3>
-       <ul class="facts"><li><span class="k">Absent on the design side</span><span class="v good">0 of 8</span></li><li><span class="k">Complete on the code side</span><span class="v bad">0 of 8</span></li><li><span class="k">Solid on design</span><span class="v good">7 of 8</span></li><li><span class="k">Absent in code</span><span class="v bad">4 of 8</span></li></ul>
+       <ul class="facts"><li data-token="--eo-color-content-utility-positive"><span class="k">Absent on the design side</span><span class="v good">0 of 8</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">Complete on the code side</span><span class="v bad">0 of 8</span></li><li data-token="--eo-color-content-utility-positive"><span class="k">Solid on design</span><span class="v good">7 of 8</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">Absent in code</span><span class="v bad">4 of 8</span></li></ul>
        <p class="tile-text">Across eight dimensions, <b>nothing is absent on the design side and nothing is complete on the code side</b>. The specification, the governance and the craft exist. Shipping them does not.</p></div></eo-card>
   </div>
 </section>
@@ -1476,7 +1477,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
        <h3>18 of 37 not started</h3>
        <svg class="chart" viewBox="0 0 520 40" role="img"
     aria-label="In code 15, Ready for release 2, In development 2, Not started 18 of 37"><rect class="pipe good" x="0" y="0" width="208.81" height="40" rx="4"/><rect class="pipe info" x="210.81" y="0" width="26.11" height="40" rx="4"/><rect class="pipe warn" x="238.92" y="0" width="26.11" height="40" rx="4"/><rect class="pipe absent" x="267.03" y="0" width="250.97" height="40" rx="4"/></svg>
-       <ul class="facts"><li><span class="k">In code</span><span class="v good">15</span></li><li><span class="k">Ready for release</span><span class="v good">2</span></li><li><span class="k">In development</span><span class="v warn">2</span></li><li><span class="k">Not started</span><span class="v bad">18</span></li></ul>
+       <ul class="facts"><li data-token="--eo-color-content-utility-positive"><span class="k">In code</span><span class="v good">15</span></li><li data-token="--eo-color-content-utility-positive"><span class="k">Ready for release</span><span class="v good">2</span></li><li data-token="--eo-color-content-utility-warning"><span class="k">In development</span><span class="v warn">2</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">Not started</span><span class="v bad">18</span></li></ul>
        <p class="tile-text">Design coverage for Wellpass is at 100%. The pipeline above is the code side of the same set.</p></div></eo-card>
   </div>
 </section>
@@ -1638,7 +1639,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
        <p class="tile-text"><b>One caveat, stated plainly.</b> The EGYM accent pairs land on exactly 4.5:1 — passing, but with no headroom. Any darkening of the surface or lightening of the accent breaks them.</p></div></eo-card>
     <eo-card class="tile span-5" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Code side · unverified</p>
        <h3>Nothing has ever been checked</h3>
-       <ul class="facts"><li><span class="k">axe assertions</span><span class="v bad">0</span></li><li><span class="k">a11y gate</span><span class="v bad">test: &#39;todo&#39;</span></li><li><span class="k">Storybook a11y tests ever run</span><span class="v bad">No</span></li><li><span class="k">Components failing WCAG</span><span class="v bad">1</span></li></ul>
+       <ul class="facts"><li data-token="--eo-color-content-utility-negative"><span class="k">axe assertions</span><span class="v bad">0</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">a11y gate</span><span class="v bad">test: &#39;todo&#39;</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">Storybook a11y tests ever run</span><span class="v bad">No</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">Components failing WCAG</span><span class="v bad">1</span></li></ul>
        <p class="tile-text">Two typos in vitest.config.ts point at paths that do not exist, so npm run storybook:test resolves zero projects and passes silently. Every Storybook test, including every accessibility check, has never run — found in five consecutive inspections.</p></div></eo-card>
     <eo-card class="tile span-7" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">The gate that produced those numbers</p>
        <h3>Accessibility is a required phase, not a review note</h3>
@@ -1658,7 +1659,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
        <p class="tile-text">Figma craft is the counterweight, and it is now measured across the full population rather than sampled: <b>0.54% generic layer names across all 109,402 layers</b>, <b>zero detached instances</b>, <b>96% of fills and 100% of strokes bound</b>, and <b>zero local styles</b> left anywhere. The conventions exist. Nothing enforces them in code.</p></div></eo-card>
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Station 03 · accessibility</p>
        <h3>Real engineering, gate still off</h3>
-       <ul class="facts"><li><span class="k">axe assertions in the repo</span><span class="v bad">0</span></li><li><span class="k">a11y gate</span><span class="v bad">test: &#39;todo&#39;</span></li><li><span class="k">Open contrast reports</span><span class="v bad">1 unanswered</span></li></ul>
+       <ul class="facts"><li data-token="--eo-color-content-utility-negative"><span class="k">axe assertions in the repo</span><span class="v bad">0</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">a11y gate</span><span class="v bad">test: &#39;todo&#39;</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">Open contrast reports</span><span class="v bad">1 unanswered</span></li></ul>
        <p class="tile-text">delegatesFocus is now the house pattern, the tooltip enforces focusable anchors, and PR #166 adds the first behavioural focus-ring test — approved, unmerged. Meanwhile a reported brand-on-dark AA contrast failure has sat unanswered since 31 July.</p></div></eo-card>
     <eo-card class="tile span-12" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Station 05 · testing</p>
        <h3>Two characters, and a branch protection setting</h3>
@@ -1670,23 +1671,23 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
   <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Delivery</p><h2 data-token="--eo-typography-headline-500">A queue waiting on capacity, not decisions</h2><p data-token="--eo-color-content-subtle">Everything in “Ready for Development” already has a spec and a priority.</p><p class="stamp"><span class="dot manual"></span>Updated 6 Aug 2026 · read by hand</p></div>
   <div class="bento">
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">All open DSC issues</p><h3>117 open</h3><div class="bars"><div class="bar-row"><span class="label">Neu</span>
-      <span class="bar-track neutral"><span style="width:100%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:100%"></span></span>
       <span class="count">59</span></div><div class="bar-row"><span class="label">Ready for Development</span>
-      <span class="bar-track neutral"><span style="width:42%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:42%"></span></span>
       <span class="count">25</span></div><div class="bar-row"><span class="label">In Design</span>
-      <span class="bar-track neutral"><span style="width:8%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:8%"></span></span>
       <span class="count">5</span></div><div class="bar-row"><span class="label">In Development</span>
-      <span class="bar-track neutral"><span style="width:7%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:7%"></span></span>
       <span class="count">4</span></div><div class="bar-row"><span class="label">Discovery</span>
-      <span class="bar-track neutral"><span style="width:7%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:7%"></span></span>
       <span class="count">4</span></div><div class="bar-row"><span class="label">Ready For Release</span>
-      <span class="bar-track neutral"><span style="width:3%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:3%"></span></span>
       <span class="count">2</span></div><div class="bar-row"><span class="label">Backlog</span>
-      <span class="bar-track neutral"><span style="width:2%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:2%"></span></span>
       <span class="count">1</span></div></div></div></eo-card>
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">The queue engineers would drain</p>
        <h3>25 ready, 24 unassigned</h3>
-       <ul class="facts"><li><span class="k">Waiting since Oct 2025</span><span class="v bad">8</span></li><li><span class="k">Currently in development</span><span class="v ">4</span></li></ul>
+       <ul class="facts"><li data-token="--eo-color-content-utility-negative"><span class="k">Waiting since Oct 2025</span><span class="v bad">8</span></li><li data-token="--eo-color-content-emphasized"><span class="k">Currently in development</span><span class="v ">4</span></li></ul>
        <p class="tile-text">This is the single number the ask is built on.</p></div></eo-card>
     <eo-card class="tile span-12" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Oldest first · flagged past 180 days</p>
       <div class="table-scroll"><table>
@@ -1743,27 +1744,27 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
       <td><eo-label intent="neutral" size="small" data-token="eo-label · intent=neutral">Task</eo-label></td>
       <td class="age ">3 d</td></tr></tbody></table></div></div></eo-card>
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">BMA build plan</p><h3>51 items</h3><div class="bars"><div class="bar-row"><span class="label">QA: Design</span>
-      <span class="bar-track neutral"><span style="width:100%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:100%"></span></span>
       <span class="count">25</span></div><div class="bar-row"><span class="label">Won&#39;t Build</span>
-      <span class="bar-track neutral"><span style="width:48%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:48%"></span></span>
       <span class="count">12</span></div><div class="bar-row"><span class="label">Backlog</span>
-      <span class="bar-track neutral"><span style="width:20%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:20%"></span></span>
       <span class="count">5</span></div><div class="bar-row"><span class="label">In progress Design</span>
-      <span class="bar-track neutral"><span style="width:12%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:12%"></span></span>
       <span class="count">3</span></div><div class="bar-row"><span class="label">Done</span>
-      <span class="bar-track neutral"><span style="width:12%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:12%"></span></span>
       <span class="count">3</span></div><div class="bar-row"><span class="label">In progress Spec &amp; Doc</span>
-      <span class="bar-track neutral"><span style="width:8%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:8%"></span></span>
       <span class="count">2</span></div><div class="bar-row"><span class="label">Planning</span>
-      <span class="bar-track neutral"><span style="width:4%"></span></span>
+      <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:4%"></span></span>
       <span class="count">1</span></div></div></div></eo-card>
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Remaining backlog by impact</p>
        <div class="bars"><div class="bar-row"><span class="label">Low</span>
-      <span class="bar-track positive"><span style="width:100%"></span></span>
+      <span class="bar-track positive" data-token="--eo-color-surface-subtle"><span style="width:100%"></span></span>
       <span class="count">3</span></div><div class="bar-row"><span class="label">Lowest</span>
-      <span class="bar-track positive"><span style="width:33%"></span></span>
+      <span class="bar-track positive" data-token="--eo-color-surface-subtle"><span style="width:33%"></span></span>
       <span class="count">1</span></div><div class="bar-row"><span class="label">Medium</span>
-      <span class="bar-track positive"><span style="width:33%"></span></span>
+      <span class="bar-track positive" data-token="--eo-color-surface-subtle"><span style="width:33%"></span></span>
       <span class="count">1</span></div></div>
        <p class="tile-text">Only low-impact items remain in backlog; everything BMA-blocking is triaged, prioritized or already in design QA.</p></div></eo-card>
   </div>
@@ -1782,11 +1783,11 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
   <div class="bento">
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Community</p>
        <h3>Contribution is not the bottleneck</h3>
-       <ul class="facts"><li><span class="k">External contributors</span><span class="v good">9</span></li><li><span class="k">Merged community PRs</span><span class="v good">19</span></li><li><span class="k">Median time to merge</span><span class="v good">3 d</span></li></ul>
+       <ul class="facts"><li data-token="--eo-color-content-utility-positive"><span class="k">External contributors</span><span class="v good">9</span></li><li data-token="--eo-color-content-utility-positive"><span class="k">Merged community PRs</span><span class="v good">19</span></li><li data-token="--eo-color-content-utility-positive"><span class="k">Median time to merge</span><span class="v good">3 d</span></li></ul>
        <p class="tile-text">Nine engineers outside the design system team have landed code. The channel is alive — Jira is the dead one.</p></div></eo-card>
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">…but the tail is</p>
        <h3>Review capacity is</h3>
-       <ul class="facts"><li><span class="k">Worst merges</span><span class="v bad">174, 152, 104 d</span></li><li><span class="k">Open human PRs</span><span class="v bad">13 · median 100 d</span></li><li><span class="k">Dependabot backlog</span><span class="v bad">18 · oldest 290 d</span></li><li><span class="k">CONTRIBUTING draft</span><span class="v bad">198 d open</span></li></ul></div></eo-card>
+       <ul class="facts"><li data-token="--eo-color-content-utility-negative"><span class="k">Worst merges</span><span class="v bad">174, 152, 104 d</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">Open human PRs</span><span class="v bad">13 · median 100 d</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">Dependabot backlog</span><span class="v bad">18 · oldest 290 d</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">CONTRIBUTING draft</span><span class="v bad">198 d open</span></li></ul></div></eo-card>
     <eo-card class="tile span-12" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Release governance</p>
        <h3>0 tags. 0 releases. No changelog.</h3>
        <p class="tile-text">The publish workflow stamps a CI build counter as the version, so the system <b>cannot express a breaking change</b> — which means no migration can be announced. The token system repository, same team and same org, already tags and releases properly.</p>

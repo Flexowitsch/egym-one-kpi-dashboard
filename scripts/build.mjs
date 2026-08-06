@@ -60,7 +60,12 @@ const stat = (v, k, t = '', tone = '', small = false) =>
   )}</p>${t ? `<p class="t" data-token="--eo-color-content-hinted">${esc(t)}</p>` : ''}</div></div>`;
 const facts = (rows) =>
   `<ul class="facts">${rows
-    .map(([k, v, tone = '']) => `<li><span class="k">${esc(k)}</span><span class="v ${tone}">${esc(v)}</span></li>`)
+    .map(
+      ([k, v, tone = '']) =>
+        `<li data-token="${TONE_TOKEN[tone] ?? '--eo-color-border-subtle'}"><span class="k">${esc(
+          k
+        )}</span><span class="v ${tone}">${esc(v)}</span></li>`
+    )
     .join('')}</ul>`;
 const bars = (obj, tone = 'neutral') => {
   const max = Math.max(...Object.values(obj));
@@ -68,7 +73,7 @@ const bars = (obj, tone = 'neutral') => {
     .sort((a, b) => b[1] - a[1])
     .map(
       ([k, v]) => `<div class="bar-row"><span class="label">${esc(k)}</span>
-      <span class="bar-track ${tone}"><span style="width:${pct(v, max)}%"></span></span>
+      <span class="bar-track ${tone}" data-token="--eo-color-surface-subtle"><span style="width:${pct(v, max)}%"></span></span>
       <span class="count">${v}</span></div>`
     )
     .join('')}</div>`;
@@ -123,6 +128,42 @@ const overview = `
   </div>
   </div>
   <p class="scroll-cue" aria-hidden="true"><span>Scroll</span></p>
+</section>
+
+
+<!-- The finding, in one sentence, revealed word by word as you scroll past it.
+     It is the only place on the dashboard that argues rather than reports, so it
+     gets the whole viewport and no chrome. -->
+<section class="band manifesto">
+  <p class="manifesto-text" data-scrub-text>
+    Across roughly 480 components and 1,619 variables, the entire design-side
+    defect list is <b>two broken token aliases, one broken component set and
+    three property inconsistencies</b>. The code side has not moved in six days,
+    across five inspections. <b>The gap is not quality. It is throughput.</b>
+  </p>
+</section>
+
+<section class="band tight">
+  <div class="stat-row">
+    ${stat(`${coverage.inCodePct}%`, 'Core coverage in code', `${coverage.inCode} of ${coverage.coreSetTotal}`, coverage.inCodePct >= 50 ? 'warn' : 'bad')}
+    ${stat(rfd.count, 'Ready for development', `${rfd.unassigned} unassigned`, 'bad')}
+    ${stat(`${cv.openHumanPRs.medianAgeDays}d`, 'Median open PR age', `${cv.openHumanPRs.count} open`, 'bad')}
+    ${stat(cv.mergedCommunityPRs, 'Community PRs merged', `${cv.externalContributors} contributors`, 'good')}
+    ${stat(`${cv.medianTimeToMergeDays}d`, 'Median time to merge', 'when review happens', 'good')}
+  </div>
+</section>
+
+<section class="band">
+  ${bandHead('Ten stations', 'Where the system is strong, and where it is not', 'Scored against the design system multi-point inspection. The dashed ring is a perfect score — the gap between the shape and the ring is the work left.', inspection?.date)}
+  <div class="bento">
+    ${tile('span-7', radar(inspection?.stations ?? []))}
+    ${tile(
+      'span-5',
+      `<p class="eyebrow">Station by station</p>
+       ${stationBars(inspection?.stations ?? [])}
+       <p class="tile-text">A lighter bar behind a score is where that station lands if finished work is promoted into main.</p>`
+    )}
+  </div>
 </section>
 
 <!-- The five numbers that carry the argument, as a pinned horizontal run.
@@ -194,41 +235,6 @@ const overview = `
         .join('')}
     </div>
     <div class="kpi-progress" aria-hidden="true"><span></span></div>
-  </div>
-</section>
-
-<!-- The finding, in one sentence, revealed word by word as you scroll past it.
-     It is the only place on the dashboard that argues rather than reports, so it
-     gets the whole viewport and no chrome. -->
-<section class="band manifesto">
-  <p class="manifesto-text" data-scrub-text>
-    Across roughly 480 components and 1,619 variables, the entire design-side
-    defect list is <b>two broken token aliases, one broken component set and
-    three property inconsistencies</b>. The code side has not moved in six days,
-    across five inspections. <b>The gap is not quality. It is throughput.</b>
-  </p>
-</section>
-
-<section class="band tight">
-  <div class="stat-row">
-    ${stat(`${coverage.inCodePct}%`, 'Core coverage in code', `${coverage.inCode} of ${coverage.coreSetTotal}`, coverage.inCodePct >= 50 ? 'warn' : 'bad')}
-    ${stat(rfd.count, 'Ready for development', `${rfd.unassigned} unassigned`, 'bad')}
-    ${stat(`${cv.openHumanPRs.medianAgeDays}d`, 'Median open PR age', `${cv.openHumanPRs.count} open`, 'bad')}
-    ${stat(cv.mergedCommunityPRs, 'Community PRs merged', `${cv.externalContributors} contributors`, 'good')}
-    ${stat(`${cv.medianTimeToMergeDays}d`, 'Median time to merge', 'when review happens', 'good')}
-  </div>
-</section>
-
-<section class="band">
-  ${bandHead('Ten stations', 'Where the system is strong, and where it is not', 'Scored against the design system multi-point inspection. The dashed ring is a perfect score — the gap between the shape and the ring is the work left.', inspection?.date)}
-  <div class="bento">
-    ${tile('span-7', radar(inspection?.stations ?? []))}
-    ${tile(
-      'span-5',
-      `<p class="eyebrow">Station by station</p>
-       ${stationBars(inspection?.stations ?? [])}
-       <p class="tile-text">A lighter bar behind a score is where that station lands if finished work is promoted into main.</p>`
-    )}
   </div>
 </section>
 
