@@ -689,18 +689,29 @@ body[data-tab-state="overview"] .cascade-field { opacity: 1; }
   position: fixed; inset: 0; z-index: 100;
   display: grid; place-items: center;
   background: var(--eo-color-surface-subtle);
+  clip-path: inset(0% 0% 0% 0%);
 }
-.pre-inner { text-align: center; width: min(90vw, 28rem); }
+.pre-inner { text-align: center; width: min(90vw, 30rem); }
 .pre-word {
   margin: 0;
-  display: flex; justify-content: center;
+  display: flex; justify-content: center; align-items: flex-end;
   font-family: var(--eo-typography-headline-700-font-family);
   font-size: var(--eo-typography-headline-700-font-size);
+  line-height: 1;
   letter-spacing: -0.02em;
-  overflow: hidden;
 }
-.pre-word span { display: inline-block; }
-.pre-word .pre-space { width: 0.32em; }
+/* One clipping box per letter, tall enough for the whole glyph run. The
+   padding is what stops the mask shaving the tops and tails off — a flex line
+   box is shorter than ascender-to-descender, so a single overflow:hidden on
+   the word cuts every letter through the middle. */
+.pre-l {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.14em 0 0.22em;
+  margin: -0.14em 0 -0.22em;
+}
+.pre-l > span { display: inline-block; will-change: transform; }
+.pre-word .pre-space { width: 0.3em; }
 .pre-meta {
   display: flex; justify-content: space-between; align-items: baseline;
   margin-top: var(--eo-dimension-16);

@@ -697,18 +697,29 @@ body[data-tab-state="overview"] .cascade-field { opacity: 1; }
   position: fixed; inset: 0; z-index: 100;
   display: grid; place-items: center;
   background: var(--eo-color-surface-subtle);
+  clip-path: inset(0% 0% 0% 0%);
 }
-.pre-inner { text-align: center; width: min(90vw, 28rem); }
+.pre-inner { text-align: center; width: min(90vw, 30rem); }
 .pre-word {
   margin: 0;
-  display: flex; justify-content: center;
+  display: flex; justify-content: center; align-items: flex-end;
   font-family: var(--eo-typography-headline-700-font-family);
   font-size: var(--eo-typography-headline-700-font-size);
+  line-height: 1;
   letter-spacing: -0.02em;
-  overflow: hidden;
 }
-.pre-word span { display: inline-block; }
-.pre-word .pre-space { width: 0.32em; }
+/* One clipping box per letter, tall enough for the whole glyph run. The
+   padding is what stops the mask shaving the tops and tails off — a flex line
+   box is shorter than ascender-to-descender, so a single overflow:hidden on
+   the word cuts every letter through the middle. */
+.pre-l {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.14em 0 0.22em;
+  margin: -0.14em 0 -0.22em;
+}
+.pre-l > span { display: inline-block; will-change: transform; }
+.pre-word .pre-space { width: 0.3em; }
 .pre-meta {
   display: flex; justify-content: space-between; align-items: baseline;
   margin-top: var(--eo-dimension-16);
@@ -807,9 +818,12 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
      matter what, because a KPI page must never be held behind an animation. -->
 <div id="preloader" class="preloader" aria-hidden="true">
   <div class="pre-inner">
-    <p class="pre-word"><span>E</span><span>G</span><span>Y</span><span>M</span><span class="pre-space"></span><span>O</span><span>n</span><span>e</span></p>
+    <!-- Each letter carries its own clipping box. A single overflow:hidden on
+         the whole word cuts the glyphs through the middle, because the flex
+         line box is shorter than the ascender-to-descender run. -->
+    <p class="pre-word"><span class="pre-l"><span>E</span></span><span class="pre-l"><span>G</span></span><span class="pre-l"><span>Y</span></span><span class="pre-l"><span>M</span></span><span class="pre-space"></span><span class="pre-l"><span>O</span></span><span class="pre-l"><span>n</span></span><span class="pre-l"><span>e</span></span></p>
     <div class="pre-meta">
-      <span class="pre-label">Design system</span>
+      <span class="pre-label">Design system inspection</span>
       <span class="pre-count"><span class="pre-count-n">0</span>/100</span>
     </div>
     <div class="pre-bar"><span></span></div>

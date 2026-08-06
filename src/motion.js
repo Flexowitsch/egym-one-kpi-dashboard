@@ -390,25 +390,41 @@ function preloader(reveal) {
   const n = $('.pre-count-n', el);
   const score = Number($('.score-hero .n')?.dataset.count) || 100;
 
+  gsap.set('.pre-l > span', { yPercent: 115 });
+  gsap.set('.pre-bar span', { scaleX: 0 });
+
   return gsap
     .timeline({ defaults: { ease: 'power4.out' }, onComplete: kill })
-    .fromTo('.pre-word span', { yPercent: 120 }, { yPercent: 0, duration: 0.7, stagger: 0.04 })
-    .to('.pre-meta', { opacity: 1, duration: 0.3 }, '-=0.4')
+    // Letters rise out of their own boxes, slightly overlapping, so the word
+    // assembles rather than appearing.
+    .to('.pre-l > span', { yPercent: 0, duration: 0.85, stagger: 0.045 })
+    .to('.pre-meta', { opacity: 1, duration: 0.3 }, '-=0.5')
     // The bar and the counter run to the real inspection score, not to 100 —
-    // the loading sequence is the first time the page states its number.
-    .to('.pre-bar span', { scaleX: score / 100, duration: 0.9, ease: 'power2.inOut' }, '-=0.2')
+    // the loading sequence is the first time the page states its number, and
+    // a bar that always fills to the end would be theatre.
+    .to('.pre-bar span', { scaleX: score / 100, duration: 1, ease: 'power2.inOut' }, '-=0.25')
     .to(counter, {
       v: score,
-      duration: 0.9,
+      duration: 1,
       ease: 'power2.inOut',
       onUpdate: () => { if (n) n.textContent = Math.round(counter.v); },
     }, '<')
-    .to('.pre-word span', { yPercent: -120, duration: 0.45, stagger: 0.025, ease: 'power3.in' }, '+=0.15')
-    .to('.pre-meta, .pre-bar', { opacity: 0, duration: 0.25 }, '<')
-    .to(el, { yPercent: -100, duration: 0.7, ease: 'power4.inOut' }, '-=0.1')
+    // Exit: the panel wipes upward off its own bottom edge while its contents
+    // leave faster than the wipe. That difference is what makes it read as a
+    // curtain lifting rather than a block sliding away.
+    .to('.pre-inner', { yPercent: -18, opacity: 0, duration: 0.7, ease: 'power3.in' }, '+=0.25')
+    .to(
+      el,
+      {
+        clipPath: 'inset(0% 0% 100% 0%)',
+        duration: 0.9,
+        ease: 'expo.inOut',
+      },
+      '-=0.5'
+    )
     // The hero starts while the curtain is still lifting, so the two overlap
     // rather than queue. Added inside the timeline, not bolted on afterwards.
-    .call(once, null, '-=0.45') && true;
+    .call(once, null, '-=0.6') && true;
 }
 
 /* --------------------------------------------------------- token cursor ---

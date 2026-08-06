@@ -636,9 +636,19 @@ const html = `<!doctype html>
      matter what, because a KPI page must never be held behind an animation. -->
 <div id="preloader" class="preloader" aria-hidden="true">
   <div class="pre-inner">
-    <p class="pre-word"><span>E</span><span>G</span><span>Y</span><span>M</span><span class="pre-space"></span><span>O</span><span>n</span><span>e</span></p>
+    <!-- Each letter carries its own clipping box. A single overflow:hidden on
+         the whole word cuts the glyphs through the middle, because the flex
+         line box is shorter than the ascender-to-descender run. -->
+    <p class="pre-word">${'EGYM One'
+      .split('')
+      .map((ch) =>
+        ch === ' '
+          ? '<span class="pre-space"></span>'
+          : `<span class="pre-l"><span>${ch}</span></span>`
+      )
+      .join('')}</p>
     <div class="pre-meta">
-      <span class="pre-label">Design system</span>
+      <span class="pre-label">Design system inspection</span>
       <span class="pre-count"><span class="pre-count-n">0</span>/100</span>
     </div>
     <div class="pre-bar"><span></span></div>
