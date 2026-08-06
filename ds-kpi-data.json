@@ -581,8 +581,8 @@
       {
         "name": "Craft and hygiene",
         "design": {
-          "state": "in-place",
-          "detail": "Zero generic layer names across ~7,000 sampled layers; 82% variable binding"
+          "state": "partial",
+          "detail": "Zero generic layer names across ~7,000 sampled layers — exceptional. Variable binding is at 82%: 552 fills remain hard-coded, 480 of them propagating from one unbound element in button"
         },
         "code": {
           "state": "partial",
@@ -603,8 +603,8 @@
       {
         "name": "Documentation for machines",
         "design": {
-          "state": "in-place",
-          "detail": "2,263 DTCG token descriptions; 63 of 108 public Figma sets described"
+          "state": "partial",
+          "detail": "2,263 DTCG token descriptions at full conformance. Figma component metadata is 63 of 108 public sets — 45 still bare, including dialog, label and the input family"
         },
         "code": {
           "state": "partial",
@@ -677,5 +677,34 @@
     "inProgress": "delegatesFocus is now the house pattern for focusable components, the tooltip enforces focusable anchors, and PR #166 adds the first behavioural focus-ring test — approved and waiting to merge.",
     "designSideOpen": "One accessibility item does sit on the design side: a reported brand-on-dark AA contrast failure on free and secondary buttons, unanswered since 31 July.",
     "fixCost": "Two characters in a config file, one branch-protection setting, and one component rewrite."
+  },
+  "designOpen": {
+    "note": "The design side is strong, not spotless. These are the open items on our side of the line — all of them small, specific and already understood.",
+    "items": [
+      [
+        "552 hard-coded fills",
+        "480 in button and 72 in alert, each propagating from a single unbound element in the base component. Two edits fix both."
+      ],
+      [
+        "45 of 108 Figma sets undescribed",
+        "Metadata rollout stalled part-way; the shipped-in-code components are the obvious next batch."
+      ],
+      [
+        "Properties Glossary has drifted",
+        "14 of 34 entries are spelled differently from the real Figma property, and 8 match none. Now a generatable diff rather than a manual audit."
+      ],
+      [
+        "UI Kit changelog stalled",
+        "Last real entry is 0.0.20 on 8 May, with a malformed [0.0.0] entry above it."
+      ],
+      [
+        "Semver documented, not practised",
+        "0.0.15 deprecated three components and renamed two — and shipped as a patch."
+      ],
+      [
+        "One open contrast report",
+        "Brand-on-dark AA failure on free and secondary buttons, unanswered since 31 July."
+      ]
+    ]
   }
 }

@@ -413,6 +413,17 @@ eo-card > * { width: 100%; }
 
 /* tabs are eo-button; the host needs to sit inline in the tab strip */
 .tabs eo-button { display: inline-block; }
+
+/* design-side open items */
+.openlist { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--eo-dimension-12); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.openlist li {
+  display: grid; gap: var(--eo-dimension-2);
+  padding-left: var(--eo-dimension-12);
+  border-left: 2px solid var(--eo-color-border-utility-warning);
+  font-size: var(--eo-typography-body-50-font-size);
+}
+.openlist b { color: var(--eo-color-content-emphasized); }
+.openlist span { color: var(--eo-color-content-subtle); }
 </style>
 </head>
 <body>
@@ -601,13 +612,13 @@ eo-card > * { width: 100%; }
   </svg></div></eo-card>
     <eo-card class="tile span-4"><div class="tile-in"><p class="eyebrow">Where the gap is</p>
        <h3>Design leads, code follows</h3>
-       <ul class="facts"><li><span class="k">Dimensions solid on design</span><span class="v good">8 of 8</span></li><li><span class="k">Dimensions absent in code</span><span class="v bad">4 of 8</span></li></ul>
-       <p class="tile-text">The specification, the governance and the craft are in place. What is missing is almost entirely on the implementation side.</p></div></eo-card>
+       <ul class="facts"><li><span class="k">Absent on the design side</span><span class="v good">0 of 8</span></li><li><span class="k">Complete on the code side</span><span class="v bad">0 of 8</span></li><li><span class="k">Solid on design</span><span class="v good">6 of 8</span></li><li><span class="k">Absent in code</span><span class="v bad">4 of 8</span></li></ul>
+       <p class="tile-text">Across eight dimensions, <b>nothing is absent on the design side and nothing is complete on the code side</b>. The specification, the governance and the craft exist. Shipping them does not.</p></div></eo-card>
   </div>
 </section>
 
 <section class="band">
-  <div class="band-head"><p class="eyebrow">Two sides, two speeds</p><h2>The design system is in good shape. Its implementation is not.</h2><p>Each row attributes the inspection findings to the side of the system they belong to. Every cell rests on a measurement, not an opinion.</p></div>
+  <div class="band-head"><p class="eyebrow">Two sides, two speeds</p><h2>The design system is in good shape. Getting it into code is the work.</h2><p>Each row attributes the inspection findings to the side of the system they belong to. Every cell rests on a measurement, not an opinion — including the two where the design side is only partial.</p></div>
   <div class="bento">
     <eo-card class="tile span-12"><div class="tile-in"><div class="legend">
          <span><span class="cell in-place"><span></span></span> In place</span>
@@ -644,11 +655,11 @@ eo-card > * { width: 100%; }
           <span><b>Code</b> 0 git tags, 0 releases, no CHANGELOG; the version is a CI build counter</span>
         </div><div class="matrix-row">
           <span class="mname">Craft and hygiene</span>
-          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
+          <span class="cell partial" role="img" aria-label="partial"><span></span></span>
           <span class="cell partial" role="img" aria-label="partial"><span></span></span>
         </div>
         <div class="matrix-detail">
-          <span><b>Design</b> Zero generic layer names across ~7,000 sampled layers; 82% variable binding</span>
+          <span><b>Design</b> Zero generic layer names across ~7,000 sampled layers — exceptional. Variable binding is at 82%: 552 fills remain hard-coded, 480 of them propagating from one unbound element in button</span>
           <span><b>Code</b> 14 of 15 components follow the house pattern; nothing enforces it — no lint rule catches a deviation</span>
         </div><div class="matrix-row">
           <span class="mname">Naming and API language</span>
@@ -660,11 +671,11 @@ eo-card > * { width: 100%; }
           <span><b>Code</b> 33 of 34 glossary entries are scoped Design only; no code-side counterpart or validator</span>
         </div><div class="matrix-row">
           <span class="mname">Documentation for machines</span>
-          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
+          <span class="cell partial" role="img" aria-label="partial"><span></span></span>
           <span class="cell partial" role="img" aria-label="partial"><span></span></span>
         </div>
         <div class="matrix-detail">
-          <span><b>Design</b> 2,263 DTCG token descriptions; 63 of 108 public Figma sets described</span>
+          <span><b>Design</b> 2,263 DTCG token descriptions at full conformance. Figma component metadata is 63 of 108 public sets — 45 still bare, including dialog, label and the input family</span>
           <span><b>Code</b> JSDoc on 3 of 15 components; no custom-elements.json; token descriptions never leave the repo</span>
         </div><div class="matrix-row">
           <span class="mname">Usage telemetry</span>
@@ -684,6 +695,10 @@ eo-card > * { width: 100%; }
           <span><b>Code</b> A CONTRIBUTING guide was written on 20 Jan and has sat as an unreviewed draft for 198 days</span>
         </div>
   </div></div></eo-card>
+    <eo-card class="tile span-12"><div class="tile-in"><p class="eyebrow">In fairness — what is open on our side</p>
+       <h3>Strong, not spotless</h3>
+       <p class="tile-text">The design side is strong, not spotless. These are the open items on our side of the line — all of them small, specific and already understood.</p>
+       <ul class="openlist"><li><b>552 hard-coded fills</b><span>480 in button and 72 in alert, each propagating from a single unbound element in the base component. Two edits fix both.</span></li><li><b>45 of 108 Figma sets undescribed</b><span>Metadata rollout stalled part-way; the shipped-in-code components are the obvious next batch.</span></li><li><b>Properties Glossary has drifted</b><span>14 of 34 entries are spelled differently from the real Figma property, and 8 match none. Now a generatable diff rather than a manual audit.</span></li><li><b>UI Kit changelog stalled</b><span>Last real entry is 0.0.20 on 8 May, with a malformed [0.0.0] entry above it.</span></li><li><b>Semver documented, not practised</b><span>0.0.15 deprecated three components and renamed two — and shipped as a patch.</span></li><li><b>One open contrast report</b><span>Brand-on-dark AA failure on free and secondary buttons, unanswered since 31 July.</span></li></ul></div></eo-card>
   </div>
 </section>
 

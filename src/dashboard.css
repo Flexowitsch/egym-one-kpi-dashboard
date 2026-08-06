@@ -405,3 +405,14 @@ eo-card > * { width: 100%; }
 
 /* tabs are eo-button; the host needs to sit inline in the tab strip */
 .tabs eo-button { display: inline-block; }
+
+/* design-side open items */
+.openlist { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--eo-dimension-12); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.openlist li {
+  display: grid; gap: var(--eo-dimension-2);
+  padding-left: var(--eo-dimension-12);
+  border-left: 2px solid var(--eo-color-border-utility-warning);
+  font-size: var(--eo-typography-body-50-font-size);
+}
+.openlist b { color: var(--eo-color-content-emphasized); }
+.openlist span { color: var(--eo-color-content-subtle); }

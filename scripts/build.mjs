@@ -52,13 +52,16 @@ const bandHead = (eyebrow, title, sub) =>
     sub ? `<p>${sub}</p>` : ''
   }</div>`;
 
-const { coverage, jira, bmaBuildPlan, communityVelocity, ask, kpis, roadmap, meta, inspection, designVsCode, accessibility } = data;
+const { coverage, jira, bmaBuildPlan, communityVelocity, ask, kpis, roadmap, meta, inspection, designVsCode, accessibility, designOpen } = data;
 const rfd = jira.readyForDevelopment;
 const cv = communityVelocity;
 const gap = inspection ? inspection.potentialTotal - inspection.shippedTotal : 0;
 const st = (n) => inspection?.stations.find((s) => s.n === n);
 const designSolid = designVsCode ? designVsCode.dimensions.filter((d) => d.design.state === 'in-place').length : 0;
 const codeAbsent = designVsCode ? designVsCode.dimensions.filter((d) => d.code.state === 'absent').length : 0;
+const designAbsent = designVsCode ? designVsCode.dimensions.filter((d) => d.design.state === 'absent').length : 0;
+const codeComplete = designVsCode ? designVsCode.dimensions.filter((d) => d.code.state === 'in-place').length : 0;
+const dimN = designVsCode ? designVsCode.dimensions.length : 0;
 
 /* ══════════════════════════════════════════════════════════════ OVERVIEW ═══ */
 const overview = `
@@ -127,10 +130,12 @@ const overview = `
       `<p class="eyebrow">Where the gap is</p>
        <h3>Design leads, code follows</h3>
        ${facts([
-         ['Dimensions solid on design', `${designSolid} of ${designVsCode.dimensions.length}`, 'good'],
-         ['Dimensions absent in code', `${codeAbsent} of ${designVsCode.dimensions.length}`, 'bad'],
+         ['Absent on the design side', `${designAbsent} of ${dimN}`, 'good'],
+         ['Complete on the code side', `${codeComplete} of ${dimN}`, 'bad'],
+         ['Solid on design', `${designSolid} of ${dimN}`, 'good'],
+         ['Absent in code', `${codeAbsent} of ${dimN}`, 'bad'],
        ])}
-       <p class="tile-text">The specification, the governance and the craft are in place. What is missing is almost entirely on the implementation side.</p>`
+       <p class="tile-text">Across eight dimensions, <b>nothing is absent on the design side and nothing is complete on the code side</b>. The specification, the governance and the craft exist. Shipping them does not.</p>`
     )}
   </div>
 </section>
@@ -138,8 +143,8 @@ const overview = `
 <section class="band">
   ${bandHead(
     'Two sides, two speeds',
-    'The design system is in good shape. Its implementation is not.',
-    'Each row attributes the inspection findings to the side of the system they belong to. Every cell rests on a measurement, not an opinion.'
+    'The design system is in good shape. Getting it into code is the work.',
+    'Each row attributes the inspection findings to the side of the system they belong to. Every cell rests on a measurement, not an opinion — including the two where the design side is only partial.'
   )}
   <div class="bento">
     ${tile(
@@ -150,6 +155,15 @@ const overview = `
          <span><span class="cell absent"><span></span></span> Absent</span>
        </div>
        ${splitMatrix(designVsCode?.dimensions ?? [])}`
+    )}
+    ${tile(
+      'span-12',
+      `<p class="eyebrow">In fairness — what is open on our side</p>
+       <h3>Strong, not spotless</h3>
+       <p class="tile-text">${esc(designOpen?.note ?? '')}</p>
+       <ul class="openlist">${(designOpen?.items ?? [])
+         .map(([t, d]) => `<li><b>${esc(t)}</b><span>${esc(d)}</span></li>`)
+         .join('')}</ul>`
     )}
   </div>
 </section>
