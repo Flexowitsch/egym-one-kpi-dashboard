@@ -581,8 +581,8 @@
       {
         "name": "Craft and hygiene",
         "design": {
-          "state": "partial",
-          "detail": "Zero generic layer names across ~7,000 sampled layers — exceptional. Variable binding is at 82%: 552 fills remain hard-coded, 480 of them propagating from one unbound element in button"
+          "state": "in-place",
+          "detail": "Measured across all 109,402 layers: 0.54% generic names, zero detached instances, 96% of fills and 100% of strokes bound to variables (98.6% of fills once icon placeholders are excluded)"
         },
         "code": {
           "state": "partial",
@@ -604,7 +604,7 @@
         "name": "Documentation for machines",
         "design": {
           "state": "partial",
-          "detail": "2,263 DTCG token descriptions at full conformance. Figma component metadata is 63 of 108 public sets — 45 still bare, including dialog, label and the input family"
+          "detail": "2,263 DTCG token descriptions. 62 of 128 components carry a description, but those average 1,342 characters — thorough where present, absent for the other half"
         },
         "code": {
           "state": "partial",
@@ -682,12 +682,12 @@
     "note": "The design side is strong, not spotless. These are the open items on our side of the line — all of them small, specific and already understood.",
     "items": [
       [
-        "552 hard-coded fills",
-        "480 in button and 72 in alert, each propagating from a single unbound element in the base component. Two edits fix both."
+        "Residual unbound fills",
+        "Fill binding is at 96%, or 98.6% once icon placeholders are excluded. What remains is the logo brand marks and placeholder text still sitting in accordion-item."
       ],
       [
-        "45 of 108 Figma sets undescribed",
-        "Metadata rollout stalled part-way; the shipped-in-code components are the obvious next batch."
+        "66 of 128 components undescribed",
+        "Half the in-scope set has no description. The 62 that do average 1,342 characters — when this team documents, it documents properly."
       ],
       [
         "Properties Glossary has drifted",
@@ -706,5 +706,46 @@
         "Brand-on-dark AA failure on free and secondary buttons, unanswered since 31 July."
       ]
     ]
+  },
+  "figmaAudit": {
+    "measuredAt": "2026-08-06",
+    "source": "Live audit of the EGYM One UI Kit via the Figma plugin bridge — full traversal, not a sample",
+    "inventory": {
+      "componentSets": 288,
+      "looseComponents": 99,
+      "total": 387,
+      "bricks": 239,
+      "deprecated": 30,
+      "inScope": 128
+    },
+    "documentation": {
+      "described": 62,
+      "bare": 66,
+      "thin": 4,
+      "medianDescriptionChars": 1342
+    },
+    "api": {
+      "withProperties": 110,
+      "withoutProperties": 18,
+      "totalVariants": 2889
+    },
+    "soundness": {
+      "layersScanned": 109402,
+      "genericLayerNames": 591,
+      "genericPct": 0.54,
+      "detachedInstances": 0,
+      "fillsBound": 36262,
+      "fillsUnbound": 1621,
+      "fillsBoundPct": 96,
+      "strokesBound": 8157,
+      "strokesUnbound": 10,
+      "strokesBoundPct": 100,
+      "unboundInsideIconWrappers": 1098,
+      "unboundRealCandidates": 523,
+      "fillsBoundPctExcludingIconPlaceholders": 98.6,
+      "setsFullyBound": 53,
+      "setsScanned": 92
+    },
+    "note": "Icon glyphs carry a placeholder fill that the consuming component overrides, so they are counted separately rather than as drift. The largest remaining block is the logo component brand marks, which are arguably correct as literals."
   }
 }
