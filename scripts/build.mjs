@@ -255,35 +255,59 @@ const qualityTab = `
 
 
 <section class="band">
-  ${bandHead('Accessibility, explained', 'Why this station scores 5', 'The requirements are specified. The verification is not built. Those are different problems, and they sit on different sides of the system.')}
+  ${bandHead(
+    'Accessibility',
+    'Specified, measured, and passing — on the design side',
+    'The design system defines WCAG 2.2 AA, and every colour pair it governs measurably passes. The code that implements it has never run a single accessibility check.'
+  )}
+  <div class="stat-row">
+    ${stat(`${accessibility.designSide.contrast.aaPass}/20`, 'Token pairs passing WCAG AA', 'the other two are disabled text, which WCAG exempts', 'good')}
+    ${stat(`${accessibility.designSide.contrast.aaaPass}/20`, 'Reaching AAA', 'well beyond the requirement', 'good')}
+    ${stat(`${accessibility.designSide.focusStates.pct}%`, 'Stateful components with a focus state', `${accessibility.designSide.focusStates.withFocusState} of ${accessibility.designSide.focusStates.statefulComponents}`, 'good')}
+    ${stat(accessibility.codeSide.axeAssertions, 'Accessibility assertions in code', 'across the entire repository', 'bad')}
+  </div>
+</section>
+
+<section class="band tight">
   <div class="bento">
     ${tile(
-      'span-6',
-      `<p class="eyebrow">Specified — design side</p>
-       <h3>The gate exists and is rigorous</h3>
-       ${facts((accessibility?.specified ?? []).map(([t, ok]) => [t, ok ? 'Yes' : 'No', ok ? 'good' : 'bad']))}
-       <p class="tile-text">Every new component passes a WCAG 2.2 AA checklist before it ships: ARIA Authoring Practices, keyboard paths, contrast ratios, 44x44 touch targets, reduced motion and screen-reader testing.</p>`
+      'span-7',
+      `<p class="eyebrow">Design side · measured</p>
+       <h3>Every governed colour pair passes</h3>
+       <div class="table-scroll"><table>
+         <thead><tr><th>Pair</th><th>Ratio</th><th>Level</th></tr></thead>
+         <tbody>${accessibility.designSide.contrast.highlights
+           .map(([pair, r, level]) => `<tr><td>${esc(pair)}</td><td class="key">${esc(r)}</td><td>${chip(level, level === 'AAA' ? 'positive' : 'info')}</td></tr>`)
+           .join('')}</tbody>
+       </table></div>
+       <p class="tile-text">${esc(accessibility.designSide.contrast.exemptNote)}</p>
+       <p class="tile-text"><b>One caveat, stated plainly.</b> ${esc(accessibility.designSide.contrast.caveat)}</p>`
     )}
     ${tile(
-      'span-6',
-      `<p class="eyebrow">Verified — code side</p>
-       <h3>Nothing checks any of it</h3>
-       ${facts((accessibility?.verified ?? []).map(([t, ok]) => [t, ok ? 'Yes' : 'No', ok ? 'good' : 'bad']))}
-       <p class="tile-text">${esc(accessibility?.rootCause ?? '')}</p>`
+      'span-5',
+      `<p class="eyebrow">Code side · unverified</p>
+       <h3>Nothing has ever been checked</h3>
+       ${facts([
+         ['axe assertions', accessibility.codeSide.axeAssertions, 'bad'],
+         ['a11y gate', "test: 'todo'", 'bad'],
+         ['Storybook a11y tests ever run', 'No', 'bad'],
+         ['Components failing WCAG', accessibility.codeSide.componentsFailingWcag, 'bad'],
+       ])}
+       <p class="tile-text">${esc(accessibility.codeSide.rootCause)}</p>`
     )}
     ${tile(
-      'span-8',
-      `<p class="eyebrow">The cause is one config file</p>
-       <h3>${esc(accessibility?.headline ?? '')}</h3>
-       <p class="tile-text">${esc(accessibility?.fixCost ?? '')} That is the whole distance between this station and a green one.</p>
-       <p class="tile-text"><b>Already moving.</b> ${esc(accessibility?.inProgress ?? '')}</p>`
+      'span-7',
+      `<p class="eyebrow">The gate that produced those numbers</p>
+       <h3>Accessibility is a required phase, not a review note</h3>
+       <p class="tile-text">${esc(accessibility.designSide.gate)}</p>
+       <p class="tile-text"><b>Already moving on the code side.</b> ${esc(accessibility.codeSide.inProgress)}</p>`
     )}
     ${tile(
-      'span-4',
+      'span-5',
       `<p class="eyebrow">In fairness</p>
        <h3>One item is ours</h3>
-       <p class="tile-text">${esc(accessibility?.designSideOpen ?? '')}</p>
-       <p class="tile-text">Dark-mode contrast is not counted here — it is deliberate scaffolding in the token architecture, not a shipped surface.</p>`
+       <p class="tile-text">${esc(accessibility.designSide.open)}</p>
+       <p class="tile-text">${esc(accessibility.designSide.focusStates.note)}</p>`
     )}
   </div>
 </section>
@@ -294,7 +318,7 @@ const qualityTab = `
       `<p class="eyebrow">Station 02 · best practices</p>
        <h3>One component is the whole problem</h3>
        <p class="tile-text">Of 35 component stylesheets, <b>34 are .scss and exactly one is .css</b>. Of 15 components, 14 use reflected properties — <b>eo-link uses none</b>, and renders no anchor element at all.</p>
-       <p class="tile-text">Figma craft is the counterweight: <b>zero generic layer names across ~7,000 sampled layers</b> and 82% variable binding. The conventions exist. Nothing enforces them in code.</p>`
+       <p class="tile-text">Figma craft is the counterweight, and it is now measured across the full population rather than sampled: <b>0.54% generic layer names across all 109,402 layers</b>, <b>zero detached instances</b>, <b>96% of fills and 100% of strokes bound</b>, and <b>zero local styles</b> left anywhere. The conventions exist. Nothing enforces them in code.</p>`
     )}
     ${tile(
       'span-6',

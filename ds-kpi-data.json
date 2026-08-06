@@ -561,11 +561,11 @@
         "name": "Accessibility",
         "design": {
           "state": "in-place",
-          "detail": "WCAG 2.2 AA gate in the contribution checklist: ARIA APG, keyboard, contrast ratios, 44x44 targets, reduced motion, screen-reader testing. focus-outline shipped, 2,912 inserts"
+          "detail": "Measured, not just specified: 18 of 20 token pairs pass WCAG AA and 11 reach AAA, with the only two below the threshold being disabled text, which WCAG exempts. 94% of stateful components model a focus state. The contribution checklist gates WCAG 2.2 AA on every new component."
         },
         "code": {
           "state": "absent",
-          "detail": "a11y gate set to test: todo; zero axe assertions; Storybook a11y tests have never run; eo-link fails WCAG 4.1.2 and 2.1.1"
+          "detail": "Zero axe assertions. The a11y gate is set to test: todo. Storybook accessibility tests have never run because vitest.config.ts points at two paths that do not exist. eo-link fails WCAG 4.1.2 and 2.1.1."
         }
       },
       {
@@ -637,47 +637,65 @@
     ]
   },
   "accessibility": {
-    "headline": "The requirements are specified. The verification is not built.",
-    "specified": [
-      [
-        "WCAG 2.2 AA gate in the contribution checklist",
-        true
-      ],
-      [
-        "ARIA Authoring Practices referenced per component",
-        true
-      ],
-      [
-        "Contrast ratios, 44x44 touch targets, reduced motion",
-        true
-      ],
-      [
-        "focus-outline component shipped and in use",
-        true
-      ]
-    ],
-    "verified": [
-      [
-        "axe assertions anywhere in the codebase",
-        false
-      ],
-      [
-        "a11y gate enabled in CI",
-        false
-      ],
-      [
-        "Storybook accessibility tests actually running",
-        false
-      ],
-      [
-        "Components passing a keyboard-reachability test",
-        false
-      ]
-    ],
-    "rootCause": "Two typos in vitest.config.ts point at paths that do not exist, so npm run storybook:test resolves zero projects and passes silently. Every Storybook test, including every accessibility check, has never run. Found in four consecutive inspections.",
-    "inProgress": "delegatesFocus is now the house pattern for focusable components, the tooltip enforces focusable anchors, and PR #166 adds the first behavioural focus-ring test — approved and waiting to merge.",
-    "designSideOpen": "One accessibility item does sit on the design side: a reported brand-on-dark AA contrast failure on free and secondary buttons, unanswered since 31 July.",
-    "fixCost": "Two characters in a config file, one branch-protection setting, and one component rewrite."
+    "headline": "Specified, measured and passing on the design side. Unverified on the code side.",
+    "measuredAt": "2026-08-06",
+    "source": "WCAG contrast computed directly from the token system across both brand modes, plus focus-state coverage across the UI Kit",
+    "designSide": {
+      "contrast": {
+        "pairsTested": 20,
+        "aaPass": 18,
+        "aaaPass": 11,
+        "exemptFailures": 2,
+        "exemptNote": "The only two pairs below 4.5:1 are disabled text at 2.1:1. WCAG 1.4.3 explicitly exempts inactive controls from the contrast minimum, so every pair that the guideline actually governs passes.",
+        "range": "4.5:1 to 21:1",
+        "highlights": [
+          [
+            "emphasized on default",
+            "21:1 EGYM · 17.4:1 Wellpass",
+            "AAA"
+          ],
+          [
+            "subtle on default",
+            "8.45:1 both brands",
+            "AAA"
+          ],
+          [
+            "on-emphasized on emphasized",
+            "15.08:1 both brands",
+            "AAA"
+          ],
+          [
+            "hinted on default",
+            "5.66:1 both brands",
+            "AA"
+          ],
+          [
+            "accent on default",
+            "4.5:1 EGYM · 6.17:1 Wellpass",
+            "AA"
+          ]
+        ],
+        "caveat": "The EGYM accent pairs land on exactly 4.5:1 — passing, but with no headroom. Any darkening of the surface or lightening of the accent breaks them."
+      },
+      "focusStates": {
+        "statefulComponents": 34,
+        "withFocusState": 32,
+        "pct": 94,
+        "note": "Of the components that model interaction states at all, 94% include a focus state. Most of those without a state property are containers — cards, navigation shells, button stacks — where the interaction lives in the child."
+      },
+      "gate": "WCAG 2.2 AA is a mandatory phase in the contribution checklist: ARIA Authoring Practices, keyboard paths, contrast ratios, 44x44 touch targets, reduced motion and screen-reader testing.",
+      "open": "One reported brand-on-dark AA contrast failure on free and secondary buttons, unanswered since 31 July. Dark mode is scaffolding — 7 variables against 1,111 in Brand — so this sits outside the shipped surface."
+    },
+    "codeSide": {
+      "axeAssertions": 0,
+      "a11yGate": "test: 'todo'",
+      "storybookA11yTestsEverRun": false,
+      "componentsFailingWcag": 1,
+      "rootCause": "Two typos in vitest.config.ts point at paths that do not exist, so npm run storybook:test resolves zero projects and passes silently. Every Storybook test, including every accessibility check, has never run — found in five consecutive inspections.",
+      "failing": "eo-link renders no anchor element, is not keyboard reachable and does not announce as a link — WCAG 4.1.2 and 2.1.1.",
+      "inProgress": "delegatesFocus is now the house pattern, the tooltip enforces focusable anchors, and PR #166 adds the first behavioural focus-ring test — approved and still unmerged."
+    },
+    "theContrast": "The design system specifies WCAG 2.2 AA, and every colour pair it governs measurably passes. The code that implements it has never run a single accessibility check."
   },
   "designOpen": {
     "note": "The design side is strong, not spotless. These are the open items on our side of the line — all of them small, specific and already understood.",
