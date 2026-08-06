@@ -8,7 +8,7 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { radar, donut, trend, stationBars } from '../src/charts.mjs';
+import { radar, donut, trend, stationBars, splitMatrix, slope, pipeline } from '../src/charts.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const data = JSON.parse(readFileSync(resolve(root, 'ds-kpi-data.json'), 'utf8'));
@@ -23,11 +23,15 @@ const pct = (n, d) => (d ? Math.round((n / d) * 100) : 0);
 const daysSince = (iso, from) => Math.round((new Date(from) - new Date(iso)) / 86400000);
 
 const chip = (t, intent = 'neutral') => `<eo-label intent="${intent}" size="small">${esc(t)}</eo-label>`;
-const tile = (cls, inner) => `<div class="tile ${cls}">${inner}</div>`;
+// Real design system components throughout: eo-card paints every card surface,
+// eo-label every chip, eo-button every tab, eo-divider every rule. The only
+// hand-built things left are the charts, because the system has no chart
+// component in code yet (DSC-100).
+const tile = (cls, inner) => `<eo-card class="tile ${cls}"><div class="tile-in">${inner}</div></eo-card>`;
 const stat = (v, k, t = '', tone = '', small = false) =>
-  `<div class="stat ${tone}"><div class="v ${small ? 'small' : ''}">${esc(v)}</div><p class="k">${esc(k)}</p>${
-    t ? `<p class="t">${esc(t)}</p>` : ''
-  }</div>`;
+  `<eo-card class="stat ${tone}"><div class="stat-in"><div class="v ${small ? 'small' : ''}">${esc(
+    v
+  )}</div><p class="k">${esc(k)}</p>${t ? `<p class="t">${esc(t)}</p>` : ''}</div></eo-card>`;
 const facts = (rows) =>
   `<ul class="facts">${rows
     .map(([k, v, tone = '']) => `<li><span class="k">${esc(k)}</span><span class="v ${tone}">${esc(v)}</span></li>`)
@@ -48,11 +52,13 @@ const bandHead = (eyebrow, title, sub) =>
     sub ? `<p>${sub}</p>` : ''
   }</div>`;
 
-const { coverage, jira, bmaBuildPlan, communityVelocity, ask, kpis, roadmap, meta, inspection } = data;
+const { coverage, jira, bmaBuildPlan, communityVelocity, ask, kpis, roadmap, meta, inspection, designVsCode, accessibility } = data;
 const rfd = jira.readyForDevelopment;
 const cv = communityVelocity;
 const gap = inspection ? inspection.potentialTotal - inspection.shippedTotal : 0;
 const st = (n) => inspection?.stations.find((s) => s.n === n);
+const designSolid = designVsCode ? designVsCode.dimensions.filter((d) => d.design.state === 'in-place').length : 0;
+const codeAbsent = designVsCode ? designVsCode.dimensions.filter((d) => d.code.state === 'absent').length : 0;
 
 /* ══════════════════════════════════════════════════════════════ OVERVIEW ═══ */
 const overview = `
@@ -117,18 +123,67 @@ const overview = `
        })}`
     )}
     ${tile(
-      'span-4 dark',
-      `<p class="eyebrow">The ask</p>
-       <h3>${ask.engineers} engineers, ${ask.durationWeeks} weeks</h3>
-       <p class="tile-text">${esc(ask.velocityAssumption)}</p>
+      'span-4',
+      `<p class="eyebrow">Where the gap is</p>
+       <h3>Design leads, code follows</h3>
        ${facts([
-         ['Check-in', `week ${ask.checkInWeek}`],
-         ['Final review', `week ${ask.finalReviewWeek}`],
-       ])}`
+         ['Dimensions solid on design', `${designSolid} of ${designVsCode.dimensions.length}`, 'good'],
+         ['Dimensions absent in code', `${codeAbsent} of ${designVsCode.dimensions.length}`, 'bad'],
+       ])}
+       <p class="tile-text">The specification, the governance and the craft are in place. What is missing is almost entirely on the implementation side.</p>`
+    )}
+  </div>
+</section>
+
+<section class="band">
+  ${bandHead(
+    'Two sides, two speeds',
+    'The design system is in good shape. Its implementation is not.',
+    'Each row attributes the inspection findings to the side of the system they belong to. Every cell rests on a measurement, not an opinion.'
+  )}
+  <div class="bento">
+    ${tile(
+      'span-12',
+      `<div class="legend">
+         <span><span class="cell in-place"><span></span></span> In place</span>
+         <span><span class="cell partial"><span></span></span> Partial</span>
+         <span><span class="cell absent"><span></span></span> Absent</span>
+       </div>
+       ${splitMatrix(designVsCode?.dimensions ?? [])}`
+    )}
+  </div>
+</section>
+
+<section class="band tight">
+  ${bandHead('Progress', 'What actually moved', 'Station scores between the last two full inspections. Flat lines are the finding — most stations did not move.')}
+  <div class="bento">
+    ${tile('span-7', slope(inspection?.stations ?? []))}
+    ${tile(
+      'span-5',
+      `<p class="eyebrow">Component pipeline</p>
+       <h3>${coverage.coreSetTotal - coverage.inCode - coverage.readyForRelease.length - coverage.inDevelopment.length} of ${coverage.coreSetTotal} not started</h3>
+       ${pipeline([
+         { label: 'In code', value: coverage.inCode, tone: 'good' },
+         { label: 'Ready for release', value: coverage.readyForRelease.length, tone: 'info' },
+         { label: 'In development', value: coverage.inDevelopment.length, tone: 'warn' },
+         {
+           label: 'Not started',
+           value: coverage.coreSetTotal - coverage.inCode - coverage.readyForRelease.length - coverage.inDevelopment.length,
+           tone: 'absent',
+         },
+       ])}
+       ${facts([
+         ['In code', coverage.inCode, 'good'],
+         ['Ready for release', coverage.readyForRelease.length, 'good'],
+         ['In development', coverage.inDevelopment.length, 'warn'],
+         ['Not started', coverage.coreSetTotal - coverage.inCode - coverage.readyForRelease.length - coverage.inDevelopment.length, 'bad'],
+       ])}
+       <p class="tile-text">Design coverage for Wellpass is at ${coverage.designCoverageWellpassPct}%. The pipeline above is the code side of the same set.</p>`
     )}
   </div>
 </section>
 `;
+
 
 /* ══════════════════════════════════════════════════════════════ COVERAGE ═══ */
 const coverageTab = `
@@ -152,7 +207,7 @@ const coverageTab = `
        <ul class="chips">${coverage.inDevelopment.map((c) => `<li>${chip(c, 'warning')}</li>`).join('')}</ul>`
     )}
     ${tile(
-      'span-12 dark',
+      'span-12',
       `<p class="eyebrow">Why this stays red</p>
        <h3>The gap is concentrated on the single most-used control in any system</h3>
        <p class="tile-text">The yellow anchor requires the core set to be “mostly present”. A system whose consumers write <b>36 raw &lt;input&gt; elements</b> across five repositories does not have its core set present. <b>input-text, input-dropdown, textarea and toggle</b> all have full Figma property contracts and no code.</p>
@@ -173,6 +228,40 @@ const qualityTab = `
   </div>
 </section>
 
+
+<section class="band">
+  ${bandHead('Accessibility, explained', 'Why this station scores 5', 'The requirements are specified. The verification is not built. Those are different problems, and they sit on different sides of the system.')}
+  <div class="bento">
+    ${tile(
+      'span-6',
+      `<p class="eyebrow">Specified — design side</p>
+       <h3>The gate exists and is rigorous</h3>
+       ${facts((accessibility?.specified ?? []).map(([t, ok]) => [t, ok ? 'Yes' : 'No', ok ? 'good' : 'bad']))}
+       <p class="tile-text">Every new component passes a WCAG 2.2 AA checklist before it ships: ARIA Authoring Practices, keyboard paths, contrast ratios, 44x44 touch targets, reduced motion and screen-reader testing.</p>`
+    )}
+    ${tile(
+      'span-6',
+      `<p class="eyebrow">Verified — code side</p>
+       <h3>Nothing checks any of it</h3>
+       ${facts((accessibility?.verified ?? []).map(([t, ok]) => [t, ok ? 'Yes' : 'No', ok ? 'good' : 'bad']))}
+       <p class="tile-text">${esc(accessibility?.rootCause ?? '')}</p>`
+    )}
+    ${tile(
+      'span-8',
+      `<p class="eyebrow">The cause is one config file</p>
+       <h3>${esc(accessibility?.headline ?? '')}</h3>
+       <p class="tile-text">${esc(accessibility?.fixCost ?? '')} That is the whole distance between this station and a green one.</p>
+       <p class="tile-text"><b>Already moving.</b> ${esc(accessibility?.inProgress ?? '')}</p>`
+    )}
+    ${tile(
+      'span-4',
+      `<p class="eyebrow">In fairness</p>
+       <h3>One item is ours</h3>
+       <p class="tile-text">${esc(accessibility?.designSideOpen ?? '')}</p>
+       <p class="tile-text">Dark-mode contrast is not counted here — it is deliberate scaffolding in the token architecture, not a shipped surface.</p>`
+    )}
+  </div>
+</section>
 <section class="band tight">
   <div class="bento">
     ${tile(
@@ -220,7 +309,7 @@ const deliveryTab = `
   <div class="bento">
     ${tile('span-6', `<p class="eyebrow">All open DSC issues</p><h3>${jira.openIssuesTotal} open</h3>${bars(jira.byStatus)}`)}
     ${tile(
-      'span-6 dark',
+      'span-6',
       `<p class="eyebrow">The queue engineers would drain</p>
        <h3>${rfd.count} ready, ${rfd.unassigned} unassigned</h3>
        ${facts([
@@ -280,7 +369,7 @@ const governanceTab = `
        ])}`
     )}
     ${tile(
-      'span-12 dark',
+      'span-12',
       `<p class="eyebrow">Release governance</p>
        <h3>${cv.gitTags} tags. ${cv.gitHubReleases} releases. No changelog.</h3>
        <p class="tile-text">The publish workflow stamps a CI build counter as the version, so the system <b>cannot express a breaking change</b> — which means no migration can be announced. The token system repository, same team and same org, already tags and releases properly.</p>
@@ -363,9 +452,9 @@ const html = `<!doctype html>
     <div class="tabs" role="tablist" aria-label="Dashboard sections">
       ${TABS.map(
         ([id, label], i) =>
-          `<button class="tab" role="tab" id="tab-${id}" aria-controls="panel-${id}" aria-selected="${i === 0}" data-tab="${id}">${esc(
-            label
-          )}</button>`
+          `<eo-button class="tab" role="tab" id="tab-${id}" aria-controls="panel-${id}"
+             aria-selected="${i === 0}" data-tab="${id}" size="small"
+             hierarchy="${i === 0 ? 'primary' : 'free'}">${esc(label)}</eo-button>`
       ).join('')}
     </div>
   </div>
@@ -400,7 +489,13 @@ const html = `<!doctype html>
 <script>
   const tabs = [...document.querySelectorAll('.tab')];
   const show = (id, push) => {
-    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
+    tabs.forEach((t) => {
+      const on = t.dataset.tab === id;
+      t.setAttribute('aria-selected', String(on));
+      // eo-button carries its selected state through hierarchy, so drive that
+      // rather than layering a CSS class over a design system component
+      t.setAttribute('hierarchy', on ? 'primary' : 'free');
+    });
     document.querySelectorAll('.panel').forEach((p) => {
       const on = p.id === 'panel-' + id;
       p.classList.toggle('is-active', on);

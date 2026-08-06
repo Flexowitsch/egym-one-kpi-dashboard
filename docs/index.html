@@ -161,48 +161,31 @@ body {
    STAT ROW — the "20k / 700k / 2.2m / 4.8" treatment
    =========================================================================== */
 .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--eo-dimension-16); }
-.stat {
-  background: var(--eo-color-surface-default);
-  border-radius: var(--eo-dimension-border-radius-large);
-  padding: var(--eo-dimension-24) var(--eo-dimension-20);
-  text-align: center;
-}
-.stat .v {
+/* eo-card paints the surface and radius; this only lays out its slotted content */
+.stat-in { padding: var(--eo-dimension-24) var(--eo-dimension-20); text-align: center; }
+.stat { display: block; }
+.stat-in .v {
   font-family: var(--eo-typography-headline-500-font-family);
   font-size: var(--eo-typography-headline-500-font-size);
   line-height: 1;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
-.stat .v.small { font-size: var(--eo-typography-headline-300-font-size); }
-.stat.good .v { color: var(--eo-color-content-utility-positive); }
-.stat.warn .v { color: var(--eo-color-content-utility-warning); }
-.stat.bad  .v { color: var(--eo-color-content-utility-negative); }
-.stat .k { margin: var(--eo-dimension-8) 0 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-subtle); }
-.stat .t { margin: var(--eo-dimension-4) 0 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-hinted); }
+.stat-in .v.small { font-size: var(--eo-typography-headline-300-font-size); }
+.stat.good .stat-in .v { color: var(--eo-color-content-utility-positive); }
+.stat.warn .stat-in .v { color: var(--eo-color-content-utility-warning); }
+.stat.bad .stat-in .v { color: var(--eo-color-content-utility-negative); }
+.stat-in .k { margin: var(--eo-dimension-8) 0 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-subtle); }
+.stat-in .t { margin: var(--eo-dimension-4) 0 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-hinted); }
 
 /* ===========================================================================
    BENTO — alternating content / visual cards
    =========================================================================== */
 .bento { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--eo-dimension-16); }
-.tile {
-  background: var(--eo-color-surface-default);
-  border-radius: var(--eo-dimension-border-radius-large);
-  padding: var(--eo-dimension-24);
-  grid-column: span 12;
-  display: flex; flex-direction: column; gap: var(--eo-dimension-12);
-  min-width: 0;
-}
-.tile.dark {
-  background: var(--eo-color-surface-emphasized);
-  color: var(--eo-color-content-on-emphasized);
-}
-.tile.dark .eyebrow { color: var(--eo-color-content-on-emphasized-subtle); }
-.tile.dark .tile-text, .tile.dark .facts .k { color: var(--eo-color-content-on-emphasized-subtle); }
-.tile.dark .facts li { border-bottom-color: var(--eo-color-border-on-emphasized); }
-.tile.dark .facts .v { color: var(--eo-color-content-on-emphasized); }
+.tile { grid-column: span 12; min-width: 0; display: block; }
+.tile-in { padding: var(--eo-dimension-24); display: flex; flex-direction: column; gap: var(--eo-dimension-12); }
 
-.tile h3 {
+.tile-in h3 {
   margin: 0;
   font-family: var(--eo-typography-headline-300-font-family);
   font-size: var(--eo-typography-headline-300-font-size);
@@ -357,6 +340,79 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
   .sbar .track { grid-column: 1 / -1; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* ===========================================================================
+   DESIGN vs CODE MATRIX
+   =========================================================================== */
+.matrix { display: grid; gap: 0; }
+.matrix-head, .matrix-row {
+  display: grid; grid-template-columns: 1fr 5.5rem 5.5rem;
+  gap: var(--eo-dimension-12); align-items: center;
+}
+.matrix-head { padding-bottom: var(--eo-dimension-8); border-bottom: 1px solid var(--eo-color-border-hinted); }
+.matrix-head .mh {
+  text-align: center;
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--eo-color-content-subtle); font-weight: 700;
+}
+.matrix-row { padding: var(--eo-dimension-12) 0 var(--eo-dimension-4); }
+.mname { font-size: var(--eo-typography-body-100-font-size); font-weight: 600; }
+.cell { display: flex; justify-content: center; }
+.cell > span {
+  display: block; width: var(--eo-dimension-20); height: var(--eo-dimension-20);
+  border-radius: var(--eo-dimension-border-radius-round);
+}
+.cell.in-place > span { background: var(--eo-color-surface-utility-positive); }
+.cell.partial  > span {
+  background: var(--eo-color-surface-utility-warning);
+  /* half-filled reads as "partial" without needing a legend lookup */
+  -webkit-mask-image: linear-gradient(90deg, #000 50%, transparent 50%);
+          mask-image: linear-gradient(90deg, #000 50%, transparent 50%);
+  outline: 2px solid var(--eo-color-surface-utility-warning); outline-offset: -1px;
+  border-radius: var(--eo-dimension-border-radius-round);
+}
+.cell.absent > span { background: transparent; box-shadow: inset 0 0 0 2px var(--eo-color-border-utility-negative); }
+.matrix-detail {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--eo-dimension-16);
+  padding: 0 0 var(--eo-dimension-12);
+  border-bottom: 1px solid var(--eo-color-border-subtle);
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-subtle);
+}
+.matrix-detail b { color: var(--eo-color-content-emphasized); }
+@media (max-width: 760px) {
+  .matrix-detail { grid-template-columns: 1fr; gap: var(--eo-dimension-4); }
+  .matrix-head, .matrix-row { grid-template-columns: 1fr 3.5rem 3.5rem; }
+}
+
+.legend { display: flex; flex-wrap: wrap; gap: var(--eo-dimension-16); font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-subtle); }
+.legend span { display: flex; align-items: center; gap: var(--eo-dimension-8); }
+
+/* ---------- slope chart ---------- */
+.sl { stroke-width: 2; fill: none; }
+.sl.up   { stroke: var(--eo-color-surface-utility-positive); }
+.sl.down { stroke: var(--eo-color-surface-utility-negative); }
+.sl.flat { stroke: var(--eo-color-border-hinted); }
+.sl-dot.up   { fill: var(--eo-color-surface-utility-positive); }
+.sl-dot.down { fill: var(--eo-color-surface-utility-negative); }
+.sl-dot.flat { fill: var(--eo-color-border-hinted); }
+
+/* ---------- pipeline ---------- */
+.pipe.good    { fill: var(--eo-color-surface-utility-positive); }
+.pipe.info    { fill: var(--eo-color-surface-utility-info); }
+.pipe.warn    { fill: var(--eo-color-surface-utility-warning); }
+.pipe.absent  { fill: var(--eo-color-surface-subtle); }
+
+/* ---------- eo-* component overrides ----------
+   eo-card's shadow container is `display:flex; align-items:flex-start`, so
+   slotted content shrinks to its own width. Everything below fills the card. */
+eo-card { display: block; }
+eo-card > * { width: 100%; }
+
+/* tabs are eo-button; the host needs to sit inline in the tab strip */
+.tabs eo-button { display: inline-block; }
 </style>
 </head>
 <body>
@@ -365,7 +421,19 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
   <div class="nav-inner">
     <div class="wordmark">EGYM<span>One</span></div>
     <div class="tabs" role="tablist" aria-label="Dashboard sections">
-      <button class="tab" role="tab" id="tab-overview" aria-controls="panel-overview" aria-selected="true" data-tab="overview">Overview</button><button class="tab" role="tab" id="tab-coverage" aria-controls="panel-coverage" aria-selected="false" data-tab="coverage">Coverage</button><button class="tab" role="tab" id="tab-quality" aria-controls="panel-quality" aria-selected="false" data-tab="quality">Quality</button><button class="tab" role="tab" id="tab-delivery" aria-controls="panel-delivery" aria-selected="false" data-tab="delivery">Delivery</button><button class="tab" role="tab" id="tab-governance" aria-controls="panel-governance" aria-selected="false" data-tab="governance">Governance</button><button class="tab" role="tab" id="tab-roadmap" aria-controls="panel-roadmap" aria-selected="false" data-tab="roadmap">Roadmap</button>
+      <eo-button class="tab" role="tab" id="tab-overview" aria-controls="panel-overview"
+             aria-selected="true" data-tab="overview" size="small"
+             hierarchy="primary">Overview</eo-button><eo-button class="tab" role="tab" id="tab-coverage" aria-controls="panel-coverage"
+             aria-selected="false" data-tab="coverage" size="small"
+             hierarchy="free">Coverage</eo-button><eo-button class="tab" role="tab" id="tab-quality" aria-controls="panel-quality"
+             aria-selected="false" data-tab="quality" size="small"
+             hierarchy="free">Quality</eo-button><eo-button class="tab" role="tab" id="tab-delivery" aria-controls="panel-delivery"
+             aria-selected="false" data-tab="delivery" size="small"
+             hierarchy="free">Delivery</eo-button><eo-button class="tab" role="tab" id="tab-governance" aria-controls="panel-governance"
+             aria-selected="false" data-tab="governance" size="small"
+             hierarchy="free">Governance</eo-button><eo-button class="tab" role="tab" id="tab-roadmap" aria-controls="panel-roadmap"
+             aria-selected="false" data-tab="roadmap" size="small"
+             hierarchy="free">Roadmap</eo-button>
     </div>
   </div>
 </nav>
@@ -390,18 +458,18 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
 
 <section class="band tight">
   <div class="stat-row">
-    <div class="stat bad"><div class="v ">41%</div><p class="k">Core coverage in code</p><p class="t">15 of 37</p></div>
-    <div class="stat bad"><div class="v ">25</div><p class="k">Ready for development</p><p class="t">24 unassigned</p></div>
-    <div class="stat bad"><div class="v ">100d</div><p class="k">Median open PR age</p><p class="t">13 open</p></div>
-    <div class="stat good"><div class="v ">19</div><p class="k">Community PRs merged</p><p class="t">9 contributors</p></div>
-    <div class="stat good"><div class="v ">3d</div><p class="k">Median time to merge</p><p class="t">when review happens</p></div>
+    <eo-card class="stat bad"><div class="stat-in"><div class="v ">41%</div><p class="k">Core coverage in code</p><p class="t">15 of 37</p></div></eo-card>
+    <eo-card class="stat bad"><div class="stat-in"><div class="v ">25</div><p class="k">Ready for development</p><p class="t">24 unassigned</p></div></eo-card>
+    <eo-card class="stat bad"><div class="stat-in"><div class="v ">100d</div><p class="k">Median open PR age</p><p class="t">13 open</p></div></eo-card>
+    <eo-card class="stat good"><div class="stat-in"><div class="v ">19</div><p class="k">Community PRs merged</p><p class="t">9 contributors</p></div></eo-card>
+    <eo-card class="stat good"><div class="stat-in"><div class="v ">3d</div><p class="k">Median time to merge</p><p class="t">when review happens</p></div></eo-card>
   </div>
 </section>
 
 <section class="band">
   <div class="band-head"><p class="eyebrow">Ten stations</p><h2>Where the system is strong, and where it is not</h2><p>Scored against the design system multi-point inspection. The dashed ring is a perfect score — the gap between the shape and the ring is the work left.</p></div>
   <div class="bento">
-    <div class="tile span-7"><svg class="chart" viewBox="0 0 560 440" role="img"
+    <eo-card class="tile span-7"><div class="tile-in"><svg class="chart" viewBox="0 0 560 440" role="img"
     aria-label="Radar of ten inspection stations scored out of ten. Coverage & gaps 3, Best practices 7, Accessibility 5, Shared language 7, Testing & validation 4, Orchestration 5, Governance 6, Feedback & adoption 5, Machine-readable docs 5, Agent access 4.">
     <path class="c-grid" d="M280,192.72 L296.03,197.93 L305.94,211.57 L305.94,228.43 L296.03,242.07 L280,247.28 L263.97,242.07 L254.06,228.43 L254.06,211.57 L263.97,197.93Z"/><path class="c-grid" d="M280,165.44 L312.07,175.86 L331.89,203.14 L331.89,236.86 L312.07,264.14 L280,274.56 L247.93,264.14 L228.11,236.86 L228.11,203.14 L247.93,175.86Z"/><path class="c-grid" d="M280,138.16 L328.1,153.79 L357.83,194.71 L357.83,245.29 L328.1,286.21 L280,301.84 L231.9,286.21 L202.17,245.29 L202.17,194.71 L231.9,153.79Z"/><path class="c-grid" d="M280,110.88 L344.14,131.72 L383.78,186.28 L383.78,253.72 L344.14,308.28 L280,329.12 L215.86,308.28 L176.22,253.72 L176.22,186.28 L215.86,131.72Z"/><line class="c-axis" x1="280" y1="220" x2="280" y2="83.6"/><line class="c-axis" x1="280" y1="220" x2="360.17" y2="109.65"/><line class="c-axis" x1="280" y1="220" x2="409.72" y2="177.85"/><line class="c-axis" x1="280" y1="220" x2="409.72" y2="262.15"/><line class="c-axis" x1="280" y1="220" x2="360.17" y2="330.35"/><line class="c-axis" x1="280" y1="220" x2="280" y2="356.4"/><line class="c-axis" x1="280" y1="220" x2="199.83" y2="330.35"/><line class="c-axis" x1="280" y1="220" x2="150.28" y2="262.15"/><line class="c-axis" x1="280" y1="220" x2="150.28" y2="177.85"/><line class="c-axis" x1="280" y1="220" x2="199.83" y2="109.65"/>
     <path class="c-shape-max" d="M280,83.6 L360.17,109.65 L409.72,177.85 L409.72,262.15 L360.17,330.35 L280,356.4 L199.83,330.35 L150.28,262.15 L150.28,177.85 L199.83,109.65Z"/>
@@ -417,8 +485,8 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
       <text class="c-value" x="117.94" y="285.66" text-anchor="end" dominant-baseline="middle">5</text><text class="c-label" x="117.94" y="167.34" text-anchor="end" dominant-baseline="middle">Machine-readable docs</text>
       <text class="c-value" x="117.94" y="180.34" text-anchor="end" dominant-baseline="middle">5</text><text class="c-label" x="179.84" y="82.14" text-anchor="end" dominant-baseline="middle">Agent access</text>
       <text class="c-value" x="179.84" y="95.14" text-anchor="end" dominant-baseline="middle">4</text>
-  </svg></div>
-    <div class="tile span-5"><p class="eyebrow">Station by station</p>
+  </svg></div></eo-card>
+    <eo-card class="tile span-5"><div class="tile-in"><p class="eyebrow">Station by station</p>
        <div class="sbars"><div class="sbar">
         <span class="i">01</span>
         <span class="nm">Coverage &amp; gaps</span>
@@ -500,13 +568,13 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
         </span>
         <span class="sc">4<span class="c-label"> → 6</span></span>
       </div></div>
-       <p class="tile-text">A lighter bar behind a score is where that station lands if finished work is promoted into main.</p></div>
+       <p class="tile-text">A lighter bar behind a score is where that station lands if finished work is promoted into main.</p></div></eo-card>
   </div>
 </section>
 
 <section class="band tight">
   <div class="bento">
-    <div class="tile span-4"><p class="eyebrow">Trend</p>
+    <eo-card class="tile span-4"><div class="tile-in"><p class="eyebrow">Trend</p>
        <h3>Three inspections, four points</h3>
        <svg class="chart" viewBox="0 0 260 90" style="max-width:260px" role="img"
     aria-label="Score trend: 47 then 51">
@@ -517,8 +585,8 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
       <text class="c-value" x="238" y="27.33" text-anchor="middle">51</text>
       <text class="c-label" x="238" y="86" text-anchor="middle">5 Aug</text>
   </svg>
-       <p class="tile-text">Almost none of that movement is improvement — six stations moved because evidence surfaces were inspected for the first time.</p></div>
-    <div class="tile span-4"><p class="eyebrow">Coverage</p>
+       <p class="tile-text">Almost none of that movement is improvement — six stations moved because evidence surfaces were inspected for the first time.</p></div></eo-card>
+    <eo-card class="tile span-4"><div class="tile-in"><p class="eyebrow">Coverage</p>
        <h3>Core set built in code</h3>
        <svg class="chart" viewBox="0 0 180 180" style="max-width:180px" role="img"
     aria-label="41% 15 of 37">
@@ -530,18 +598,137 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
     <text class="c-donut-label" x="90" y="88" text-anchor="middle" dominant-baseline="middle"
       style="font-size:36px">41%</text>
     <text class="c-donut-sub" x="90" y="117" text-anchor="middle">15 of 37</text>
-  </svg></div>
-    <div class="tile span-4 dark"><p class="eyebrow">The ask</p>
-       <h3>2 engineers, 12 weeks</h3>
-       <p class="tile-text">≈ 1 component per engineer per week incl. review &amp; QA (conservative; median merge is 2 days when review capacity exists)</p>
-       <ul class="facts"><li><span class="k">Check-in</span><span class="v ">week 6</span></li><li><span class="k">Final review</span><span class="v ">week 12</span></li></ul></div>
+  </svg></div></eo-card>
+    <eo-card class="tile span-4"><div class="tile-in"><p class="eyebrow">Where the gap is</p>
+       <h3>Design leads, code follows</h3>
+       <ul class="facts"><li><span class="k">Dimensions solid on design</span><span class="v good">8 of 8</span></li><li><span class="k">Dimensions absent in code</span><span class="v bad">4 of 8</span></li></ul>
+       <p class="tile-text">The specification, the governance and the craft are in place. What is missing is almost entirely on the implementation side.</p></div></eo-card>
+  </div>
+</section>
+
+<section class="band">
+  <div class="band-head"><p class="eyebrow">Two sides, two speeds</p><h2>The design system is in good shape. Its implementation is not.</h2><p>Each row attributes the inspection findings to the side of the system they belong to. Every cell rests on a measurement, not an opinion.</p></div>
+  <div class="bento">
+    <eo-card class="tile span-12"><div class="tile-in"><div class="legend">
+         <span><span class="cell in-place"><span></span></span> In place</span>
+         <span><span class="cell partial"><span></span></span> Partial</span>
+         <span><span class="cell absent"><span></span></span> Absent</span>
+       </div>
+       <div class="matrix">
+    <div class="matrix-head">
+      <span></span><span class="mh">Design</span><span class="mh">Code</span>
+    </div>
+    <div class="matrix-row">
+          <span class="mname">Component coverage</span>
+          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
+          <span class="cell partial" role="img" aria-label="partial"><span></span></span>
+        </div>
+        <div class="matrix-detail">
+          <span><b>Design</b> 127 in-scope components in the UI Kit; Wellpass design coverage at 100%</span>
+          <span><b>Code</b> 15 of those exist in code — 12%</span>
+        </div><div class="matrix-row">
+          <span class="mname">Accessibility</span>
+          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
+          <span class="cell absent" role="img" aria-label="absent"><span></span></span>
+        </div>
+        <div class="matrix-detail">
+          <span><b>Design</b> WCAG 2.2 AA gate in the contribution checklist: ARIA APG, keyboard, contrast ratios, 44x44 targets, reduced motion, screen-reader testing. focus-outline shipped, 2,912 inserts</span>
+          <span><b>Code</b> a11y gate set to test: todo; zero axe assertions; Storybook a11y tests have never run; eo-link fails WCAG 4.1.2 and 2.1.1</span>
+        </div><div class="matrix-row">
+          <span class="mname">Release governance</span>
+          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
+          <span class="cell absent" role="img" aria-label="absent"><span></span></span>
+        </div>
+        <div class="matrix-detail">
+          <span><b>Design</b> Two-track process documented and practised across v0.0.14 to v0.0.25, with migration guides and a six-week deprecation grace period</span>
+          <span><b>Code</b> 0 git tags, 0 releases, no CHANGELOG; the version is a CI build counter</span>
+        </div><div class="matrix-row">
+          <span class="mname">Craft and hygiene</span>
+          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
+          <span class="cell partial" role="img" aria-label="partial"><span></span></span>
+        </div>
+        <div class="matrix-detail">
+          <span><b>Design</b> Zero generic layer names across ~7,000 sampled layers; 82% variable binding</span>
+          <span><b>Code</b> 14 of 15 components follow the house pattern; nothing enforces it — no lint rule catches a deviation</span>
+        </div><div class="matrix-row">
+          <span class="mname">Naming and API language</span>
+          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
+          <span class="cell absent" role="img" aria-label="absent"><span></span></span>
+        </div>
+        <div class="matrix-detail">
+          <span><b>Design</b> Properties Glossary: 34 system-wide properties with types, values and defaults</span>
+          <span><b>Code</b> 33 of 34 glossary entries are scoped Design only; no code-side counterpart or validator</span>
+        </div><div class="matrix-row">
+          <span class="mname">Documentation for machines</span>
+          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
+          <span class="cell partial" role="img" aria-label="partial"><span></span></span>
+        </div>
+        <div class="matrix-detail">
+          <span><b>Design</b> 2,263 DTCG token descriptions; 63 of 108 public Figma sets described</span>
+          <span><b>Code</b> JSDoc on 3 of 15 components; no custom-elements.json; token descriptions never leave the repo</span>
+        </div><div class="matrix-row">
+          <span class="mname">Usage telemetry</span>
+          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
+          <span class="cell absent" role="img" aria-label="absent"><span></span></span>
+        </div>
+        <div class="matrix-detail">
+          <span><b>Design</b> Figma library analytics live — button at 49k uses, filter-tag at 9,499, detach rates per component</span>
+          <span><b>Code</b> No code-side telemetry; every consumer figure was reverse-engineered by hand</span>
+        </div><div class="matrix-row">
+          <span class="mname">Contribution process</span>
+          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
+          <span class="cell partial" role="img" aria-label="partial"><span></span></span>
+        </div>
+        <div class="matrix-detail">
+          <span><b>Design</b> Seven-phase checklist with a mandatory Phase 0 intake gate</span>
+          <span><b>Code</b> A CONTRIBUTING guide was written on 20 Jan and has sat as an unreviewed draft for 198 days</span>
+        </div>
+  </div></div></eo-card>
+  </div>
+</section>
+
+<section class="band tight">
+  <div class="band-head"><p class="eyebrow">Progress</p><h2>What actually moved</h2><p>Station scores between the last two full inspections. Flat lines are the finding — most stations did not move.</p></div>
+  <div class="bento">
+    <eo-card class="tile span-7"><div class="tile-in"><svg class="chart" viewBox="0 0 520 300" role="img"
+    aria-label="Slope chart of station scores between the last two inspections.">
+    <text class="c-label" x="116" y="14" text-anchor="middle">3 Aug</text>
+    <text class="c-label" x="404" y="14" text-anchor="middle">5 Aug</text>
+    <line class="sl flat" x1="116" y1="199.6" x2="404" y2="199.6"/>
+        <circle class="sl-dot flat" cx="116" cy="199.6" r="3"/>
+        <circle class="sl-dot flat" cx="404" cy="199.6" r="3"/><line class="sl flat" x1="116" y1="100.4" x2="404" y2="100.4"/>
+        <circle class="sl-dot flat" cx="116" cy="100.4" r="3"/>
+        <circle class="sl-dot flat" cx="404" cy="100.4" r="3"/><line class="sl flat" x1="116" y1="150" x2="404" y2="150"/>
+        <circle class="sl-dot flat" cx="116" cy="150" r="3"/>
+        <circle class="sl-dot flat" cx="404" cy="150" r="3"/><line class="sl up" x1="116" y1="125.2" x2="404" y2="100.4"/>
+        <circle class="sl-dot up" cx="116" cy="125.2" r="3"/>
+        <circle class="sl-dot up" cx="404" cy="100.4" r="3"/><line class="sl down" x1="116" y1="150" x2="404" y2="174.8"/>
+        <circle class="sl-dot down" cx="116" cy="150" r="3"/>
+        <circle class="sl-dot down" cx="404" cy="174.8" r="3"/><line class="sl flat" x1="116" y1="150" x2="404" y2="150"/>
+        <circle class="sl-dot flat" cx="116" cy="150" r="3"/>
+        <circle class="sl-dot flat" cx="404" cy="150" r="3"/><line class="sl up" x1="116" y1="174.8" x2="404" y2="125.2"/>
+        <circle class="sl-dot up" cx="116" cy="174.8" r="3"/>
+        <circle class="sl-dot up" cx="404" cy="125.2" r="3"/><line class="sl up" x1="116" y1="199.6" x2="404" y2="150"/>
+        <circle class="sl-dot up" cx="116" cy="199.6" r="3"/>
+        <circle class="sl-dot up" cx="404" cy="150" r="3"/><line class="sl flat" x1="116" y1="150" x2="404" y2="150"/>
+        <circle class="sl-dot flat" cx="116" cy="150" r="3"/>
+        <circle class="sl-dot flat" cx="404" cy="150" r="3"/><line class="sl flat" x1="116" y1="174.8" x2="404" y2="174.8"/>
+        <circle class="sl-dot flat" cx="116" cy="174.8" r="3"/>
+        <circle class="sl-dot flat" cx="404" cy="174.8" r="3"/><text class="c-label" x="106" y="199.6" text-anchor="end" dominant-baseline="middle">Coverage &amp; gaps 3</text><text class="c-label" x="106" y="100.4" text-anchor="end" dominant-baseline="middle">Best practices 7</text><text class="c-label" x="106" y="150" text-anchor="end" dominant-baseline="middle">Accessibility 5</text><text class="c-label" x="106" y="125.2" text-anchor="end" dominant-baseline="middle">Shared language 6</text><text class="c-label" x="106" y="162" text-anchor="end" dominant-baseline="middle">Testing &amp; validation 5</text><text class="c-label" x="106" y="174" text-anchor="end" dominant-baseline="middle">Orchestration 5</text><text class="c-label" x="106" y="174.8" text-anchor="end" dominant-baseline="middle">Governance 4</text><text class="c-label" x="106" y="211.6" text-anchor="end" dominant-baseline="middle">Feedback &amp; adoption 3</text><text class="c-label" x="106" y="186" text-anchor="end" dominant-baseline="middle">Machine-readable docs 5</text><text class="c-label" x="106" y="186.8" text-anchor="end" dominant-baseline="middle">Agent access 4</text><text class="c-label" x="414" y="199.6" text-anchor="start" dominant-baseline="middle">Coverage &amp; gaps 3</text><text class="c-label" x="414" y="100.4" text-anchor="start" dominant-baseline="middle">Best practices 7</text><text class="c-label" x="414" y="150" text-anchor="start" dominant-baseline="middle">Accessibility 5</text><text class="c-label" x="414" y="112.4" text-anchor="start" dominant-baseline="middle">Shared language 7</text><text class="c-label" x="414" y="174.8" text-anchor="start" dominant-baseline="middle">Testing &amp; validation 4</text><text class="c-label" x="414" y="162" text-anchor="start" dominant-baseline="middle">Orchestration 5</text><text class="c-label" x="414" y="125.2" text-anchor="start" dominant-baseline="middle">Governance 6</text><text class="c-label" x="414" y="174" text-anchor="start" dominant-baseline="middle">Feedback &amp; adoption 5</text><text class="c-label" x="414" y="186" text-anchor="start" dominant-baseline="middle">Machine-readable docs 5</text><text class="c-label" x="414" y="186.8" text-anchor="start" dominant-baseline="middle">Agent access 4</text>
+  </svg></div></eo-card>
+    <eo-card class="tile span-5"><div class="tile-in"><p class="eyebrow">Component pipeline</p>
+       <h3>18 of 37 not started</h3>
+       <svg class="chart" viewBox="0 0 520 40" role="img"
+    aria-label="In code 15, Ready for release 2, In development 2, Not started 18 of 37"><rect class="pipe good" x="0" y="0" width="208.81" height="40" rx="4"/><rect class="pipe info" x="210.81" y="0" width="26.11" height="40" rx="4"/><rect class="pipe warn" x="238.92" y="0" width="26.11" height="40" rx="4"/><rect class="pipe absent" x="267.03" y="0" width="250.97" height="40" rx="4"/></svg>
+       <ul class="facts"><li><span class="k">In code</span><span class="v good">15</span></li><li><span class="k">Ready for release</span><span class="v good">2</span></li><li><span class="k">In development</span><span class="v warn">2</span></li><li><span class="k">Not started</span><span class="v bad">18</span></li></ul>
+       <p class="tile-text">Design coverage for Wellpass is at 100%. The pipeline above is the code side of the same set.</p></div></eo-card>
   </div>
 </section>
 </div><div class="panel " id="panel-coverage" role="tabpanel" aria-labelledby="tab-coverage" hidden>
 <section class="band">
   <div class="band-head"><p class="eyebrow">Station 01 · red</p><h2>Coverage &amp;amp; gaps</h2><p>+2 components; the staple gap is unchanged</p></div>
   <div class="bento">
-    <div class="tile span-5"><p class="eyebrow">Built</p>
+    <eo-card class="tile span-5"><div class="tile-in"><p class="eyebrow">Built</p>
        <h3>15 of 37 core components</h3>
        <svg class="chart" viewBox="0 0 180 180" style="max-width:180px" role="img"
     aria-label="41% 15 of 37">
@@ -554,49 +741,71 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
       style="font-size:36px">41%</text>
     <text class="c-donut-sub" x="90" y="117" text-anchor="middle">in code</text>
   </svg>
-       <p class="tile-text">Extrapolated from library usage, 1 year vs. 90 days comparison (AI-Readiness plan)</p></div>
-    <div class="tile span-7"><p class="eyebrow">Shipped in code</p>
+       <p class="tile-text">Extrapolated from library usage, 1 year vs. 90 days comparison (AI-Readiness plan)</p></div></eo-card>
+    <eo-card class="tile span-7"><div class="tile-in"><p class="eyebrow">Shipped in code</p>
        <ul class="chips"><li><eo-label intent="positive" size="small">Alert</eo-label></li><li><eo-label intent="positive" size="small">Bottom Sheet</eo-label></li><li><eo-label intent="positive" size="small">Button</eo-label></li><li><eo-label intent="positive" size="small">Button Stack</eo-label></li><li><eo-label intent="positive" size="small">Card</eo-label></li><li><eo-label intent="positive" size="small">Checkbox</eo-label></li><li><eo-label intent="positive" size="small">Dialog</eo-label></li><li><eo-label intent="positive" size="small">Divider</eo-label></li><li><eo-label intent="positive" size="small">Label</eo-label></li><li><eo-label intent="positive" size="small">Link</eo-label></li><li><eo-label intent="positive" size="small">Loading Skeleton</eo-label></li><li><eo-label intent="positive" size="small">Navigation</eo-label></li><li><eo-label intent="positive" size="small">Radio Button</eo-label></li><li><eo-label intent="positive" size="small">Radio Group</eo-label></li><li><eo-label intent="positive" size="small">Tooltip</eo-label></li></ul>
        <p class="eyebrow" style="margin-top:var(--eo-dimension-8)">Ready for release</p>
        <ul class="chips"><li><eo-label intent="info" size="small">Avatar (DSC-37)</eo-label></li><li><eo-label intent="info" size="small">Countdown (DSC-172)</eo-label></li></ul>
        <p class="eyebrow" style="margin-top:var(--eo-dimension-8)">In development</p>
-       <ul class="chips"><li><eo-label intent="warning" size="small">Alert - Snackbar/Toast (DSC-101)</eo-label></li><li><eo-label intent="warning" size="small">Form - Search Filter (DSC-188)</eo-label></li></ul></div>
-    <div class="tile span-12 dark"><p class="eyebrow">Why this stays red</p>
+       <ul class="chips"><li><eo-label intent="warning" size="small">Alert - Snackbar/Toast (DSC-101)</eo-label></li><li><eo-label intent="warning" size="small">Form - Search Filter (DSC-188)</eo-label></li></ul></div></eo-card>
+    <eo-card class="tile span-12"><div class="tile-in"><p class="eyebrow">Why this stays red</p>
        <h3>The gap is concentrated on the single most-used control in any system</h3>
        <p class="tile-text">The yellow anchor requires the core set to be “mostly present”. A system whose consumers write <b>36 raw &lt;input&gt; elements</b> across five repositories does not have its core set present. <b>input-text, input-dropdown, textarea and toggle</b> all have full Figma property contracts and no code.</p>
-       <p class="tile-text">The slot is not empty — it is occupied by a mature, documented, react-hook-form-compatible library. A minimal component will become the fifth option in those applications rather than replacing anything.</p></div>
+       <p class="tile-text">The slot is not empty — it is occupied by a mature, documented, react-hook-form-compatible library. A minimal component will become the fifth option in those applications rather than replacing anything.</p></div></eo-card>
   </div>
 </section></div><div class="panel " id="panel-quality" role="tabpanel" aria-labelledby="tab-quality" hidden>
 <section class="band">
   <div class="band-head"><p class="eyebrow">Stations 02 · 03 · 05</p><h2>Practices, accessibility and testing</h2><p>Craft is good where it is enforced, and drifts where nothing checks it.</p></div>
   <div class="stat-row">
-    <div class="stat warn"><div class="v ">7</div><p class="k">Best practices</p><p class="t">of 10</p></div>
-    <div class="stat warn"><div class="v ">5</div><p class="k">Accessibility</p><p class="t">of 10</p></div>
-    <div class="stat bad"><div class="v ">4</div><p class="k">Testing &amp; validation</p><p class="t">of 10</p></div>
-    <div class="stat warn"><div class="v ">7</div><p class="k">Shared language</p><p class="t">of 10</p></div>
+    <eo-card class="stat warn"><div class="stat-in"><div class="v ">7</div><p class="k">Best practices</p><p class="t">of 10</p></div></eo-card>
+    <eo-card class="stat warn"><div class="stat-in"><div class="v ">5</div><p class="k">Accessibility</p><p class="t">of 10</p></div></eo-card>
+    <eo-card class="stat bad"><div class="stat-in"><div class="v ">4</div><p class="k">Testing &amp; validation</p><p class="t">of 10</p></div></eo-card>
+    <eo-card class="stat warn"><div class="stat-in"><div class="v ">7</div><p class="k">Shared language</p><p class="t">of 10</p></div></eo-card>
   </div>
 </section>
 
+
+<section class="band">
+  <div class="band-head"><p class="eyebrow">Accessibility, explained</p><h2>Why this station scores 5</h2><p>The requirements are specified. The verification is not built. Those are different problems, and they sit on different sides of the system.</p></div>
+  <div class="bento">
+    <eo-card class="tile span-6"><div class="tile-in"><p class="eyebrow">Specified — design side</p>
+       <h3>The gate exists and is rigorous</h3>
+       <ul class="facts"><li><span class="k">WCAG 2.2 AA gate in the contribution checklist</span><span class="v good">Yes</span></li><li><span class="k">ARIA Authoring Practices referenced per component</span><span class="v good">Yes</span></li><li><span class="k">Contrast ratios, 44x44 touch targets, reduced motion</span><span class="v good">Yes</span></li><li><span class="k">focus-outline component shipped and in use</span><span class="v good">Yes</span></li></ul>
+       <p class="tile-text">Every new component passes a WCAG 2.2 AA checklist before it ships: ARIA Authoring Practices, keyboard paths, contrast ratios, 44x44 touch targets, reduced motion and screen-reader testing.</p></div></eo-card>
+    <eo-card class="tile span-6"><div class="tile-in"><p class="eyebrow">Verified — code side</p>
+       <h3>Nothing checks any of it</h3>
+       <ul class="facts"><li><span class="k">axe assertions anywhere in the codebase</span><span class="v bad">No</span></li><li><span class="k">a11y gate enabled in CI</span><span class="v bad">No</span></li><li><span class="k">Storybook accessibility tests actually running</span><span class="v bad">No</span></li><li><span class="k">Components passing a keyboard-reachability test</span><span class="v bad">No</span></li></ul>
+       <p class="tile-text">Two typos in vitest.config.ts point at paths that do not exist, so npm run storybook:test resolves zero projects and passes silently. Every Storybook test, including every accessibility check, has never run. Found in four consecutive inspections.</p></div></eo-card>
+    <eo-card class="tile span-8"><div class="tile-in"><p class="eyebrow">The cause is one config file</p>
+       <h3>The requirements are specified. The verification is not built.</h3>
+       <p class="tile-text">Two characters in a config file, one branch-protection setting, and one component rewrite. That is the whole distance between this station and a green one.</p>
+       <p class="tile-text"><b>Already moving.</b> delegatesFocus is now the house pattern for focusable components, the tooltip enforces focusable anchors, and PR #166 adds the first behavioural focus-ring test — approved and waiting to merge.</p></div></eo-card>
+    <eo-card class="tile span-4"><div class="tile-in"><p class="eyebrow">In fairness</p>
+       <h3>One item is ours</h3>
+       <p class="tile-text">One accessibility item does sit on the design side: a reported brand-on-dark AA contrast failure on free and secondary buttons, unanswered since 31 July.</p>
+       <p class="tile-text">Dark-mode contrast is not counted here — it is deliberate scaffolding in the token architecture, not a shipped surface.</p></div></eo-card>
+  </div>
+</section>
 <section class="band tight">
   <div class="bento">
-    <div class="tile span-6"><p class="eyebrow">Station 02 · best practices</p>
+    <eo-card class="tile span-6"><div class="tile-in"><p class="eyebrow">Station 02 · best practices</p>
        <h3>One component is the whole problem</h3>
        <p class="tile-text">Of 35 component stylesheets, <b>34 are .scss and exactly one is .css</b>. Of 15 components, 14 use reflected properties — <b>eo-link uses none</b>, and renders no anchor element at all.</p>
-       <p class="tile-text">Figma craft is the counterweight: <b>zero generic layer names across ~7,000 sampled layers</b> and 82% variable binding. The conventions exist. Nothing enforces them in code.</p></div>
-    <div class="tile span-6"><p class="eyebrow">Station 03 · accessibility</p>
+       <p class="tile-text">Figma craft is the counterweight: <b>zero generic layer names across ~7,000 sampled layers</b> and 82% variable binding. The conventions exist. Nothing enforces them in code.</p></div></eo-card>
+    <eo-card class="tile span-6"><div class="tile-in"><p class="eyebrow">Station 03 · accessibility</p>
        <h3>Real engineering, gate still off</h3>
        <ul class="facts"><li><span class="k">axe assertions in the repo</span><span class="v bad">0</span></li><li><span class="k">a11y gate</span><span class="v bad">test: &#39;todo&#39;</span></li><li><span class="k">Open contrast reports</span><span class="v bad">1 unanswered</span></li></ul>
-       <p class="tile-text">delegatesFocus is now the house pattern, the tooltip enforces focusable anchors, and PR #166 adds the first behavioural focus-ring test — approved, unmerged. Meanwhile a reported brand-on-dark AA contrast failure has sat unanswered since 31 July.</p></div>
-    <div class="tile span-12"><p class="eyebrow">Station 05 · testing</p>
+       <p class="tile-text">delegatesFocus is now the house pattern, the tooltip enforces focusable anchors, and PR #166 adds the first behavioural focus-ring test — approved, unmerged. Meanwhile a reported brand-on-dark AA contrast failure has sat unanswered since 31 July.</p></div></eo-card>
+    <eo-card class="tile span-12"><div class="tile-in"><p class="eyebrow">Station 05 · testing</p>
        <h3>Two characters, and a branch protection setting</h3>
        <p class="tile-text">vitest.config.ts points at <b>two paths that do not exist</b> — <code>vitest.config.storybook/ts</code> and <code>packages/eguym-…</code>. The correctly named files are right there. <code>npm run storybook:test</code> resolves zero projects and passes silently, so every Storybook test, including every accessibility check, has never run. Found in four consecutive inspections.</p>
-       <p class="tile-text">Branch protection compounds it: <code>required_status_checks</code> is strict with an <b>empty contexts array</b>, so a pull request with a red build satisfies protection today.</p></div>
+       <p class="tile-text">Branch protection compounds it: <code>required_status_checks</code> is strict with an <b>empty contexts array</b>, so a pull request with a red build satisfies protection today.</p></div></eo-card>
   </div>
 </section></div><div class="panel " id="panel-delivery" role="tabpanel" aria-labelledby="tab-delivery" hidden>
 <section class="band">
   <div class="band-head"><p class="eyebrow">Delivery</p><h2>A queue waiting on capacity, not decisions</h2><p>Everything in “Ready for Development” already has a spec and a priority.</p></div>
   <div class="bento">
-    <div class="tile span-6"><p class="eyebrow">All open DSC issues</p><h3>117 open</h3><div class="bars"><div class="bar-row"><span class="label">Neu</span>
+    <eo-card class="tile span-6"><div class="tile-in"><p class="eyebrow">All open DSC issues</p><h3>117 open</h3><div class="bars"><div class="bar-row"><span class="label">Neu</span>
       <span class="bar-track neutral"><span style="width:100%"></span></span>
       <span class="count">59</span></div><div class="bar-row"><span class="label">Ready for Development</span>
       <span class="bar-track neutral"><span style="width:42%"></span></span>
@@ -610,12 +819,12 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
       <span class="bar-track neutral"><span style="width:3%"></span></span>
       <span class="count">2</span></div><div class="bar-row"><span class="label">Backlog</span>
       <span class="bar-track neutral"><span style="width:2%"></span></span>
-      <span class="count">1</span></div></div></div>
-    <div class="tile span-6 dark"><p class="eyebrow">The queue engineers would drain</p>
+      <span class="count">1</span></div></div></div></eo-card>
+    <eo-card class="tile span-6"><div class="tile-in"><p class="eyebrow">The queue engineers would drain</p>
        <h3>25 ready, 24 unassigned</h3>
        <ul class="facts"><li><span class="k">Waiting since Oct 2025</span><span class="v bad">8</span></li><li><span class="k">Currently in development</span><span class="v ">4</span></li></ul>
-       <p class="tile-text">This is the single number the ask is built on.</p></div>
-    <div class="tile span-12"><p class="eyebrow">Oldest first · flagged past 180 days</p>
+       <p class="tile-text">This is the single number the ask is built on.</p></div></eo-card>
+    <eo-card class="tile span-12"><div class="tile-in"><p class="eyebrow">Oldest first · flagged past 180 days</p>
       <div class="table-scroll"><table>
         <thead><tr><th>Key</th><th>Title</th><th>Type</th><th>Age</th></tr></thead>
         <tbody><tr><td class="key">DSC-58</td><td>Atom: Filter - Tag</td>
@@ -668,8 +877,8 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
       <td><eo-label intent="negative" size="small">Bug</eo-label></td>
       <td class="age ">3 d</td></tr><tr><td class="key">DSC-216</td><td>Make QUICK_START an actual quick start</td>
       <td><eo-label intent="neutral" size="small">Task</eo-label></td>
-      <td class="age ">3 d</td></tr></tbody></table></div></div>
-    <div class="tile span-6"><p class="eyebrow">BMA build plan</p><h3>51 items</h3><div class="bars"><div class="bar-row"><span class="label">QA: Design</span>
+      <td class="age ">3 d</td></tr></tbody></table></div></div></eo-card>
+    <eo-card class="tile span-6"><div class="tile-in"><p class="eyebrow">BMA build plan</p><h3>51 items</h3><div class="bars"><div class="bar-row"><span class="label">QA: Design</span>
       <span class="bar-track neutral"><span style="width:100%"></span></span>
       <span class="count">25</span></div><div class="bar-row"><span class="label">Won&#39;t Build</span>
       <span class="bar-track neutral"><span style="width:48%"></span></span>
@@ -683,8 +892,8 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
       <span class="bar-track neutral"><span style="width:8%"></span></span>
       <span class="count">2</span></div><div class="bar-row"><span class="label">Planning</span>
       <span class="bar-track neutral"><span style="width:4%"></span></span>
-      <span class="count">1</span></div></div></div>
-    <div class="tile span-6"><p class="eyebrow">Remaining backlog by impact</p>
+      <span class="count">1</span></div></div></div></eo-card>
+    <eo-card class="tile span-6"><div class="tile-in"><p class="eyebrow">Remaining backlog by impact</p>
        <div class="bars"><div class="bar-row"><span class="label">Low</span>
       <span class="bar-track positive"><span style="width:100%"></span></span>
       <span class="count">3</span></div><div class="bar-row"><span class="label">Lowest</span>
@@ -692,60 +901,60 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
       <span class="count">1</span></div><div class="bar-row"><span class="label">Medium</span>
       <span class="bar-track positive"><span style="width:33%"></span></span>
       <span class="count">1</span></div></div>
-       <p class="tile-text">Only low-impact items remain in backlog; everything BMA-blocking is triaged, prioritized or already in design QA.</p></div>
+       <p class="tile-text">Only low-impact items remain in backlog; everything BMA-blocking is triaged, prioritized or already in design QA.</p></div></eo-card>
   </div>
 </section></div><div class="panel " id="panel-governance" role="tabpanel" aria-labelledby="tab-governance" hidden>
 <section class="band">
   <div class="band-head"><p class="eyebrow">Stations 06 · 07 · 09 · 10</p><h2>Governance, orchestration and agent readiness</h2><p>The written governance is good. Most of it is invisible from where engineers work.</p></div>
   <div class="stat-row">
-    <div class="stat warn"><div class="v ">6</div><p class="k">Governance</p><p class="t">of 10</p></div>
-    <div class="stat warn"><div class="v ">5</div><p class="k">Orchestration</p><p class="t">→ 6 if promoted</p></div>
-    <div class="stat warn"><div class="v ">5</div><p class="k">Machine-readable docs</p><p class="t">→ 8 if promoted</p></div>
-    <div class="stat bad"><div class="v ">4</div><p class="k">Agent access</p><p class="t">→ 6 if promoted</p></div>
+    <eo-card class="stat warn"><div class="stat-in"><div class="v ">6</div><p class="k">Governance</p><p class="t">of 10</p></div></eo-card>
+    <eo-card class="stat warn"><div class="stat-in"><div class="v ">5</div><p class="k">Orchestration</p><p class="t">→ 6 if promoted</p></div></eo-card>
+    <eo-card class="stat warn"><div class="stat-in"><div class="v ">5</div><p class="k">Machine-readable docs</p><p class="t">→ 8 if promoted</p></div></eo-card>
+    <eo-card class="stat bad"><div class="stat-in"><div class="v ">4</div><p class="k">Agent access</p><p class="t">→ 6 if promoted</p></div></eo-card>
   </div>
 </section>
 
 <section class="band tight">
   <div class="bento">
-    <div class="tile span-6"><p class="eyebrow">Community</p>
+    <eo-card class="tile span-6"><div class="tile-in"><p class="eyebrow">Community</p>
        <h3>Contribution is not the bottleneck</h3>
        <ul class="facts"><li><span class="k">External contributors</span><span class="v good">9</span></li><li><span class="k">Merged community PRs</span><span class="v good">19</span></li><li><span class="k">Median time to merge</span><span class="v good">3 d</span></li></ul>
-       <p class="tile-text">Nine engineers outside the design system team have landed code. The channel is alive — Jira is the dead one.</p></div>
-    <div class="tile span-6"><p class="eyebrow">…but the tail is</p>
+       <p class="tile-text">Nine engineers outside the design system team have landed code. The channel is alive — Jira is the dead one.</p></div></eo-card>
+    <eo-card class="tile span-6"><div class="tile-in"><p class="eyebrow">…but the tail is</p>
        <h3>Review capacity is</h3>
-       <ul class="facts"><li><span class="k">Worst merges</span><span class="v bad">174, 152, 104 d</span></li><li><span class="k">Open human PRs</span><span class="v bad">13 · median 100 d</span></li><li><span class="k">Dependabot backlog</span><span class="v bad">18 · oldest 290 d</span></li><li><span class="k">CONTRIBUTING draft</span><span class="v bad">198 d open</span></li></ul></div>
-    <div class="tile span-12 dark"><p class="eyebrow">Release governance</p>
+       <ul class="facts"><li><span class="k">Worst merges</span><span class="v bad">174, 152, 104 d</span></li><li><span class="k">Open human PRs</span><span class="v bad">13 · median 100 d</span></li><li><span class="k">Dependabot backlog</span><span class="v bad">18 · oldest 290 d</span></li><li><span class="k">CONTRIBUTING draft</span><span class="v bad">198 d open</span></li></ul></div></eo-card>
+    <eo-card class="tile span-12"><div class="tile-in"><p class="eyebrow">Release governance</p>
        <h3>0 tags. 0 releases. No changelog.</h3>
        <p class="tile-text">The publish workflow stamps a CI build counter as the version, so the system <b>cannot express a breaking change</b> — which means no migration can be announced. The token system repository, same team and same org, already tags and releases properly.</p>
-       <p class="tile-text">Business-Suite rebuilt a component locally instead of waiting (2026-06-19) — Self-merge under pressure documented in Slack (2026-04-08)</p></div>
-    <div class="tile span-12"><p class="eyebrow">The 6-point gap</p>
+       <p class="tile-text">Business-Suite rebuilt a component locally instead of waiting (2026-06-19) — Self-merge under pressure documented in Slack (2026-04-08)</p></div></eo-card>
+    <eo-card class="tile span-12"><div class="tile-in"><p class="eyebrow">The 6-point gap</p>
        <h3>Finished work nobody can reach</h3>
        <p class="tile-text">Stations 06, 09 and 10 are held down almost entirely by an AI-readiness repository sitting in a playground organisation that is not linked from either design system repo, from Notion, or from Slack. It holds a validated 3,061-token <code>design.md</code>, 127 machine-readable component contracts against a published JSON Schema, a working design-to-token drift detector, and an agent skill wired for both Claude Code and Copilot. Both of its validators pass, offline, in under a second.</p>
-       <p class="tile-text">Promoting it is a move, not a build. It is the largest single score movement available.</p></div>
+       <p class="tile-text">Promoting it is a move, not a build. It is the largest single score movement available.</p></div></eo-card>
   </div>
 </section></div><div class="panel " id="panel-roadmap" role="tabpanel" aria-labelledby="tab-roadmap" hidden>
 <section class="band">
   <div class="band-head"><p class="eyebrow">Twelve weeks</p><h2>What two engineers would do</h2><p>After tranche 1, two new engineers from another project take over (tranche 2). Alumni carry DS/package knowledge into their downstream teams → adoption via multipliers.</p></div>
   <div class="bento">
-    <div class="tile span-4"><p class="eyebrow">Weeks 1-2</p>
+    <eo-card class="tile span-4"><div class="tile-in"><p class="eyebrow">Weeks 1-2</p>
      <h3>Infrastructure &amp; Quick Wins</h3>
      <ul class="ticket-list"><li>DSC-214</li><li>DSC-216</li><li>DSC-172</li><li>DSC-37</li><li>DSC-199</li><li>DSC-187</li><li>DSC-202</li><li>DSC-213</li></ul>
-     <p class="tile-text">Release tagging &amp; semver (pattern: egym-one-token-system) · Onboarding on DS standards</p></div>
-    <div class="tile span-4"><p class="eyebrow">Weeks 3-8</p>
+     <p class="tile-text">Release tagging &amp; semver (pattern: egym-one-token-system) · Onboarding on DS standards</p></div></eo-card>
+    <eo-card class="tile span-4"><div class="tile-in"><p class="eyebrow">Weeks 3-8</p>
      <h3>Core by BMA priority</h3>
      <ul class="ticket-list"><li>DSC-64</li><li>DSC-63</li><li>DSC-200</li><li>DSC-208</li><li>DSC-205</li><li>DSC-175</li><li>DSC-78</li><li>DSC-206</li><li>DSC-58</li><li>DSC-203</li><li>DSC-100</li><li>DSC-204</li></ul>
-     </div>
-    <div class="tile span-4"><p class="eyebrow">Weeks 9-12</p>
+     </div></eo-card>
+    <eo-card class="tile span-4"><div class="tile-in"><p class="eyebrow">Weeks 9-12</p>
      <h3>Clear the queue &amp; handover</h3>
      <ul class="ticket-list"><li>DSC-113</li><li>DSC-90</li><li>DSC-92</li><li>DSC-197</li><li>DSC-189</li><li>DSC-159</li></ul>
-     <p class="tile-text">Component MDs &amp; documentation gaps · Establish contribution model · Buffer/spillover in week 12</p></div>
+     <p class="tile-text">Component MDs &amp; documentation gaps · Establish contribution model · Buffer/spillover in week 12</p></div></eo-card>
   </div>
 </section>
 
 <section class="band tight">
   <div class="band-head"><p class="eyebrow">Targets</p><h2>How we would know it worked</h2></div>
   <div class="stat-row">
-    <div class="stat bad"><div class="v ">43</div><p class="k">Core coverage in code</p><p class="t">→ 100 · 37/37</p></div><div class="stat bad"><div class="v ">25</div><p class="k">Jira queue &#39;Ready for Development&#39;</p><p class="t">→ 0</p></div><div class="stat "><div class="v small">&gt;100</div><p class="k">P90 time-to-merge (incl. community PRs)</p><p class="t">→ &lt;14</p></div><div class="stat "><div class="v ">0</div><p class="k">Tagged, versioned releases</p><p class="t">→ every release</p></div><div class="stat "><div class="v small">—</div><p class="k">New BMA features built from DS components</p><p class="t">→ 100</p></div>
+    <eo-card class="stat bad"><div class="stat-in"><div class="v ">43</div><p class="k">Core coverage in code</p><p class="t">→ 100 · 37/37</p></div></eo-card><eo-card class="stat bad"><div class="stat-in"><div class="v ">25</div><p class="k">Jira queue &#39;Ready for Development&#39;</p><p class="t">→ 0</p></div></eo-card><eo-card class="stat "><div class="stat-in"><div class="v small">&gt;100</div><p class="k">P90 time-to-merge (incl. community PRs)</p><p class="t">→ &lt;14</p></div></eo-card><eo-card class="stat "><div class="stat-in"><div class="v ">0</div><p class="k">Tagged, versioned releases</p><p class="t">→ every release</p></div></eo-card><eo-card class="stat "><div class="stat-in"><div class="v small">—</div><p class="k">New BMA features built from DS components</p><p class="t">→ 100</p></div></eo-card>
   </div>
 </section></div>
 </main>
@@ -766,7 +975,13 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
 <script>
   const tabs = [...document.querySelectorAll('.tab')];
   const show = (id, push) => {
-    tabs.forEach((t) => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
+    tabs.forEach((t) => {
+      const on = t.dataset.tab === id;
+      t.setAttribute('aria-selected', String(on));
+      // eo-button carries its selected state through hierarchy, so drive that
+      // rather than layering a CSS class over a design system component
+      t.setAttribute('hierarchy', on ? 'primary' : 'free');
+    });
     document.querySelectorAll('.panel').forEach((p) => {
       const on = p.id === 'panel-' + id;
       p.classList.toggle('is-active', on);

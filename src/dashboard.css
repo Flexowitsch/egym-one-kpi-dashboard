@@ -153,48 +153,31 @@ body {
    STAT ROW — the "20k / 700k / 2.2m / 4.8" treatment
    =========================================================================== */
 .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: var(--eo-dimension-16); }
-.stat {
-  background: var(--eo-color-surface-default);
-  border-radius: var(--eo-dimension-border-radius-large);
-  padding: var(--eo-dimension-24) var(--eo-dimension-20);
-  text-align: center;
-}
-.stat .v {
+/* eo-card paints the surface and radius; this only lays out its slotted content */
+.stat-in { padding: var(--eo-dimension-24) var(--eo-dimension-20); text-align: center; }
+.stat { display: block; }
+.stat-in .v {
   font-family: var(--eo-typography-headline-500-font-family);
   font-size: var(--eo-typography-headline-500-font-size);
   line-height: 1;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.01em;
 }
-.stat .v.small { font-size: var(--eo-typography-headline-300-font-size); }
-.stat.good .v { color: var(--eo-color-content-utility-positive); }
-.stat.warn .v { color: var(--eo-color-content-utility-warning); }
-.stat.bad  .v { color: var(--eo-color-content-utility-negative); }
-.stat .k { margin: var(--eo-dimension-8) 0 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-subtle); }
-.stat .t { margin: var(--eo-dimension-4) 0 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-hinted); }
+.stat-in .v.small { font-size: var(--eo-typography-headline-300-font-size); }
+.stat.good .stat-in .v { color: var(--eo-color-content-utility-positive); }
+.stat.warn .stat-in .v { color: var(--eo-color-content-utility-warning); }
+.stat.bad .stat-in .v { color: var(--eo-color-content-utility-negative); }
+.stat-in .k { margin: var(--eo-dimension-8) 0 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-subtle); }
+.stat-in .t { margin: var(--eo-dimension-4) 0 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-hinted); }
 
 /* ===========================================================================
    BENTO — alternating content / visual cards
    =========================================================================== */
 .bento { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--eo-dimension-16); }
-.tile {
-  background: var(--eo-color-surface-default);
-  border-radius: var(--eo-dimension-border-radius-large);
-  padding: var(--eo-dimension-24);
-  grid-column: span 12;
-  display: flex; flex-direction: column; gap: var(--eo-dimension-12);
-  min-width: 0;
-}
-.tile.dark {
-  background: var(--eo-color-surface-emphasized);
-  color: var(--eo-color-content-on-emphasized);
-}
-.tile.dark .eyebrow { color: var(--eo-color-content-on-emphasized-subtle); }
-.tile.dark .tile-text, .tile.dark .facts .k { color: var(--eo-color-content-on-emphasized-subtle); }
-.tile.dark .facts li { border-bottom-color: var(--eo-color-border-on-emphasized); }
-.tile.dark .facts .v { color: var(--eo-color-content-on-emphasized); }
+.tile { grid-column: span 12; min-width: 0; display: block; }
+.tile-in { padding: var(--eo-dimension-24); display: flex; flex-direction: column; gap: var(--eo-dimension-12); }
 
-.tile h3 {
+.tile-in h3 {
   margin: 0;
   font-family: var(--eo-typography-headline-300-font-family);
   font-size: var(--eo-typography-headline-300-font-size);
@@ -349,3 +332,76 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
   .sbar .track { grid-column: 1 / -1; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* ===========================================================================
+   DESIGN vs CODE MATRIX
+   =========================================================================== */
+.matrix { display: grid; gap: 0; }
+.matrix-head, .matrix-row {
+  display: grid; grid-template-columns: 1fr 5.5rem 5.5rem;
+  gap: var(--eo-dimension-12); align-items: center;
+}
+.matrix-head { padding-bottom: var(--eo-dimension-8); border-bottom: 1px solid var(--eo-color-border-hinted); }
+.matrix-head .mh {
+  text-align: center;
+  font-family: var(--eo-typography-action-label-100-font-family);
+  font-size: var(--eo-typography-body-50-font-size);
+  letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--eo-color-content-subtle); font-weight: 700;
+}
+.matrix-row { padding: var(--eo-dimension-12) 0 var(--eo-dimension-4); }
+.mname { font-size: var(--eo-typography-body-100-font-size); font-weight: 600; }
+.cell { display: flex; justify-content: center; }
+.cell > span {
+  display: block; width: var(--eo-dimension-20); height: var(--eo-dimension-20);
+  border-radius: var(--eo-dimension-border-radius-round);
+}
+.cell.in-place > span { background: var(--eo-color-surface-utility-positive); }
+.cell.partial  > span {
+  background: var(--eo-color-surface-utility-warning);
+  /* half-filled reads as "partial" without needing a legend lookup */
+  -webkit-mask-image: linear-gradient(90deg, #000 50%, transparent 50%);
+          mask-image: linear-gradient(90deg, #000 50%, transparent 50%);
+  outline: 2px solid var(--eo-color-surface-utility-warning); outline-offset: -1px;
+  border-radius: var(--eo-dimension-border-radius-round);
+}
+.cell.absent > span { background: transparent; box-shadow: inset 0 0 0 2px var(--eo-color-border-utility-negative); }
+.matrix-detail {
+  display: grid; grid-template-columns: 1fr 1fr; gap: var(--eo-dimension-16);
+  padding: 0 0 var(--eo-dimension-12);
+  border-bottom: 1px solid var(--eo-color-border-subtle);
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-subtle);
+}
+.matrix-detail b { color: var(--eo-color-content-emphasized); }
+@media (max-width: 760px) {
+  .matrix-detail { grid-template-columns: 1fr; gap: var(--eo-dimension-4); }
+  .matrix-head, .matrix-row { grid-template-columns: 1fr 3.5rem 3.5rem; }
+}
+
+.legend { display: flex; flex-wrap: wrap; gap: var(--eo-dimension-16); font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-subtle); }
+.legend span { display: flex; align-items: center; gap: var(--eo-dimension-8); }
+
+/* ---------- slope chart ---------- */
+.sl { stroke-width: 2; fill: none; }
+.sl.up   { stroke: var(--eo-color-surface-utility-positive); }
+.sl.down { stroke: var(--eo-color-surface-utility-negative); }
+.sl.flat { stroke: var(--eo-color-border-hinted); }
+.sl-dot.up   { fill: var(--eo-color-surface-utility-positive); }
+.sl-dot.down { fill: var(--eo-color-surface-utility-negative); }
+.sl-dot.flat { fill: var(--eo-color-border-hinted); }
+
+/* ---------- pipeline ---------- */
+.pipe.good    { fill: var(--eo-color-surface-utility-positive); }
+.pipe.info    { fill: var(--eo-color-surface-utility-info); }
+.pipe.warn    { fill: var(--eo-color-surface-utility-warning); }
+.pipe.absent  { fill: var(--eo-color-surface-subtle); }
+
+/* ---------- eo-* component overrides ----------
+   eo-card's shadow container is `display:flex; align-items:flex-start`, so
+   slotted content shrinks to its own width. Everything below fills the card. */
+eo-card { display: block; }
+eo-card > * { width: 100%; }
+
+/* tabs are eo-button; the host needs to sit inline in the tab strip */
+.tabs eo-button { display: inline-block; }

@@ -147,3 +147,96 @@ export function stationBars(stations, { max = 10 } = {}) {
     )
     .join('')}</div>`;
 }
+
+/* ------------------------------------------------- design vs code matrix ---
+   Attribution of the inspection findings to the side of the system they belong
+   to. Three states, so it reads at a glance from the back of a room. */
+export function splitMatrix(dimensions) {
+  const dot = (state) =>
+    `<span class="cell ${state}" role="img" aria-label="${
+      state === 'in-place' ? 'in place' : state
+    }"><span></span></span>`;
+  return `<div class="matrix">
+    <div class="matrix-head">
+      <span></span><span class="mh">Design</span><span class="mh">Code</span>
+    </div>
+    ${dimensions
+      .map(
+        (d) => `<div class="matrix-row">
+          <span class="mname">${esc(d.name)}</span>
+          ${dot(d.design.state)}
+          ${dot(d.code.state)}
+        </div>
+        <div class="matrix-detail">
+          <span><b>Design</b> ${esc(d.design.detail)}</span>
+          <span><b>Code</b> ${esc(d.code.detail)}</span>
+        </div>`
+      )
+      .join('')}
+  </div>`;
+}
+
+/* ----------------------------------------------------------- slope chart ---
+   How each station moved between the last two full inspections. Flat lines are
+   the point: most stations did not move. */
+export function slope(stations, { width = 520, height = 300, labels = ['3 Aug', '5 Aug'] } = {}) {
+  const pad = { t: 26, b: 26, l: 116, r: 116 };
+  const usable = height - pad.t - pad.b;
+  const y = (v) => pad.t + usable - (v / 10) * usable;
+  const x1 = pad.l;
+  const x2 = width - pad.r;
+
+  const rows = stations
+    .map((s) => {
+      const a = s.history?.[1];
+      const b = s.score;
+      if (a == null) return '';
+      const dir = b > a ? 'up' : b < a ? 'down' : 'flat';
+      return `<line class="sl ${dir}" x1="${x1}" y1="${r2(y(a))}" x2="${x2}" y2="${r2(y(b))}"/>
+        <circle class="sl-dot ${dir}" cx="${x1}" cy="${r2(y(a))}" r="3"/>
+        <circle class="sl-dot ${dir}" cx="${x2}" cy="${r2(y(b))}" r="3"/>`;
+    })
+    .join('');
+
+  // label each end, nudged apart where scores collide
+  const stack = (col) => {
+    const seen = {};
+    return stations
+      .map((s) => {
+        const v = col === 0 ? s.history?.[1] : s.score;
+        if (v == null) return '';
+        seen[v] = (seen[v] || 0) + 1;
+        const off = (seen[v] - 1) * 12;
+        const tx = col === 0 ? x1 - 10 : x2 + 10;
+        const anchor = col === 0 ? 'end' : 'start';
+        return `<text class="c-label" x="${tx}" y="${r2(y(v) + off)}" text-anchor="${anchor}" dominant-baseline="middle">${esc(
+          s.name
+        )} ${v}</text>`;
+      })
+      .join('');
+  };
+
+  return `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img"
+    aria-label="Slope chart of station scores between the last two inspections.">
+    <text class="c-label" x="${x1}" y="14" text-anchor="middle">${esc(labels[0])}</text>
+    <text class="c-label" x="${x2}" y="14" text-anchor="middle">${esc(labels[1])}</text>
+    ${rows}${stack(0)}${stack(1)}
+  </svg>`;
+}
+
+/* ------------------------------------------------------- stacked pipeline ---
+   Where the core set stands: built, nearly there, and not started. */
+export function pipeline(segments, { width = 520, height = 40 } = {}) {
+  const total = segments.reduce((a, s) => a + s.value, 0) || 1;
+  let x = 0;
+  const bars = segments
+    .map((s) => {
+      const w = (s.value / total) * width;
+      const rect = `<rect class="pipe ${s.tone}" x="${r2(x)}" y="0" width="${r2(Math.max(0, w - 2))}" height="${height}" rx="4"/>`;
+      x += w;
+      return rect;
+    })
+    .join('');
+  return `<svg class="chart" viewBox="0 0 ${width} ${height}" role="img"
+    aria-label="${segments.map((s) => `${s.label} ${s.value}`).join(', ')} of ${total}">${bars}</svg>`;
+}

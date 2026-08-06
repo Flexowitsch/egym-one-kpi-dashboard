@@ -541,5 +541,141 @@
         "note": "skills still user-level; no CLAUDE.md in either repo"
       }
     ]
+  },
+  "designVsCode": {
+    "note": "Each row attributes the 2026-08-05 inspection findings to the side of the system they belong to. States are in-place / partial / absent, and every cell carries the measurement it rests on.",
+    "dimensions": [
+      {
+        "name": "Component coverage",
+        "design": {
+          "state": "in-place",
+          "detail": "127 in-scope components in the UI Kit; Wellpass design coverage at 100%"
+        },
+        "code": {
+          "state": "partial",
+          "detail": "15 of those exist in code — 12%"
+        }
+      },
+      {
+        "name": "Accessibility",
+        "design": {
+          "state": "in-place",
+          "detail": "WCAG 2.2 AA gate in the contribution checklist: ARIA APG, keyboard, contrast ratios, 44x44 targets, reduced motion, screen-reader testing. focus-outline shipped, 2,912 inserts"
+        },
+        "code": {
+          "state": "absent",
+          "detail": "a11y gate set to test: todo; zero axe assertions; Storybook a11y tests have never run; eo-link fails WCAG 4.1.2 and 2.1.1"
+        }
+      },
+      {
+        "name": "Release governance",
+        "design": {
+          "state": "in-place",
+          "detail": "Two-track process documented and practised across v0.0.14 to v0.0.25, with migration guides and a six-week deprecation grace period"
+        },
+        "code": {
+          "state": "absent",
+          "detail": "0 git tags, 0 releases, no CHANGELOG; the version is a CI build counter"
+        }
+      },
+      {
+        "name": "Craft and hygiene",
+        "design": {
+          "state": "in-place",
+          "detail": "Zero generic layer names across ~7,000 sampled layers; 82% variable binding"
+        },
+        "code": {
+          "state": "partial",
+          "detail": "14 of 15 components follow the house pattern; nothing enforces it — no lint rule catches a deviation"
+        }
+      },
+      {
+        "name": "Naming and API language",
+        "design": {
+          "state": "in-place",
+          "detail": "Properties Glossary: 34 system-wide properties with types, values and defaults"
+        },
+        "code": {
+          "state": "absent",
+          "detail": "33 of 34 glossary entries are scoped Design only; no code-side counterpart or validator"
+        }
+      },
+      {
+        "name": "Documentation for machines",
+        "design": {
+          "state": "in-place",
+          "detail": "2,263 DTCG token descriptions; 63 of 108 public Figma sets described"
+        },
+        "code": {
+          "state": "partial",
+          "detail": "JSDoc on 3 of 15 components; no custom-elements.json; token descriptions never leave the repo"
+        }
+      },
+      {
+        "name": "Usage telemetry",
+        "design": {
+          "state": "in-place",
+          "detail": "Figma library analytics live — button at 49k uses, filter-tag at 9,499, detach rates per component"
+        },
+        "code": {
+          "state": "absent",
+          "detail": "No code-side telemetry; every consumer figure was reverse-engineered by hand"
+        }
+      },
+      {
+        "name": "Contribution process",
+        "design": {
+          "state": "in-place",
+          "detail": "Seven-phase checklist with a mandatory Phase 0 intake gate"
+        },
+        "code": {
+          "state": "partial",
+          "detail": "A CONTRIBUTING guide was written on 20 Jan and has sat as an unreviewed draft for 198 days"
+        }
+      }
+    ]
+  },
+  "accessibility": {
+    "headline": "The requirements are specified. The verification is not built.",
+    "specified": [
+      [
+        "WCAG 2.2 AA gate in the contribution checklist",
+        true
+      ],
+      [
+        "ARIA Authoring Practices referenced per component",
+        true
+      ],
+      [
+        "Contrast ratios, 44x44 touch targets, reduced motion",
+        true
+      ],
+      [
+        "focus-outline component shipped and in use",
+        true
+      ]
+    ],
+    "verified": [
+      [
+        "axe assertions anywhere in the codebase",
+        false
+      ],
+      [
+        "a11y gate enabled in CI",
+        false
+      ],
+      [
+        "Storybook accessibility tests actually running",
+        false
+      ],
+      [
+        "Components passing a keyboard-reachability test",
+        false
+      ]
+    ],
+    "rootCause": "Two typos in vitest.config.ts point at paths that do not exist, so npm run storybook:test resolves zero projects and passes silently. Every Storybook test, including every accessibility check, has never run. Found in four consecutive inspections.",
+    "inProgress": "delegatesFocus is now the house pattern for focusable components, the tooltip enforces focusable anchors, and PR #166 adds the first behavioural focus-ring test — approved and waiting to merge.",
+    "designSideOpen": "One accessibility item does sit on the design side: a reported brand-on-dark AA contrast failure on free and secondary buttons, unanswered since 31 July.",
+    "fixCost": "Two characters in a config file, one branch-protection setting, and one component rewrite."
   }
 }
