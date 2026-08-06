@@ -714,12 +714,16 @@
         "All recent component-level additions. The other 1,584 are described — 98% coverage."
       ],
       [
-        "13 icons spell the same property differently",
-        "isFilled is canonical across 320 sets, but 13 use \"is filled\", \"isfilled\" or \"IsFilled\" — including all four chevrons and checkmark. Anyone toggling filled state has to know which spelling that icon uses."
-      ],
-      [
         "1 broken component set",
         "illustrative-empty-state has conflicting variant combinations, so Figma cannot read its properties at all."
+      ],
+      [
+        "13 icons spell isFilled differently",
+        "isFilled is canonical across 320 sets; 13 use \"is filled\", \"isfilled\" or \"IsFilled\", including all four chevrons and checkmark. Renaming a variant property is breaking, so this needs a versioned change rather than a quiet fix."
+      ],
+      [
+        "One icon breaks hyphen-case",
+        "\"genius weekly target\" uses spaces where all 347 others use hyphens."
       ]
     ]
   },
@@ -863,9 +867,18 @@
       "icon set organization components": 1
     },
     "documentation": {
-      "described": 335,
-      "bare": 14,
-      "describedPct": 96
+      "publicComponents": 348,
+      "described": 348,
+      "bare": 0,
+      "conformingToConvention": 348,
+      "conformancePct": 100,
+      "withDisambiguation": 127,
+      "disambiguationPct": 36,
+      "medianDescriptionChars": 202,
+      "totalDocumentationChars": 69182,
+      "convention": "tags / description / useCase / category",
+      "changedOn": "2026-08-06",
+      "changeNote": "21 components were written or rewritten to the convention: 13 that had no description, and 8 brand and product marks. A further 9 that used the older slash-separated format were upgraded. Descriptions are additive metadata — nothing structural changed."
     },
     "defects": {
       "brokenComponentSet": {
@@ -896,7 +909,12 @@
           "indent-increase",
           "indent-decrease",
           "_distance-location"
-        ]
+        ],
+        "note": "Unchanged — this needs a variant property rename, which is a breaking change for anyone binding to the old spelling, so it was not touched."
+      },
+      "namingOutlier": {
+        "name": "genius weekly target",
+        "detail": "Uses spaces where all 347 other public components use hyphen-case"
       }
     },
     "note": "A consumer switching an icon to filled has to know which of four spellings that particular icon uses. The four chevrons and checkmark are among the most-used icons in the set."
