@@ -209,22 +209,50 @@ function reveals() {
       { opacity: 1, y: 0, duration: 0.8, ease: 'siteOut', scrollTrigger: { trigger: el, start: 'top 88%', once: true } }
     );
   });
-  // Cards rise together per row rather than one long chain down the page.
+  // Cards build rather than fade. Each one wipes up from its own bottom edge
+  // while rising and settling from a fraction under size — the clip is what
+  // makes it read as being drawn rather than switched on. GSAP's grid-aware
+  // stagger orders them along the diagonal, so a 3-across row arrives as a
+  // sweep instead of three simultaneous pops.
   $$('.bento, .stat-row').forEach((group) => {
     const cards = $$(':scope > eo-card, :scope > .tile, :scope > .stat', group);
     if (!cards.length) return;
     gsap.fromTo(
       cards,
-      { opacity: 0, y: 28 },
+      { opacity: 0, y: 46, scale: 0.965, clipPath: 'inset(0% 0% 100% 0%)' },
       {
         opacity: 1,
         y: 0,
-        duration: 0.75,
-        stagger: 0.07,
+        scale: 1,
+        clipPath: 'inset(0% 0% 0% 0%)',
+        duration: 1.05,
         ease: 'siteOut',
-        scrollTrigger: { trigger: group, start: 'top 88%', once: true },
+        stagger: { grid: 'auto', from: 'start', each: 0.075 },
+        scrollTrigger: { trigger: group, start: 'top 86%', once: true },
+        // clip-path is expensive to keep composited; drop it once it is done
+        onComplete() { gsap.set(cards, { clearProps: 'clipPath' }); },
       }
     );
+
+    // The contents arrive just behind their own card, so the card reads as a
+    // container that fills rather than a picture that appears.
+    cards.forEach((card, i) => {
+      const inner = $$(':scope .tile-in > *, :scope .stat-in > *', card);
+      if (inner.length < 2) return;
+      gsap.fromTo(
+        inner,
+        { opacity: 0, y: 12 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'siteOut',
+          stagger: 0.05,
+          delay: 0.18 + i * 0.075,
+          scrollTrigger: { trigger: group, start: 'top 86%', once: true },
+        }
+      );
+    });
   });
 }
 
@@ -260,24 +288,35 @@ function cascade() {
   const track = $('.cascade-track', field);
   if (!links.length) return;
 
+  // Only the dash offset is animated from here. Opacity and the node pulse are
+  // CSS keyframes that run forever — and a CSS animation outranks an inline
+  // style, so anything GSAP wrote to opacity would be overridden on the next
+  // frame anyway. Splitting it this way means the two never fight: JS draws,
+  // CSS breathes.
   links.forEach((p) => {
     const len = p.getTotalLength ? p.getTotalLength() : 600;
-    gsap.set(p, { strokeDasharray: len, strokeDashoffset: len, opacity: 0.15 });
+    gsap.set(p, { strokeDasharray: len, strokeDashoffset: len });
   });
-  gsap.set(nodes, { opacity: 0, transformOrigin: '50% 50%', scale: 0.4 });
 
   // Drawn in tier order, so the cascade resolves the way the token system does
   // rather than in document order.
   const byTier = (els) => [...els].sort((a, b) => a.dataset.tier - b.dataset.tier);
-  gsap
-    .timeline({ delay: 0.2 })
-    .to(byTier(links), {
-      strokeDashoffset: 0,
-      duration: 1.4,
-      ease: 'power2.out',
-      stagger: { each: 0.004, from: 'start' },
-    })
-    .to(byTier(nodes), { opacity: 0.28, scale: 1, duration: 0.5, stagger: 0.004 }, '-=1.5');
+  gsap.to(byTier(links), {
+    strokeDashoffset: 0,
+    duration: 1.4,
+    delay: 0.2,
+    ease: 'power2.out',
+    stagger: { each: 0.004, from: 'start' },
+  });
+  // A very slow lateral sway on top of the scroll travel, so the field is
+  // alive even when the page is not being scrolled.
+  gsap.to(nodes.length ? $('.cascade', field) : [], {
+    xPercent: 1.2,
+    duration: 14,
+    ease: 'sine.inOut',
+    yoyo: true,
+    repeat: -1,
+  });
 
   // The travel. Two thirds of the track is off-screen; scrolling the document
   // walks the whole way down it.
@@ -485,7 +524,8 @@ window.__dashTabIn = (panel) => {
    be visible gets forced back. Costs nothing when the animation works. */
 function failsafe() {
   const SELECTOR =
-    '.band-head, .bento > eo-card, .stat-row > eo-card, .tile, .stat, .panel, .hero-inner > *, .manifesto-text';
+    '.band-head, .bento > eo-card, .stat-row > eo-card, .tile, .stat, .panel, .hero-inner > *, ' +
+    '.manifesto-text, .tile-in > *, .stat-in > *';
   const clear = () => {
     $$(SELECTOR).forEach((el) => {
       if (el.closest('.panel[hidden]')) return; // genuinely hidden tabs stay hidden

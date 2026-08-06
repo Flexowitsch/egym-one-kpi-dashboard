@@ -108,23 +108,13 @@ body {
   border-radius: var(--eo-dimension-border-radius-small);
 }
 
+/* The tabs are eo-button, unstyled from here on purpose. Every rule this file
+   used to put on .tab — background, colour, padding, radius, focus ring —
+   fought the component: the host background painted a black slab behind the
+   button the component had already drawn. Selection is expressed through the
+   component's own API (hierarchy + intent), not by layering CSS over it. */
 .tabs { display: flex; gap: var(--eo-dimension-gap-small); flex-wrap: wrap; margin-left: auto; }
-.tab {
-  appearance: none; border: 0; cursor: pointer;
-  background: transparent;
-  color: var(--eo-color-content-subtle);
-  font-family: var(--eo-typography-body-100-font-family);
-  font-size: var(--eo-typography-body-50-font-size);
-  padding: var(--eo-dimension-padding-block-default) var(--eo-dimension-padding-inline-default);
-  border-radius: var(--eo-dimension-border-radius-round);
-}
-.tab:hover { background: var(--eo-color-surface-default); color: var(--eo-color-content-emphasized); }
-.tab[aria-selected="true"] {
-  background: var(--eo-color-surface-emphasized);
-  color: var(--eo-color-content-on-emphasized);
-  font-weight: 600;
-}
-.tab:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offset: 2px; }
+.tab { cursor: pointer; }
 
 /* ===========================================================================
    SECTION RHYTHM — the "lofty" part
@@ -242,9 +232,25 @@ body {
 /* ===========================================================================
    BENTO — alternating content / visual cards
    =========================================================================== */
-.bento { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--eo-dimension-gap-extra-large); }
-.tile { grid-column: span 12; min-width: 0; display: block; }
-.tile-in { padding: var(--eo-dimension-padding-block-large); display: flex; flex-direction: column; gap: var(--eo-dimension-gap-large); }
+/* Cards in a row are the same height, always. Grid stretches the eo-card host
+   by default, but the card's own shadow container and the slotted .tile-in do
+   not inherit that — so both are told to fill, and the footnote line inside is
+   pushed to the bottom with an auto margin. Without this the row goes ragged
+   the moment one card carries a longer sentence than its neighbour. */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--eo-dimension-gap-extra-large);
+  align-items: stretch;
+}
+.tile { grid-column: span 12; min-width: 0; display: block; height: 100%; }
+.tile-in {
+  padding: var(--eo-dimension-padding-block-large);
+  display: flex; flex-direction: column;
+  gap: var(--eo-dimension-gap-large);
+  height: 100%;
+}
+.tile-in > .tile-text:last-child { margin-top: auto; }
 
 .tile-in h3 {
   margin: 0;
@@ -471,6 +477,8 @@ a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offs
    slotted content shrinks to its own width. Everything below fills the card. */
 eo-card { display: block; }
 eo-card > * { width: 100%; }
+/* Equal row heights come from eo-card's own `full-height` attribute, set in the
+   tile helper — not from CSS reaching into the shadow root. */
 
 /* tabs are eo-button; the host needs to sit inline in the tab strip */
 .tabs eo-button { display: inline-block; }
@@ -593,16 +601,37 @@ body[data-tab-state="overview"] .cascade-field { opacity: 1; }
 .cascade-track { position: absolute; inset: 0 0 auto 0; height: 300%; will-change: transform; }
 .cascade { width: 100%; height: 100%; display: block; }
 
-/* No-JS / reduced-motion resting state. Motion.js takes over from here and
-   scrubs the draw against scroll position; if it never runs, the field is
-   simply present and static, which is a perfectly good background. */
+/* Resting state, and the ambient life. The draw-in is GSAP's job; the pulse
+   below is pure CSS and runs forever, so the field is never a still image —
+   it behaves like something resolving rather than a printed diagram. --p is a
+   negative delay per element, which starts each one already partway through
+   its cycle instead of every node blinking together. */
 .cf-link {
   fill: none;
   stroke: var(--eo-color-content-accent);
   stroke-width: 1;
+  stroke-linecap: round;   /* strand ends taper instead of stopping dead */
   opacity: 0.15;
+  animation: cf-breathe 7.5s ease-in-out var(--p, 0s) infinite;
 }
-.cf-node { fill: var(--eo-color-content-accent); opacity: 0.28; }
+.cf-node {
+  fill: var(--eo-color-content-accent);
+  opacity: 0.28;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: cf-pulse 5.5s ease-in-out var(--p, 0s) infinite;
+}
+@keyframes cf-breathe {
+  0%, 100% { opacity: 0.10; }
+  50%      { opacity: 0.20; }
+}
+@keyframes cf-pulse {
+  0%, 100% { opacity: 0.18; transform: scale(0.82); }
+  50%      { opacity: 0.42; transform: scale(1.12); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cf-link, .cf-node { animation: none; }
+}
 
 /* keep page content above the field */
 .nav, main, .closer { position: relative; z-index: 1; }
@@ -632,9 +661,17 @@ body[data-tab-state="overview"] .cascade-field { opacity: 1; }
    One sentence, large, revealed word by word against scroll. The only place on
    the dashboard that makes an argument rather than reporting a number, so it
    gets the whole band and no card around it. */
-.manifesto { padding: clamp(6rem, 16vw, 14rem) 0; }
+/* A full viewport, with the sentence centred in it. Sized as a band it kept
+   arriving half off the bottom of the screen — the reveal scrubs as you scroll
+   past, so the sentence has to fit on screen for the reveal to be readable. */
+.manifesto {
+  min-height: 100vh;
+  display: grid;
+  align-content: center;
+  padding: clamp(3rem, 8vw, 6rem) 0;
+}
 .manifesto-text {
-  max-width: 24ch;
+  max-width: 30ch;
   margin: 0 auto;
   font-family: var(--eo-typography-headline-500-font-family);
   font-size: clamp(1.75rem, 4.6vw, 3.5rem);

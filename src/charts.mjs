@@ -309,19 +309,24 @@ export function cascadeField({ width = 1440, height = 2700, seed = 7, cycles = 2
     });
   }
 
-  // Tier index rides along on each element so the scroll scrub can draw the
-  // cascade in resolution order: Core first, Appearance last.
+  // Tier index rides along on each element so the draw can resolve in tier
+  // order: Core first, Appearance last. --p is a per-element phase offset, so
+  // the ambient pulse never beats in unison — that is what stops the field
+  // reading as a repeating pattern.
   const paths = links
-    .map((l) => `<path class="cf-link" data-tier="${l.tier}" d="${l.d}"/>`)
+    .map(
+      (l, i) =>
+        `<path class="cf-link" data-tier="${l.tier}" style="--p:${(-(i % 37) * 0.31).toFixed(2)}s" d="${l.d}"/>`
+    )
     .join('');
   const dots = nodes
     .map((col, c) =>
       col
         .map(
-          (n) =>
-            `<circle class="cf-node" data-tier="${c}" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(
-              1
-            )}" r="${n.r}"/>`
+          (n, i) =>
+            `<circle class="cf-node" data-tier="${c}" style="--p:${(-((i * 3 + c * 5) % 29) * 0.29).toFixed(
+              2
+            )}s" cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="${n.r}"/>`
         )
         .join('')
     )

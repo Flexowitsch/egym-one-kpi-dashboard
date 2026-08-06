@@ -22,12 +22,29 @@ const esc = (s) =>
 const pct = (n, d) => (d ? Math.round((n / d) * 100) : 0);
 const daysSince = (iso, from) => Math.round((new Date(from) - new Date(iso)) / 86400000);
 
-const chip = (t, intent = 'neutral') => `<eo-label intent="${intent}" size="small">${esc(t)}</eo-label>`;
+/* data-token is what the overview's cursor reads: hover anything and it names
+   the token or component painting it. It is applied from the helpers rather
+   than by hand so coverage is complete — a page where only four elements
+   answer is worse than none, because the label just sits there stale. */
+const chip = (t, intent = 'neutral') =>
+  `<eo-label intent="${intent}" size="small" data-token="eo-label · intent=${intent}">${esc(t)}</eo-label>`;
 // Real design system components throughout: eo-card paints every card surface,
 // eo-label every chip, eo-button every tab, eo-divider every rule. The only
 // hand-built things left are the charts, because the system has no chart
 // component in code yet (DSC-100).
-const tile = (cls, inner) => `<eo-card class="tile ${cls}"><div class="tile-in">${inner}</div></eo-card>`;
+// full-height is eo-card's own API for filling its grid row — the component
+// already solves this, so the earlier CSS override was fixing a problem that
+// did not exist.
+const tile = (cls, inner) =>
+  `<eo-card class="tile ${cls}" full-height data-token="eo-card · full-height"><div class="tile-in">${inner}</div></eo-card>`;
+// Tone maps to the utility content tokens, so the cursor names the exact
+// variable a red or green number is painted with.
+const TONE_TOKEN = {
+  good: '--eo-color-content-utility-positive',
+  bad: '--eo-color-content-utility-negative',
+  warn: '--eo-color-content-utility-warning',
+  '': '--eo-color-content-emphasized',
+};
 // Split a display value into a number and its surrounding text so the count-up
 // animation keeps the unit: "41%" counts to 41 and still renders the percent.
 const countAttrs = (v) => {
@@ -38,9 +55,9 @@ const countAttrs = (v) => {
 const stat = (v, k, t = '', tone = '', small = false) =>
   `<div class="stat ${tone}"><div class="stat-in"><div class="v ${
     small ? 'small' : ''
-  }"${countAttrs(v)}>${esc(v)}</div><p class="k">${esc(k)}</p>${
-    t ? `<p class="t">${esc(t)}</p>` : ''
-  }</div></div>`;
+  }" data-token="${TONE_TOKEN[tone] ?? TONE_TOKEN['']}"${countAttrs(v)}>${esc(v)}</div><p class="k" data-token="--eo-color-content-subtle">${esc(
+    k
+  )}</p>${t ? `<p class="t" data-token="--eo-color-content-hinted">${esc(t)}</p>` : ''}</div></div>`;
 const facts = (rows) =>
   `<ul class="facts">${rows
     .map(([k, v, tone = '']) => `<li><span class="k">${esc(k)}</span><span class="v ${tone}">${esc(v)}</span></li>`)
@@ -66,8 +83,10 @@ const stamp = (date, live = true) =>
   }</p>`;
 
 const bandHead = (eyebrow, title, sub, date, live = true) =>
-  `<div class="band-head"><p class="eyebrow">${esc(eyebrow)}</p><h2>${esc(title)}</h2>${
-    sub ? `<p>${sub}</p>` : ''
+  `<div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">${esc(
+    eyebrow
+  )}</p><h2 data-token="--eo-typography-headline-500">${esc(title)}</h2>${
+    sub ? `<p data-token="--eo-color-content-subtle">${sub}</p>` : ''
   }${date ? stamp(date, live) : ''}</div>`;
 
 const { coverage, jira, bmaBuildPlan, communityVelocity, ask, kpis, roadmap, meta, inspection, designVsCode, accessibility, designOpen, provenance, timeline, fragments, readiness } = data;
@@ -310,7 +329,7 @@ const overview = `
 /* ══════════════════════════════════════════════════════════════ COVERAGE ═══ */
 const coverageTab = `
 <section class="band">
-  ${bandHead('Station 01 · red', 'Coverage &amp; gaps', esc(st(1)?.note ?? ''))}
+  ${bandHead('Station 01 · red', 'Coverage & gaps', esc(st(1)?.note ?? ''))}
   <div class="bento">
     ${tile(
       'span-5',
@@ -643,8 +662,9 @@ const html = `<!doctype html>
       ${TABS.map(
         ([id, label], i) =>
           `<eo-button class="tab" role="tab" id="tab-${id}" aria-controls="panel-${id}"
-             aria-selected="${i === 0}" data-tab="${id}" size="small"
-             hierarchy="${i === 0 ? 'primary' : 'free'}">${esc(label)}</eo-button>`
+             aria-selected="${i === 0}" data-tab="${id}" size="small" content="text"
+             hierarchy="${i === 0 ? 'primary' : 'tertiary'}"
+             intent="${i === 0 ? 'brand' : 'neutral'}">${esc(label)}</eo-button>`
       ).join('')}
     </div>
   </div>
@@ -683,9 +703,10 @@ const html = `<!doctype html>
     tabs.forEach((t) => {
       const on = t.dataset.tab === id;
       t.setAttribute('aria-selected', String(on));
-      // eo-button carries its selected state through hierarchy, so drive that
+      // eo-button carries its selected state through its own API, so drive that
       // rather than layering a CSS class over a design system component
-      t.setAttribute('hierarchy', on ? 'primary' : 'free');
+      t.setAttribute('hierarchy', on ? 'primary' : 'tertiary');
+      t.setAttribute('intent', on ? 'brand' : 'neutral');
     });
     document.querySelectorAll('.panel').forEach((p) => {
       const on = p.id === 'panel-' + id;
