@@ -922,6 +922,10 @@ const html = `<!doctype html>
     // The promotional layer — cascade, cursor, parallax — is scoped to overview.
     // The other tabs are the technical read, and the fragments come off them.
     document.body.dataset.tabState = id;
+    // The KPI rail hides the header while it is pinned. Leaving the overview
+    // mid-pin means its onToggle never fires, so clear the flag here or the
+    // header stays gone on a tab that has no rail to justify it.
+    document.body.classList.remove('rail-pinned');
     window.scrollTo({ top: 0, behavior: 'instant' });
     window.__dashTabIn && window.__dashTabIn(document.getElementById('panel-' + id));
   };

@@ -66,6 +66,20 @@ body {
   isolation: isolate;
   background: var(--eo-color-surface-subtle);
   border-bottom: 1px solid var(--eo-color-border-subtle);
+  transition: transform 0.4s var(--ease-out), opacity 0.3s var(--ease-out);
+}
+/* While the KPI rail is pinned, the piece owns the whole viewport — a light
+   header band across a full-bleed dark panel reads as a rendering fault, not
+   as chrome. The rail has its own "keep scrolling" affordance, so nothing is
+   lost. motion.js sets the class from the pin's onToggle; the nav returns the
+   moment the rail releases. */
+body.rail-pinned .nav {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav { transition: none; }
 }
 .nav-inner {
   max-width: 1180px; margin: 0 auto;
@@ -1057,9 +1071,15 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
   padding: var(--eo-dimension-padding-block-default) var(--eo-dimension-padding-inline-default);
   margin-bottom: var(--eo-dimension-8);
   border-radius: var(--eo-dimension-border-radius-round);
-  background: color-mix(in srgb, var(--eo-color-surface-subtle) 82%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* Opaque, not translucent. Cards scroll underneath a sticky legend by
+     definition, and at 82% their text ghosted through it — which reads as a
+     rendering fault rather than as a floating chip. The shadow is what says
+     "above", so the blur is no longer doing any work. */
+  background: var(--eo-color-surface-default);
+  box-shadow:
+    var(--eo-shadow-all-around-level-1-base-x) var(--eo-shadow-all-around-level-1-base-y)
+    var(--eo-shadow-all-around-level-1-base-blur) var(--eo-shadow-all-around-level-1-base-spread)
+    var(--eo-shadow-all-around-level-1-base-color);
   border: 1px solid var(--eo-color-border-subtle);
   font-size: var(--eo-typography-body-50-font-size);
   color: var(--eo-color-content-subtle);
@@ -1117,9 +1137,15 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
   padding: var(--eo-dimension-padding-block-default) var(--eo-dimension-padding-inline-default);
   margin-bottom: var(--eo-dimension-8);
   border-radius: var(--eo-dimension-border-radius-round);
-  background: color-mix(in srgb, var(--eo-color-surface-subtle) 82%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  /* Opaque, not translucent. Cards scroll underneath a sticky legend by
+     definition, and at 82% their text ghosted through it — which reads as a
+     rendering fault rather than as a floating chip. The shadow is what says
+     "above", so the blur is no longer doing any work. */
+  background: var(--eo-color-surface-default);
+  box-shadow:
+    var(--eo-shadow-all-around-level-1-base-x) var(--eo-shadow-all-around-level-1-base-y)
+    var(--eo-shadow-all-around-level-1-base-blur) var(--eo-shadow-all-around-level-1-base-spread)
+    var(--eo-shadow-all-around-level-1-base-color);
   border: 1px solid var(--eo-color-border-subtle);
   font-size: var(--eo-typography-body-50-font-size);
   color: var(--eo-color-content-subtle);
@@ -2620,6 +2646,10 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     // The promotional layer — cascade, cursor, parallax — is scoped to overview.
     // The other tabs are the technical read, and the fragments come off them.
     document.body.dataset.tabState = id;
+    // The KPI rail hides the header while it is pinned. Leaving the overview
+    // mid-pin means its onToggle never fires, so clear the flag here or the
+    // header stays gone on a tab that has no rail to justify it.
+    document.body.classList.remove('rail-pinned');
     window.scrollTo({ top: 0, behavior: 'instant' });
     window.__dashTabIn && window.__dashTabIn(document.getElementById('panel-' + id));
   };

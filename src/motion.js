@@ -395,15 +395,20 @@ function reveals() {
     );
   });
 
-  // Provenance and matrix cards rise from below, each on its own trigger with
-  // a small delay, so a long set arrives as a sequence rather than a block.
-  $$('.pcard').filter(live).forEach((card) => {
+  // Provenance rows cascade as one timeline off the set, not one trigger per
+  // card. They are thin and densely stacked, so per-card triggers fired within
+  // a few pixels of each other: on any real scroll several were mid-tween at
+  // once, each offset by its own y, and the run read as rows landing out of
+  // order on top of one another. One owner, one direction, top to bottom.
+  $$('.prov-set').filter(live).forEach((set) => {
+    const cards = $$('.pcard', set);
+    if (!cards.length) return;
     gsap.fromTo(
-      card,
-      { opacity: 0, y: 24 },
+      cards,
+      { opacity: 0, y: 18 },
       {
-        opacity: 1, y: 0, duration: 0.65, ease: 'siteOut',
-        scrollTrigger: { trigger: card, start: 'top 92%', once: true },
+        opacity: 1, y: 0, duration: 0.55, ease: 'siteOut', stagger: 0.05,
+        scrollTrigger: { trigger: set, start: 'top 82%', once: true },
       }
     );
   });
@@ -741,6 +746,11 @@ function kpiRail() {
         scrub: 0.8,
         anticipatePin: 1,
         invalidateOnRefresh: true,
+        // The rail is a full-bleed dark panel that occupies the whole viewport
+        // for its entire pin. A light sticky header sitting on top of it is the
+        // one element that does not belong to the piece, so it steps out for
+        // the duration and comes back when the rail releases.
+        onToggle: (self) => document.body.classList.toggle('rail-pinned', self.isActive),
         onUpdate: (self) => {
           if (progress) progress.style.transform = `scaleX(${self.progress})`;
         },
