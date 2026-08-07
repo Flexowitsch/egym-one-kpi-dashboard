@@ -27,6 +27,17 @@ const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fine = window.matchMedia('(pointer: fine)').matches;
 const onOverview = () => document.body.dataset.tabState === 'overview';
 
+/* An element inside a hidden panel has no layout. A ScrollTrigger built
+   against it measures at zero extent, and GSAP then throws while refreshing
+   any trigger created afterwards. Everything that creates triggers checks this
+   first; panels that are not visible get their build from replayPanel the
+   moment they are shown. */
+const live = (el) => {
+  if (!el) return false;
+  const panel = el.closest?.('.panel');
+  return !panel || panel.classList.contains('is-active');
+};
+
 // One easing curve for the whole page, matching --ease-out in the stylesheet.
 // Registered as a named GSAP ease so every tween below reads the same.
 gsap.registerEase('siteOut', (p) => {
@@ -90,7 +101,7 @@ function drawCharts() {
   grows.forEach((el) => {
     const to = el.style.width || '0%';
     el.dataset.w = to;
-    if (reduce) return;
+    if (reduce || !live(el)) return;
     gsap.fromTo(
       el,
       { width: 0 },
@@ -106,7 +117,7 @@ function drawCharts() {
   // Donut: sweep the arc round rather than popping it in.
   $$('.c-donut-fill').forEach((el) => {
     const dash = el.getAttribute('stroke-dasharray');
-    if (!dash || reduce) return;
+    if (!dash || reduce || !live(el)) return;
     const [len, total] = dash.split(' ').map(Number);
     gsap.fromTo(
       el,
@@ -124,7 +135,7 @@ function drawCharts() {
   $$('.c-shape-now').forEach((shape) => {
     const svg = shape.closest('svg');
     const dots = $$('[class^="c-dot-"]', svg);
-    if (reduce) return;
+    if (reduce || !live(shape)) return;
     const tl = gsap.timeline({
       scrollTrigger: { trigger: svg.closest('eo-card') || svg, start: 'top 80%', once: true },
     });
@@ -142,14 +153,14 @@ function drawCharts() {
     bar.dataset.w = to;
     // changeReveal owns the bars inside .changes — driving them from here too
     // put two tweens on the same width in the same frame.
-    if (reduce || bar.closest('.changes')) return;
+    if (reduce || bar.closest('.changes') || !live(bar)) return;
     gsap.fromTo(bar, { width: 0 }, {
       width: to, duration: 0.6, ease: 'siteOut', delay: i * 0.06,
       scrollTrigger: { trigger: bar.closest('eo-card') || bar, start: 'top 85%', once: true },
     });
   });
   $$('.d-zero').forEach((d, i) => {
-    if (reduce) return;
+    if (reduce || !live(d)) return;
     gsap.fromTo(d, { scale: 0 }, {
       scale: 1, duration: 0.35, delay: i * 0.04, ease: 'back.out(2)',
       scrollTrigger: { trigger: d.closest('eo-card') || d, start: 'top 85%', once: true },
@@ -157,7 +168,7 @@ function drawCharts() {
   });
   // Pipeline segments wipe in left to right, in pipeline order.
   $$('svg .pipe').forEach((rect, i) => {
-    if (reduce) return;
+    if (reduce || !live(rect)) return;
     const w = rect.getAttribute('width');
     gsap.fromTo(
       rect,
@@ -174,7 +185,7 @@ function drawCharts() {
 
   // Trend line draws, then its point labels appear.
   $$('svg .c-line').forEach((line) => {
-    if (reduce) return;
+    if (reduce || !live(line)) return;
     const len = line.getTotalLength ? line.getTotalLength() : 400;
     const svg = line.closest('svg');
     const marks = $$('circle, text', svg);
@@ -189,22 +200,27 @@ function drawCharts() {
 /* ------------------------------------------------- the matrix, as a story --- */
 // Design column fills in first, then code. The pause between them is the point.
 function matrixReveal() {
-  const cards = $$('.mcard');
+  const cards = $$('.mcard').filter(live);
   if (!cards.length || reduce) return;
 
   // One timeline per card, triggered on that card. Each dimension is now its
   // own eo-card, so it crosses the trigger line separately and the build is
   // actually visible — inside a single container it was over before most of
   // the rows had reached the viewport.
-  cards.forEach((card) => {
+  cards.forEach((card, i) => {
     const cells = $$('.cell', card);
     const name = $('.mname', card);
     const detail = $$('.mcard-detail > span', card);
 
     gsap.set(cells, { scale: 0, transformOrigin: '50% 50%' });
 
-    const tl = gsap.timeline({ scrollTrigger: { trigger: card, start: 'top 88%', once: true } });
-    tl.fromTo(card, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.7, ease: 'siteOut' }, 0);
+    // Each card on its own trigger. The set is a single column, so scroll
+    // position already delivers them one after another — an added per-index
+    // delay only holds a card invisible after it has crossed the line.
+    const tl = gsap.timeline({
+      scrollTrigger: { trigger: card, start: 'top 90%', once: true },
+    });
+    tl.fromTo(card, { opacity: 0, y: 34, scale: 0.985 }, { opacity: 1, y: 0, scale: 1, duration: 0.75, ease: 'siteOut' }, 0);
     if (name) tl.fromTo(name, { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.45, ease: 'siteOut' }, 0.1);
     // Design lands before code. The pause between them is the finding, so it
     // survives every restructuring of this card.
@@ -223,7 +239,7 @@ function matrixReveal() {
 // its neighbours build reads as missing rather than as flat.
 function changeReveal() {
   const list = $('.changes');
-  if (!list || reduce) return;
+  if (!list || reduce || !live(list)) return;
 
   // Only the bars animate. The rows, the names and the two score columns used
   // to fade and slide in as well, which on ten rows read as a lot of motion
@@ -250,7 +266,7 @@ function changeReveal() {
 /* --------------------------------------------------------------- reveals --- */
 function reveals() {
   if (reduce) return;
-  $$('.band-head').forEach((el) => {
+  $$('.band-head').filter(live).forEach((el) => {
     gsap.fromTo(
       el,
       { opacity: 0, y: 22 },
@@ -262,7 +278,7 @@ function reveals() {
   // makes it read as being drawn rather than switched on. GSAP's grid-aware
   // stagger orders them along the diagonal, so a 3-across row arrives as a
   // sweep instead of three simultaneous pops.
-  $$('.bento, .stat-row').forEach((group) => {
+  $$('.bento, .stat-row').filter(live).forEach((group) => {
     const cards = $$(':scope > eo-card, :scope > .tile, :scope > .stat', group);
     if (!cards.length) return;
     gsap.fromTo(
@@ -314,7 +330,7 @@ function reveals() {
   // whole point of the card — and watching them arrive in order reads as a
   // tally being counted out. Each group triggers on itself, so the three
   // groups in one card fire as you reach each heading, not all at once.
-  $$('.chips, .pill-row').forEach((group) => {
+  $$('.chips, .pill-row').filter(live).forEach((group) => {
     // The hero's pill row is part of the intro timeline; a second tween here
     // would fight it on the same frame.
     if (group.closest('.hero')) return;
@@ -340,7 +356,7 @@ function reveals() {
   // Every repeating run of rows on every tab, not just the ones on the
   // overview. Delivery is almost entirely tables and bar rows, so without
   // this it was the one tab that arrived fully formed with nothing to watch.
-  $$('.bars, .tbl tbody, .keys, .legend').forEach((group) => {
+  $$('.bars, .tbl tbody, .keys, .legend').filter(live).forEach((group) => {
     const rows = $$(':scope > .bar-row, :scope > tr, :scope > li, :scope > *', group);
     if (rows.length < 2) return;
     gsap.fromTo(
@@ -362,7 +378,7 @@ function reveals() {
   // list, the fact tables — the card enters the viewport long before its last
   // row does, so tying the rows to the card meant the bottom half had already
   // animated somewhere above the fold and arrived static.
-  $$('.openlist, .facts, .prov tbody, .rows').forEach((list) => {
+  $$('.openlist, .facts, .prov tbody, .rows').filter(live).forEach((list) => {
     const rows = $$(':scope > li, :scope > tr', list);
     if (rows.length < 2) return;
     gsap.fromTo(
@@ -381,13 +397,12 @@ function reveals() {
 
   // Provenance and matrix cards rise from below, each on its own trigger with
   // a small delay, so a long set arrives as a sequence rather than a block.
-  $$('.pcard').forEach((card, i) => {
+  $$('.pcard').filter(live).forEach((card) => {
     gsap.fromTo(
       card,
       { opacity: 0, y: 24 },
       {
         opacity: 1, y: 0, duration: 0.65, ease: 'siteOut',
-        delay: (i % 4) * 0.06,
         scrollTrigger: { trigger: card, start: 'top 92%', once: true },
       }
     );
@@ -401,7 +416,7 @@ function reveals() {
   // Not .matrix: matrixReveal already choreographs those rows, and running a
   // second tween over the same elements is exactly what made the section
   // flicker — two timelines writing opacity on the same row on the same frame.
-  $$('.sbars').forEach((body) => {
+  $$('.sbars').filter(live).forEach((body) => {
     const rows = $$(':scope > .sbar', body);
     if (rows.length < 3) return;
     rows.forEach((row) => {
@@ -697,9 +712,16 @@ function hero() {
 
    Pinned only above 900px. On a phone a horizontal track fights the browser's
    own gesture, so the panels stack and reveal one at a time instead. */
+let kpiBuilt = false;
 function kpiRail() {
   const pin = $('.kpi-pin');
-  if (!pin || reduce) return;
+  // Only when the overview is actually on screen. Pinning an element inside a
+  // display:none panel produces a ScrollTrigger with no extent, and every
+  // trigger created afterwards cascades into it during refresh and throws
+  // `Cannot read properties of undefined (reading 'end')` — which killed init
+  // and left the page on the loading screen. This was the actual cause.
+  if (!pin || reduce || kpiBuilt || !pin.closest('.panel')?.classList.contains('is-active')) return;
+  kpiBuilt = true;
   const mm = gsap.matchMedia();
 
   mm.add('(min-width: 901px)', () => {
@@ -817,7 +839,7 @@ function kpiRail() {
    that it registers as weight rather than as an effect. */
 function velocity() {
   if (reduce) return;
-  $$('.stat-row').forEach((row) => {
+  $$('.stat-row').filter(live).forEach((row) => {
     const skew = gsap.quickTo(row, 'skewY', { duration: 0.5, ease: 'power2.out' });
     ScrollTrigger.create({
       trigger: row,
@@ -846,8 +868,9 @@ window.__dashTabIn = (panel) => {
     // refresh pass, which makes ScrollTrigger recurse into refresh() and throw
     // — and because that happened during init, the preloader never reached its
     // own kill timer and the page sat on the loading screen forever.
-    sectionRail(panel);
-    replayPanel(panel);
+    try { kpiRail(); } catch (e) { console.error('[motion] kpiRail:', e); }
+    try { sectionRail(panel); } catch (e) { console.error('[motion] sectionRail:', e); }
+    try { replayPanel(panel); } catch (e) { console.error('[motion] replayPanel:', e); }
     settle();
   });
 };
@@ -1056,6 +1079,30 @@ function settle() {
 
 /* ------------------------------------------------------------------ init --- */
 function init() {
+  // FIRST, before anything that can throw. A loading screen that can trap the
+  // page is worse than no loading screen at all, and that is exactly what
+  // happened: the kill timer lived inside preloader(), which is called near the
+  // end of init, so any error in the animation setup above it left the curtain
+  // up forever. The net is now independent of everything it protects.
+  const curtain = $('#preloader');
+  if (curtain) {
+    setTimeout(() => {
+      if (curtain.isConnected) {
+        curtain.remove();
+        document.body.dataset.introSkipped = 'true';
+      }
+    }, 2600);
+  }
+
+  // Each step is isolated. One broken animation should cost that animation, not
+  // the page — before this, a single throw took down every reveal after it.
+  const step = (name, fn) => {
+    try { return fn(); } catch (err) {
+      console.error(`[motion] ${name} failed:`, err);
+      return null;
+    }
+  };
+
   smoothScroll();
 
   // The sticky legends offset against the real nav height rather than a
@@ -1078,23 +1125,23 @@ function init() {
   //
   // So: the pinned trigger is created first, everything else measures against
   // the final layout, and the sort below puts them in scroll order regardless.
-  kpiRail();
+  step('kpiRail', kpiRail);
 
-  $$('[data-count]').forEach((el) => countUp(el, el.closest('eo-card') || el));
-  drawCharts();
-  matrixReveal();
-  changeReveal();
-  reveals();
-  const heroTl = hero();
+  step('counters', () => $$('[data-count]').forEach((el) => countUp(el, el.closest('eo-card') || el)));
+  step('drawCharts', drawCharts);
+  step('matrixReveal', matrixReveal);
+  step('changeReveal', changeReveal);
+  step('reveals', reveals);
+  const heroTl = step('hero', hero);
   // The loading sequence owns when the hero reveals. If it does not play — a
   // returning visit, reduced motion, no preloader in the markup — the hero
   // reveals immediately.
   if (!preloader(() => heroTl?.play())) heroTl?.play();
-  cascade();
-  manifesto();
-  cursor();
-  velocity();
-  sectionRail($('.panel.is-active'));
+  step('cascade', cascade);
+  step('manifesto', manifesto);
+  step('cursor', cursor);
+  step('velocity', velocity);
+  step('sectionRail', () => sectionRail($('.panel.is-active')));
   failsafe();
 
   // Pinned triggers have to be evaluated before the ones that sit after them,

@@ -1063,11 +1063,17 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
   width: fit-content;
 }
 .matrix-legend > span { display: inline-flex; align-items: center; gap: var(--eo-dimension-gap-small); }
+/* The column labels are a separate group, pushed away from the state keys and
+   separated by a rule — crammed against them they read as two more states. */
 .matrix-legend .ml-cols {
-  margin-left: auto;
-  gap: var(--eo-dimension-gap-large);
+  margin-left: var(--eo-dimension-gap-large);
+  padding-left: var(--eo-dimension-gap-large);
+  border-left: 1px solid var(--eo-color-border-subtle);
+  gap: var(--eo-dimension-gap-extra-large);
   font-family: var(--eo-typography-action-label-100-font-family);
-  letter-spacing: 0.1em; text-transform: uppercase;
+  font-size: var(--eo-typography-body-50-font-size);
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--eo-color-content-hinted);
 }
 
 .mcard-in {
@@ -1220,6 +1226,11 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
 
 /* No room for it beside the content on a narrow screen. */
 @media (max-width: 1180px) { .rail { display: none; } }
+
+/* Rings on their own cards on the working tabs: four measurements rather than
+   one undifferentiated strip. */
+.ring-row.on-cards > eo-card { display: block; }
+.ring-row.on-cards .sring { padding: var(--eo-dimension-padding-block-large) var(--eo-dimension-padding-inline-default); }
 </style>
 </head>
 <body data-tab-state="overview">
@@ -1303,9 +1314,12 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
 
 <main class="shell">
   <div class="panel is-active" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" >
-        <!-- Section rail. Built at runtime from this panel's own band heads, so
-             it cannot drift from the sections it points at. -->
-        <nav class="rail" aria-label="Sections on this page"></nav>
+        <!-- Section rail on the working tabs only. The overview is read top to
+             bottom as an argument, so an index there invites skipping it; the
+             other tabs are reference and benefit from one. Built at runtime
+             from the panel's own sections, so it cannot point at something
+             that has been renamed. -->
+        
         
 <section class="hero">
   <div class="hero-inner">
@@ -2132,9 +2146,12 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
 
 
       </div><div class="panel " id="panel-coverage" role="tabpanel" aria-labelledby="tab-coverage" hidden>
-        <!-- Section rail. Built at runtime from this panel's own band heads, so
-             it cannot drift from the sections it points at. -->
-        <nav class="rail" aria-label="Sections on this page"></nav>
+        <!-- Section rail on the working tabs only. The overview is read top to
+             bottom as an argument, so an index there invites skipping it; the
+             other tabs are reference and benefit from one. Built at runtime
+             from the panel's own sections, so it cannot point at something
+             that has been renamed. -->
+        
         
 <section class="band">
   <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Station 01 · red</p><h2 data-token="--eo-typography-headline-500">Coverage &amp; gaps</h2><p data-token="--eo-color-content-subtle">15 of 37 in code; the form-control hole is unchanged</p></div>
@@ -2166,17 +2183,21 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
   </div>
 </section>
       </div><div class="panel " id="panel-quality" role="tabpanel" aria-labelledby="tab-quality" hidden>
-        <!-- Section rail. Built at runtime from this panel's own band heads, so
-             it cannot drift from the sections it points at. -->
+        <!-- Section rail on the working tabs only. The overview is read top to
+             bottom as an argument, so an index there invites skipping it; the
+             other tabs are reference and benefit from one. Built at runtime
+             from the panel's own sections, so it cannot point at something
+             that has been renamed. -->
         <nav class="rail" aria-label="Sections on this page"></nav>
         
 <section class="band">
   <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Stations 02 · 03 · 05</p><h2 data-token="--eo-typography-headline-500">Practices, accessibility and testing</h2><p data-token="--eo-color-content-subtle">Craft is good where it is enforced, and drifts where nothing checks it.</p></div>
   <!-- Station scores as rings rather than bare numerals: the same drawing the
        Coverage tab uses for its ratio, so a score reads the same way wherever
-       it appears. Tone comes from the station's own light. -->
-  <div class="ring-row">
-    <div class="sring good">
+       it appears. Tone comes from the station's own light. Each sits on its own
+       card, so the set reads as four measurements rather than one strip. -->
+  <div class="ring-row on-cards">
+    <eo-card full-height data-token="eo-card"><div class="sring good">
     <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
       aria-label="Best practices 8 of 10">
       <g transform="rotate(-90 66 66)">
@@ -2188,7 +2209,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     </svg>
     <p class="sring-k">Best practices</p>
     <p class="sring-t">of 10</p>
-  </div><div class="sring warn">
+  </div></eo-card><eo-card full-height data-token="eo-card"><div class="sring warn">
     <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
       aria-label="Accessibility 5 of 10">
       <g transform="rotate(-90 66 66)">
@@ -2200,7 +2221,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     </svg>
     <p class="sring-k">Accessibility</p>
     <p class="sring-t">of 10</p>
-  </div><div class="sring warn">
+  </div></eo-card><eo-card full-height data-token="eo-card"><div class="sring warn">
     <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
       aria-label="Testing &amp; validation 4 of 10">
       <g transform="rotate(-90 66 66)">
@@ -2212,7 +2233,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     </svg>
     <p class="sring-k">Testing &amp; validation</p>
     <p class="sring-t">of 10</p>
-  </div><div class="sring good">
+  </div></eo-card><eo-card full-height data-token="eo-card"><div class="sring good">
     <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
       aria-label="Shared language 8 of 10">
       <g transform="rotate(-90 66 66)">
@@ -2224,7 +2245,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     </svg>
     <p class="sring-k">Shared language</p>
     <p class="sring-t">of 10</p>
-  </div>
+  </div></eo-card>
   </div>
 </section>
 
@@ -2280,16 +2301,19 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
   </div>
 </section>
       </div><div class="panel " id="panel-delivery" role="tabpanel" aria-labelledby="tab-delivery" hidden>
-        <!-- Section rail. Built at runtime from this panel's own band heads, so
-             it cannot drift from the sections it points at. -->
+        <!-- Section rail on the working tabs only. The overview is read top to
+             bottom as an argument, so an index there invites skipping it; the
+             other tabs are reference and benefit from one. Built at runtime
+             from the panel's own sections, so it cannot point at something
+             that has been renamed. -->
         <nav class="rail" aria-label="Sections on this page"></nav>
         
 <section class="band">
-  <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Delivery</p><h2 data-token="--eo-typography-headline-500">A queue waiting on capacity, not decisions</h2><p data-token="--eo-color-content-subtle">Everything in “Ready for Development” already has a spec and a priority.</p><p class="stamp"><span class="dot manual"></span>Updated 6 Aug 2026 · read by hand</p></div>
+  <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Delivery</p><h2 data-token="--eo-typography-headline-500">A queue waiting on capacity, not decisions</h2><p data-token="--eo-color-content-subtle">Everything in “Ready for Development” already has a spec and a priority. The four ratios below are what the queue turns on.</p><p class="stamp"><span class="dot manual"></span>Updated 6 Aug 2026 · read by hand</p></div>
   <!-- The three ratios the queue actually turns on, drawn the same way as
        every other score on the dashboard. -->
-  <div class="ring-row">
-    <div class="sring bad">
+  <div class="ring-row on-cards">
+    <eo-card full-height data-token="eo-card"><div class="sring bad">
     <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
       aria-label="Ready for development 25 of 117">
       <g transform="rotate(-90 66 66)">
@@ -2301,8 +2325,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     </svg>
     <p class="sring-k">Ready for development</p>
     <p class="sring-t">of 117 open</p>
-  </div>
-    <div class="sring bad">
+  </div></eo-card><eo-card full-height data-token="eo-card"><div class="sring bad">
     <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
       aria-label="Unassigned 24 of 25">
       <g transform="rotate(-90 66 66)">
@@ -2314,8 +2337,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     </svg>
     <p class="sring-k">Unassigned</p>
     <p class="sring-t">of 25 ready</p>
-  </div>
-    <div class="sring warn">
+  </div></eo-card><eo-card full-height data-token="eo-card"><div class="sring warn">
     <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
       aria-label="In development 4 of 25">
       <g transform="rotate(-90 66 66)">
@@ -2327,8 +2349,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     </svg>
     <p class="sring-k">In development</p>
     <p class="sring-t">of 25 ready</p>
-  </div>
-    <div class="sring good">
+  </div></eo-card><eo-card full-height data-token="eo-card"><div class="sring good">
     <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
       aria-label="Community PRs merged 19 of 19">
       <g transform="rotate(-90 66 66)">
@@ -2340,8 +2361,16 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     </svg>
     <p class="sring-k">Community PRs merged</p>
     <p class="sring-t">9 contributors</p>
+  </div></eo-card>
   </div>
-  </div>
+</section>
+
+<!-- Three sections, not one, because these are three separate questions: how
+     big the queue is, what is in it, and what the build plan behind it looks
+     like. The section rail indexes sections, so a single one gave this tab no
+     navigation at all. -->
+<section class="band tight">
+  <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">The queue</p><h2 data-token="--eo-typography-headline-500">What is waiting, and how long it has waited</h2></div>
   <div class="bento">
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">All open DSC issues</p><h3>117 open</h3><div class="bars"><div class="bar-row"><span class="label">Neu</span>
       <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:100%"></span></span>
@@ -2416,6 +2445,12 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
       <td class="age ">3 d</td></tr><tr><td class="key">DSC-216</td><td>Make QUICK_START an actual quick start</td>
       <td><eo-label intent="neutral" size="small" data-token="eo-label · intent=neutral">Task</eo-label></td>
       <td class="age ">3 d</td></tr></tbody></table></div></div></eo-card>
+  </div>
+</section>
+
+<section class="band tight">
+  <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">BMA build plan</p><h2 data-token="--eo-typography-headline-500">The plan the queue is drawn from</h2><p data-token="--eo-color-content-subtle">Status and remaining impact for the build plan behind the ready column.</p></div>
+  <div class="bento">
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">BMA build plan</p><h3>51 items</h3><div class="bars"><div class="bar-row"><span class="label">QA: Design</span>
       <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:100%"></span></span>
       <span class="count">25</span></div><div class="bar-row"><span class="label">Won&#39;t Build</span>
@@ -2443,14 +2478,17 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
   </div>
 </section>
       </div><div class="panel " id="panel-governance" role="tabpanel" aria-labelledby="tab-governance" hidden>
-        <!-- Section rail. Built at runtime from this panel's own band heads, so
-             it cannot drift from the sections it points at. -->
+        <!-- Section rail on the working tabs only. The overview is read top to
+             bottom as an argument, so an index there invites skipping it; the
+             other tabs are reference and benefit from one. Built at runtime
+             from the panel's own sections, so it cannot point at something
+             that has been renamed. -->
         <nav class="rail" aria-label="Sections on this page"></nav>
         
 <section class="band">
   <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Stations 06 · 07 · 09 · 10</p><h2 data-token="--eo-typography-headline-500">Governance, orchestration and agent readiness</h2><p data-token="--eo-color-content-subtle">The written governance is good. Most of it is invisible from where engineers work.</p></div>
-  <div class="ring-row">
-    <div class="sring warn">
+  <div class="ring-row on-cards">
+    <eo-card full-height data-token="eo-card"><div class="sring warn">
     <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
       aria-label="Governance 6 of 10">
       <g transform="rotate(-90 66 66)">
@@ -2462,7 +2500,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     </svg>
     <p class="sring-k">Governance</p>
     <p class="sring-t">of 10</p>
-  </div><div class="sring warn">
+  </div></eo-card><eo-card full-height data-token="eo-card"><div class="sring warn">
     <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
       aria-label="Orchestration 6 of 10">
       <g transform="rotate(-90 66 66)">
@@ -2474,7 +2512,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     </svg>
     <p class="sring-k">Orchestration</p>
     <p class="sring-t">→ 7 if promoted</p>
-  </div><div class="sring warn">
+  </div></eo-card><eo-card full-height data-token="eo-card"><div class="sring warn">
     <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
       aria-label="Machine-readable docs 6 of 10">
       <g transform="rotate(-90 66 66)">
@@ -2486,7 +2524,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     </svg>
     <p class="sring-k">Machine-readable docs</p>
     <p class="sring-t">→ 9 if promoted</p>
-  </div><div class="sring warn">
+  </div></eo-card><eo-card full-height data-token="eo-card"><div class="sring warn">
     <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
       aria-label="Agent access 4 of 10">
       <g transform="rotate(-90 66 66)">
@@ -2498,11 +2536,12 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     </svg>
     <p class="sring-k">Agent access</p>
     <p class="sring-t">→ 6 if promoted</p>
-  </div>
+  </div></eo-card>
   </div>
 </section>
 
 <section class="band tight">
+  <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Contribution</p><h2 data-token="--eo-typography-headline-500">The channel is open; the review queue is not</h2></div>
   <div class="bento">
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Community</p>
        <h3>Contribution is not the bottleneck</h3>
@@ -2511,6 +2550,12 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">…but the tail is</p>
        <h3>Review capacity is</h3>
        <ul class="facts"><li data-token="--eo-color-content-utility-negative"><span class="k">Worst merges</span><span class="v bad">174, 152, 104 d</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">Open human PRs</span><span class="v bad">13 · median 100 d</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">Dependabot backlog</span><span class="v bad">18 · oldest 290 d</span></li><li data-token="--eo-color-content-utility-negative"><span class="k">CONTRIBUTING draft</span><span class="v bad">198 d open</span></li></ul></div></eo-card>
+  </div>
+</section>
+
+<section class="band tight">
+  <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Releases and the gap</p><h2 data-token="--eo-typography-headline-500">What the system cannot currently say, and the work already done</h2></div>
+  <div class="bento">
     <eo-card class="tile span-12" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Release governance</p>
        <h3>0 tags. 0 releases. No changelog.</h3>
        <p class="tile-text">The publish workflow stamps a CI build counter as the version, so the system <b>cannot express a breaking change</b> — which means no migration can be announced. The token system repository, same team and same org, already tags and releases properly.</p>

@@ -476,13 +476,18 @@ const qualityTab = `
   ${bandHead('Stations 02 · 03 · 05', 'Practices, accessibility and testing', 'Craft is good where it is enforced, and drifts where nothing checks it.')}
   <!-- Station scores as rings rather than bare numerals: the same drawing the
        Coverage tab uses for its ratio, so a score reads the same way wherever
-       it appears. Tone comes from the station's own light. -->
-  <div class="ring-row">
+       it appears. Tone comes from the station's own light. Each sits on its own
+       card, so the set reads as four measurements rather than one strip. -->
+  <div class="ring-row on-cards">
     ${[2, 3, 5, 4]
       .map((n) => {
         const stn = st(n);
         const tone = stn?.light === 'green' ? 'good' : stn?.light === 'red' ? 'bad' : 'warn';
-        return scoreRing(stn?.score ?? '—', { label: stn?.name ?? '', sub: 'of 10', tone });
+        return `<eo-card full-height data-token="eo-card">${scoreRing(stn?.score ?? '—', {
+          label: stn?.name ?? '',
+          sub: 'of 10',
+          tone,
+        })}</eo-card>`;
       })
       .join('')}
   </div>
@@ -590,30 +595,25 @@ const queueRows = rfd.tickets
 
 const deliveryTab = `
 <section class="band">
-  ${bandHead('Delivery', 'A queue waiting on capacity, not decisions', 'Everything in “Ready for Development” already has a spec and a priority.', meta.asOf, false)}
+  ${bandHead('Delivery', 'A queue waiting on capacity, not decisions', 'Everything in “Ready for Development” already has a spec and a priority. The four ratios below are what the queue turns on.', meta.asOf, false)}
   <!-- The three ratios the queue actually turns on, drawn the same way as
        every other score on the dashboard. -->
-  <div class="ring-row">
-    ${scoreRing(rfd.count, {
-      max: jira.openIssuesTotal,
-      label: 'Ready for development',
-      sub: `of ${jira.openIssuesTotal} open`,
-      tone: 'bad',
-    })}
-    ${scoreRing(rfd.unassigned, { max: rfd.count, label: 'Unassigned', sub: `of ${rfd.count} ready`, tone: 'bad' })}
-    ${scoreRing(jira.byStatus['In Development'] ?? 0, {
-      max: rfd.count,
-      label: 'In development',
-      sub: `of ${rfd.count} ready`,
-      tone: 'warn',
-    })}
-    ${scoreRing(cv.mergedCommunityPRs, {
-      max: cv.mergedCommunityPRs,
-      label: 'Community PRs merged',
-      sub: `${cv.externalContributors} contributors`,
-      tone: 'good',
-    })}
+  <div class="ring-row on-cards">
+    ${[
+      scoreRing(rfd.count, { max: jira.openIssuesTotal, label: 'Ready for development', sub: `of ${jira.openIssuesTotal} open`, tone: 'bad' }),
+      scoreRing(rfd.unassigned, { max: rfd.count, label: 'Unassigned', sub: `of ${rfd.count} ready`, tone: 'bad' }),
+      scoreRing(jira.byStatus['In Development'] ?? 0, { max: rfd.count, label: 'In development', sub: `of ${rfd.count} ready`, tone: 'warn' }),
+      scoreRing(cv.mergedCommunityPRs, { max: cv.mergedCommunityPRs, label: 'Community PRs merged', sub: `${cv.externalContributors} contributors`, tone: 'good' }),
+    ].map((r) => `<eo-card full-height data-token="eo-card">${r}</eo-card>`).join('')}
   </div>
+</section>
+
+<!-- Three sections, not one, because these are three separate questions: how
+     big the queue is, what is in it, and what the build plan behind it looks
+     like. The section rail indexes sections, so a single one gave this tab no
+     navigation at all. -->
+<section class="band tight">
+  ${bandHead('The queue', 'What is waiting, and how long it has waited')}
   <div class="bento">
     ${tile('span-6', `<p class="eyebrow">All open DSC issues</p><h3>${jira.openIssuesTotal} open</h3>${bars(jira.byStatus)}`)}
     ${tile(
@@ -630,6 +630,12 @@ const deliveryTab = `
       <div class="table-scroll"><table>
         <thead><tr><th>Key</th><th>Title</th><th>Type</th><th>Age</th></tr></thead>
         <tbody>${queueRows}</tbody></table></div>`)}
+  </div>
+</section>
+
+<section class="band tight">
+  ${bandHead('BMA build plan', 'The plan the queue is drawn from', 'Status and remaining impact for the build plan behind the ready column.')}
+  <div class="bento">
     ${tile('span-6', `<p class="eyebrow">BMA build plan</p><h3>${bmaBuildPlan.itemsTotal} items</h3>${bars(bmaBuildPlan.byStatus)}`)}
     ${tile(
       'span-6',
@@ -644,19 +650,24 @@ const deliveryTab = `
 const governanceTab = `
 <section class="band">
   ${bandHead('Stations 06 · 07 · 09 · 10', 'Governance, orchestration and agent readiness', 'The written governance is good. Most of it is invisible from where engineers work.')}
-  <div class="ring-row">
+  <div class="ring-row on-cards">
     ${[7, 6, 9, 10]
       .map((n) => {
         const stn = st(n);
         const tone = stn?.light === 'green' ? 'good' : stn?.light === 'red' ? 'bad' : 'warn';
         const sub = stn?.potential ? `→ ${stn.potential} if promoted` : 'of 10';
-        return scoreRing(stn?.score ?? '—', { label: stn?.name ?? '', sub, tone });
+        return `<eo-card full-height data-token="eo-card">${scoreRing(stn?.score ?? '—', {
+          label: stn?.name ?? '',
+          sub,
+          tone,
+        })}</eo-card>`;
       })
       .join('')}
   </div>
 </section>
 
 <section class="band tight">
+  ${bandHead('Contribution', 'The channel is open; the review queue is not')}
   <div class="bento">
     ${tile(
       'span-6',
@@ -680,6 +691,12 @@ const governanceTab = `
          ['CONTRIBUTING draft', `${cv.contributingPRDraftAgeDays} d open`, 'bad'],
        ])}`
     )}
+  </div>
+</section>
+
+<section class="band tight">
+  ${bandHead('Releases and the gap', 'What the system cannot currently say, and the work already done')}
+  <div class="bento">
     ${tile(
       'span-12',
       `<p class="eyebrow">Release governance</p>
@@ -844,9 +861,12 @@ const html = `<!doctype html>
       `<div class="panel ${i === 0 ? 'is-active' : ''}" id="panel-${id}" role="tabpanel" aria-labelledby="tab-${id}" ${
         i === 0 ? '' : 'hidden'
       }>
-        <!-- Section rail. Built at runtime from this panel's own band heads, so
-             it cannot drift from the sections it points at. -->
-        <nav class="rail" aria-label="Sections on this page"></nav>
+        <!-- Section rail on the working tabs only. The overview is read top to
+             bottom as an argument, so an index there invites skipping it; the
+             other tabs are reference and benefit from one. Built at runtime
+             from the panel's own sections, so it cannot point at something
+             that has been renamed. -->
+        ${['quality', 'delivery', 'governance'].includes(id) ? '<nav class="rail" aria-label="Sections on this page"></nav>' : ''}
         ${content}
       </div>`
   ).join('')}

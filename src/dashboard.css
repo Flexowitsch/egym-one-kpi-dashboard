@@ -1055,11 +1055,17 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
   width: fit-content;
 }
 .matrix-legend > span { display: inline-flex; align-items: center; gap: var(--eo-dimension-gap-small); }
+/* The column labels are a separate group, pushed away from the state keys and
+   separated by a rule — crammed against them they read as two more states. */
 .matrix-legend .ml-cols {
-  margin-left: auto;
-  gap: var(--eo-dimension-gap-large);
+  margin-left: var(--eo-dimension-gap-large);
+  padding-left: var(--eo-dimension-gap-large);
+  border-left: 1px solid var(--eo-color-border-subtle);
+  gap: var(--eo-dimension-gap-extra-large);
   font-family: var(--eo-typography-action-label-100-font-family);
-  letter-spacing: 0.1em; text-transform: uppercase;
+  font-size: var(--eo-typography-body-50-font-size);
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--eo-color-content-hinted);
 }
 
 .mcard-in {
@@ -1212,3 +1218,8 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
 
 /* No room for it beside the content on a narrow screen. */
 @media (max-width: 1180px) { .rail { display: none; } }
+
+/* Rings on their own cards on the working tabs: four measurements rather than
+   one undifferentiated strip. */
+.ring-row.on-cards > eo-card { display: block; }
+.ring-row.on-cards .sring { padding: var(--eo-dimension-padding-block-large) var(--eo-dimension-padding-inline-default); }
