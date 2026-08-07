@@ -850,11 +850,11 @@ const html = `<!doctype html>
          earlier version used tertiary, which renders as a bare glyph with no
          affordance at all.
 
-         Default size, not small: the reference in the presentation file
-         (488:3614) is the 44px button — 12px padding-action-icon around a 20px
-         icon. At size="small" the button is 32px and takes a 16px icon, so the
-         20px glyph filled the circle edge to edge. -->
-    <eo-button class="brand-toggle" hierarchy="secondary" intent="neutral"
+         Small, on request. The size carries its own icon size: 32px button,
+         8px padding, 16px icon. The earlier version was small with the 20px
+         icon of the default size, which is 36px of content in a 32px circle —
+         that overflow is what made it look broken, not the size itself. -->
+    <eo-button class="brand-toggle" size="small" hierarchy="secondary" intent="neutral"
       content="icon" data-token="eo-button · secondary/icon"
       aria-label="Switch brand — currently EGYM" title="Switch brand">
       <span slot="icon" class="brand-icon">${paletteIcon}</span>

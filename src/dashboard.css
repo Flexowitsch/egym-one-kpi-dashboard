@@ -971,7 +971,10 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
    =========================================================================== */
 .brand-toggle { margin-left: var(--eo-dimension-gap-small); cursor: pointer; }
 .brand-icon { display: block; line-height: 0; }
-.brand-icon svg { display: block; width: 20px; height: 20px; }
+/* 16px, because the button is size="small". The button ships 8px of
+   padding-action-icon at that size, so 16 is what fits its 32px box — the
+   default size's 20px icon overflowed it. */
+.brand-icon svg { display: block; width: 16px; height: 16px; }
 
 /* ===========================================================================
    GLASS CARDS — overview only
