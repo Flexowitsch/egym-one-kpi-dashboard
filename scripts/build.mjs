@@ -16,6 +16,9 @@ import {
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const data = JSON.parse(readFileSync(resolve(root, 'ds-kpi-data.json'), 'utf8'));
 const css = readFileSync(resolve(root, 'src/dashboard.css'), 'utf8');
+// The palette icon, inlined. Its baked hex was swapped for currentColor when it
+// was prepared, so it takes the button's own colour in both brands.
+const paletteIcon = readFileSync(resolve(root, 'src/icons/palette.svg'), 'utf8').trim();
 const dsInfo = existsSync(resolve(root, 'docs/vendor/ds-version.json'))
   ? JSON.parse(readFileSync(resolve(root, 'docs/vendor/ds-version.json'), 'utf8'))
   : { version: 'unvendored', tokenCount: 0, components: [] };
@@ -305,14 +308,7 @@ const overview = `
     '2026-08-06'
   )}
   <div class="bento">
-    ${tile(
-      'span-12',
-      `<div class="legend">
-         <span data-token="--eo-color-content-utility-positive"><span class="cell in-place"><span></span></span> In place</span>
-         <span data-token="--eo-color-content-utility-warning"><span class="cell partial"><span></span></span> Partial</span>
-         <span data-token="--eo-color-content-utility-negative"><span class="cell absent"><span></span></span> Absent</span>
-       </div>
-       ${splitMatrix(designVsCode?.dimensions ?? [])}`
+    <div class="span-12">${splitMatrix(designVsCode?.dimensions ?? [])}</div>
     )}
     ${tile(
       'span-12',
@@ -413,19 +409,31 @@ const overview = `
 <section class="band tight">
   ${bandHead('Provenance', 'Where every number on this page comes from', 'Nothing here is undated, and nothing is an estimate unless it says so.', provenance.generatedAt)}
   <div class="bento">
-    ${tile(
-      'span-12',
-      `<div class="table-scroll"><table class="prov">
-        <thead><tr><th>Measurement</th><th>Updated</th><th>How</th></tr></thead>
-        <tbody>${provenance.measurements
+    <div class="span-12">${`<div class="prov-set">
+        <!-- One card per measurement rather than fourteen rows in one table.
+             In a single container the reveal was over before the reader
+             reached row four; as cards each crosses the trigger on its own.
+             The legend floats above and stays available while reading down. -->
+        <div class="prov-legend">
+          <span data-token="--eo-color-content-utility-positive">${chip('auto', 'positive')} refreshes on its own</span>
+          <span data-token="--eo-color-content-utility-warning">${chip('manual', 'warning')} last read by hand</span>
+        </div>
+        ${provenance.measurements
           .map(
-            (m) => `<tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">${esc(m.what)}</td>
-              <td class="when" data-token="--eo-color-content-default">${esc(fmt(m.date))} ${chip(m.live ? 'auto' : 'manual', m.live ? 'positive' : 'warning')}</td>
-              <td class="how" data-token="--eo-color-content-subtle">${esc(m.method)}</td></tr>`
+            (m) => `<eo-card class="pcard" data-token="eo-card">
+              <div class="pcard-in">
+                <span class="pc-what" data-token="--eo-color-content-emphasized">${esc(m.what)}</span>
+                <span class="pc-when" data-token="--eo-color-content-default">${esc(fmt(m.date))} ${chip(
+                  m.live ? 'auto' : 'manual',
+                  m.live ? 'positive' : 'warning'
+                )}</span>
+                <span class="pc-how" data-token="--eo-color-content-subtle">${esc(m.method)}</span>
+              </div>
+            </eo-card>`
           )
-          .join('')}</tbody>
-      </table></div>`
-    )}
+          .join('')}
+      </div>`}
+    </div>
   </div>
 </section>
 
@@ -787,18 +795,13 @@ const html = `<!doctype html>
              data-token="eo-button · ${i === 0 ? 'primary/brand' : 'tertiary/neutral'}">${esc(label)}</eo-button>`
       ).join('')}
     </div>
-    <!-- Brand switch. One icon-only button, no menu: the dropdown it replaced
-         could not be clicked at all, because eo-button re-emits its click from
-         the shadow root and the outside-click handler closed the menu on the
-         same gesture that opened it. A toggle has no such surface. -->
-    <eo-button class="brand-toggle" size="small" hierarchy="tertiary" intent="neutral"
-      content="icon" data-token="eo-button · content=icon"
+    <!-- Brand switch. Secondary, icon-only, from the component package — the
+         earlier version used tertiary, which renders as a bare glyph with no
+         affordance at all. -->
+    <eo-button class="brand-toggle" size="small" hierarchy="secondary" intent="neutral"
+      content="icon" data-token="eo-button · secondary/icon"
       aria-label="Switch brand — currently EGYM" title="Switch brand">
-      <!-- The real icon from the icon package, not a hand-drawn stand-in.
-           change-direction is the system's own "switch between two things"
-           mark; it inherits currentColor from the button, so it follows both
-           the brand it is switching to and the button's own state. -->
-      <eo-icon-change-direction slot="icon" size="small" variant="outlined"></eo-icon-change-direction>
+      <span slot="icon" class="brand-icon">${paletteIcon}</span>
     </eo-button>
   </div>
 </nav>

@@ -168,21 +168,34 @@ export function splitMatrix(dimensions) {
     `<span class="cell ${state}" role="img" data-token="${STATE_TOKEN[state] ?? '--eo-color-border-default'}" aria-label="${
       state === 'in-place' ? 'in place' : state
     }"><span></span></span>`;
-  return `<div class="matrix">
-    <div class="matrix-head">
-      <span></span><span class="mh">Design</span><span class="mh">Code</span>
+
+  // One card per dimension rather than nine rows inside one card. Inside a
+  // single container the per-row reveal was invisible: the card had already
+  // entered the viewport, so everything below the fold arrived formed. As
+  // separate cards each one crosses the trigger line on its own and the build
+  // is actually seen. The legend floats above the set instead of being the
+  // first row of it.
+  return `<div class="matrix-set">
+    <div class="matrix-legend">
+      <span data-token="--eo-color-content-utility-positive"><span class="cell in-place"><span></span></span> In place</span>
+      <span data-token="--eo-color-content-utility-warning"><span class="cell partial"><span></span></span> Partial</span>
+      <span data-token="--eo-color-content-utility-negative"><span class="cell absent"><span></span></span> Absent</span>
+      <span class="ml-cols"><span class="mh">Design</span><span class="mh">Code</span></span>
     </div>
     ${dimensions
       .map(
-        (d) => `<div class="matrix-row">
-          <span class="mname">${esc(d.name)}</span>
-          ${dot(d.design.state)}
-          ${dot(d.code.state)}
-        </div>
-        <div class="matrix-detail">
-          <span><b>Design</b> ${esc(d.design.detail)}</span>
-          <span><b>Code</b> ${esc(d.code.detail)}</span>
-        </div>`
+        (d) => `<eo-card class="mcard" full-height data-token="eo-card">
+          <div class="mcard-in">
+            <div class="mcard-head">
+              <span class="mname">${esc(d.name)}</span>
+              <span class="mcells">${dot(d.design.state)}${dot(d.code.state)}</span>
+            </div>
+            <div class="mcard-detail">
+              <span><b>Design</b> ${esc(d.design.detail)}</span>
+              <span><b>Code</b> ${esc(d.code.detail)}</span>
+            </div>
+          </div>
+        </eo-card>`
       )
       .join('')}
   </div>`;

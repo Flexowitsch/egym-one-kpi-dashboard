@@ -27,6 +27,8 @@
      build. The token system has no motion-easing or layout-gutter token, so
      these are the two literals in this file — everything else resolves to --eo-*. */
   --gutter: clamp(1.25rem, 4vw, 4rem);
+  /* measured by motion.js so the sticky legend clears the real nav */
+  --nav-h: 4.5rem;
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -48,8 +50,12 @@ body {
 /* ===========================================================================
    NAV — minimal, sticky, tabs live here
    =========================================================================== */
+/* Sticky, and it has to stay above everything that scrolls under it. The
+   glass cards create their own stacking context via backdrop-filter, which
+   let them paint over a z-index that used to be high enough. */
 .nav {
-  position: sticky; top: 0; z-index: 20;
+  position: sticky; top: 0; z-index: 60;
+  isolation: isolate;
   background: var(--eo-color-surface-subtle);
   border-bottom: 1px solid var(--eo-color-border-subtle);
 }
@@ -658,7 +664,7 @@ body[data-tab-state="overview"] .cascade-field { opacity: 1; }
 }
 
 /* keep page content above the field */
-.nav, main, .closer { position: relative; z-index: 1; }
+main, .closer { position: relative; z-index: 1; }
 
 /* ---------- hero ---------- */
 .hero { position: relative; }
@@ -964,7 +970,8 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
    re-colours through the cascade with nothing re-themed by hand.
    =========================================================================== */
 .brand-toggle { margin-left: var(--eo-dimension-gap-small); cursor: pointer; }
-.brand-toggle svg { display: block; }
+.brand-icon { display: block; line-height: 0; }
+.brand-icon svg { display: block; width: 20px; height: 20px; }
 
 /* ===========================================================================
    GLASS CARDS — overview only
@@ -1034,4 +1041,99 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
 @media (max-width: 900px) {
   /* Stacked panels put the text full width, so the motif would sit under it. */
   .kpi-art { position: static; transform: none; width: 60%; margin: 2rem 0 0; }
+}
+
+/* ===========================================================================
+   THE DESIGN / CODE MATRIX — one card per dimension
+   Nine rows inside a single card meant the per-row reveal was never seen: the
+   card crossed the trigger line once, and everything below the fold arrived
+   already formed. As separate cards each dimension crosses on its own.
+   =========================================================================== */
+.matrix-set { display: grid; gap: var(--eo-dimension-gap-large); }
+
+/* The legend floats above the set and sticks under the nav while you read
+   down the column, so the colour coding stays available at row nine. */
+.matrix-legend {
+  position: sticky;
+  top: calc(var(--nav-h, 4.5rem) + var(--eo-dimension-8));
+  z-index: 5;
+  display: flex; align-items: center; flex-wrap: wrap;
+  gap: var(--eo-dimension-gap-default) var(--eo-dimension-gap-large);
+  padding: var(--eo-dimension-padding-block-default) var(--eo-dimension-padding-inline-default);
+  margin-bottom: var(--eo-dimension-8);
+  border-radius: var(--eo-dimension-border-radius-round);
+  background: color-mix(in srgb, var(--eo-color-surface-subtle) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--eo-color-border-subtle);
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-subtle);
+  width: fit-content;
+}
+.matrix-legend > span { display: inline-flex; align-items: center; gap: var(--eo-dimension-gap-small); }
+.matrix-legend .ml-cols {
+  margin-left: auto;
+  gap: var(--eo-dimension-gap-large);
+  font-family: var(--eo-typography-action-label-100-font-family);
+  letter-spacing: 0.1em; text-transform: uppercase;
+}
+
+.mcard-in {
+  padding: var(--eo-dimension-padding-block-large);
+  display: grid; gap: var(--eo-dimension-gap-default);
+}
+.mcard-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: var(--eo-dimension-gap-large);
+}
+.mcard-head .mname {
+  font-family: var(--eo-typography-headline-200-font-family);
+  font-size: var(--eo-typography-headline-200-font-size);
+  line-height: 1.2;
+}
+.mcells { display: inline-flex; gap: var(--eo-dimension-gap-extra-large); align-items: center; }
+.mcard-detail {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: var(--eo-dimension-gap-default) var(--eo-dimension-gap-extra-large);
+  font-size: var(--eo-typography-body-50-font-size);
+  line-height: var(--eo-typography-body-50-line-height);
+  color: var(--eo-color-content-subtle);
+}
+.mcard-detail b { color: var(--eo-color-content-emphasized); font-weight: 700; }
+
+/* ---------- provenance, one card per measurement ---------- */
+.prov-set { display: grid; gap: var(--eo-dimension-gap-default); }
+.prov-legend {
+  position: sticky;
+  top: calc(var(--nav-h, 4.5rem) + var(--eo-dimension-8));
+  z-index: 5;
+  width: fit-content;
+  display: flex; flex-wrap: wrap;
+  gap: var(--eo-dimension-gap-default) var(--eo-dimension-gap-large);
+  padding: var(--eo-dimension-padding-block-default) var(--eo-dimension-padding-inline-default);
+  margin-bottom: var(--eo-dimension-8);
+  border-radius: var(--eo-dimension-border-radius-round);
+  background: color-mix(in srgb, var(--eo-color-surface-subtle) 82%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--eo-color-border-subtle);
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-subtle);
+}
+.prov-legend > span { display: inline-flex; align-items: center; gap: var(--eo-dimension-gap-small); }
+.pcard-in {
+  padding: var(--eo-dimension-padding-block-default) var(--eo-dimension-padding-inline-large);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) auto minmax(0, 1.4fr);
+  align-items: center;
+  gap: var(--eo-dimension-gap-large);
+}
+.pc-what { font-weight: 600; }
+.pc-when { display: inline-flex; align-items: center; gap: var(--eo-dimension-gap-small); white-space: nowrap; }
+.pc-how { color: var(--eo-color-content-subtle); font-size: var(--eo-typography-body-50-font-size); }
+@media (max-width: 900px) {
+  .pcard-in { grid-template-columns: 1fr; gap: var(--eo-dimension-gap-small); }
 }

@@ -140,7 +140,9 @@ function drawCharts() {
   $$('.d-bar').forEach((bar, i) => {
     const to = bar.style.width;
     bar.dataset.w = to;
-    if (reduce) return;
+    // changeReveal owns the bars inside .changes — driving them from here too
+    // put two tweens on the same width in the same frame.
+    if (reduce || bar.closest('.changes')) return;
     gsap.fromTo(bar, { width: 0 }, {
       width: to, duration: 0.6, ease: 'siteOut', delay: i * 0.06,
       scrollTrigger: { trigger: bar.closest('eo-card') || bar, start: 'top 85%', once: true },
@@ -187,35 +189,29 @@ function drawCharts() {
 /* ------------------------------------------------- the matrix, as a story --- */
 // Design column fills in first, then code. The pause between them is the point.
 function matrixReveal() {
-  const rows = $$('.matrix-row');
-  if (!rows.length || reduce) return;
+  const cards = $$('.mcard');
+  if (!cards.length || reduce) return;
 
-  // Per row, against that row's own scroll position. The card is nine rows and
-  // several viewports tall, so a single timeline on the card meant everything
-  // below the first screen had already played somewhere above the fold and
-  // arrived static — the reveal was only ever seen for the top two rows.
-  rows.forEach((row) => {
-    const cells = $$('.cell', row);
-    const name = $('.mname', row);
-    const detail = row.nextElementSibling?.classList.contains('matrix-detail')
-      ? row.nextElementSibling
-      : null;
+  // One timeline per card, triggered on that card. Each dimension is now its
+  // own eo-card, so it crosses the trigger line separately and the build is
+  // actually visible — inside a single container it was over before most of
+  // the rows had reached the viewport.
+  cards.forEach((card) => {
+    const cells = $$('.cell', card);
+    const name = $('.mname', card);
+    const detail = $$('.mcard-detail > span', card);
 
     gsap.set(cells, { scale: 0, transformOrigin: '50% 50%' });
 
-    const tl = gsap.timeline({ scrollTrigger: { trigger: row, start: 'top 88%', once: true } });
-    if (name) tl.fromTo(name, { opacity: 0, x: -12 }, { opacity: 1, x: 0, duration: 0.45, ease: 'siteOut' }, 0);
-    // Design lands first, then code. The pause between them is the finding, so
-    // it survives the move to per-row timing.
-    if (cells[0]) tl.to(cells[0], { scale: 1, duration: 0.4, ease: 'back.out(2.2)' }, 0.12);
-    if (cells[1]) tl.to(cells[1], { scale: 1, duration: 0.4, ease: 'back.out(2.2)' }, 0.42);
-    if (detail) {
-      tl.fromTo(
-        $$('span', detail),
-        { opacity: 0, y: 8 },
-        { opacity: 1, y: 0, duration: 0.45, stagger: 0.09, ease: 'siteOut' },
-        0.2
-      );
+    const tl = gsap.timeline({ scrollTrigger: { trigger: card, start: 'top 88%', once: true } });
+    tl.fromTo(card, { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.7, ease: 'siteOut' }, 0);
+    if (name) tl.fromTo(name, { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.45, ease: 'siteOut' }, 0.1);
+    // Design lands before code. The pause between them is the finding, so it
+    // survives every restructuring of this card.
+    if (cells[0]) tl.to(cells[0], { scale: 1, duration: 0.4, ease: 'back.out(2.2)' }, 0.2);
+    if (cells[1]) tl.to(cells[1], { scale: 1, duration: 0.4, ease: 'back.out(2.2)' }, 0.5);
+    if (detail.length) {
+      tl.fromTo(detail, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.1, ease: 'siteOut' }, 0.28);
     }
   });
 }
@@ -228,30 +224,23 @@ function matrixReveal() {
 function changeReveal() {
   const list = $('.changes');
   if (!list || reduce) return;
-  const rows = $$('.change-row', list);
-  if (!rows.length) return;
 
-  gsap.fromTo(
-    rows,
-    { opacity: 0, x: -16 },
-    {
-      opacity: 1,
-      x: 0,
-      duration: 0.5,
-      stagger: 0.07,
-      ease: 'siteOut',
-      scrollTrigger: { trigger: list, start: 'top 85%', once: true },
-    }
-  );
-  $$('.c-prev, .c-now', list).forEach((el, i) => {
+  // Only the bars animate. The rows, the names and the two score columns used
+  // to fade and slide in as well, which on ten rows read as a lot of motion
+  // for a card whose whole point is that six of the ten did not move.
+  // Everything except the bar is simply there.
+  const bars = $$('.d-bar', list);
+  if (!bars.length) return;
+  bars.forEach((bar, i) => {
+    const to = bar.dataset.w || bar.style.width;
     gsap.fromTo(
-      el,
-      { opacity: 0 },
+      bar,
+      { width: 0 },
       {
-        opacity: 1,
-        duration: 0.4,
-        delay: 0.25 + Math.floor(i / 2) * 0.07,
-        ease: 'none',
+        width: to,
+        duration: 0.65,
+        ease: 'siteOut',
+        delay: i * 0.05,
         scrollTrigger: { trigger: list, start: 'top 85%', once: true },
       }
     );
@@ -390,6 +379,20 @@ function reveals() {
     );
   });
 
+  // Provenance and matrix cards rise from below, each on its own trigger with
+  // a small delay, so a long set arrives as a sequence rather than a block.
+  $$('.pcard').forEach((card, i) => {
+    gsap.fromTo(
+      card,
+      { opacity: 0, y: 24 },
+      {
+        opacity: 1, y: 0, duration: 0.65, ease: 'siteOut',
+        delay: (i % 4) * 0.06,
+        scrollTrigger: { trigger: card, start: 'top 92%', once: true },
+      }
+    );
+  });
+
   // Tall cards build as you travel down them. These are several viewports
   // long, so a single reveal on the card is over before most of it is on
   // screen — each row has to answer to its own position instead. Rows rise a
@@ -398,8 +401,8 @@ function reveals() {
   // Not .matrix: matrixReveal already choreographs those rows, and running a
   // second tween over the same elements is exactly what made the section
   // flicker — two timelines writing opacity on the same row on the same frame.
-  $$('.prov tbody, .sbars').forEach((body) => {
-    const rows = $$(':scope > tr, :scope > .sbar', body);
+  $$('.sbars').forEach((body) => {
+    const rows = $$(':scope > .sbar', body);
     if (rows.length < 3) return;
     rows.forEach((row) => {
       gsap.fromTo(
@@ -828,8 +831,78 @@ window.__dashTabIn = (panel) => {
   window.__dashScrollTop?.();
   if (reduce || !panel) return;
   gsap.fromTo(panel, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45, ease: 'power2.out' });
-  ScrollTrigger.refresh();
+
+  // Replay this panel's build. Every trigger in a hidden panel was created
+  // while that panel was display:none — it measured at zero height, fired
+  // immediately, and by the time anyone switched to the tab the animation was
+  // long over. That is why Coverage and Delivery arrived fully formed.
+  requestAnimationFrame(() => {
+    ScrollTrigger.refresh();
+    replayPanel(panel);
+  });
 };
+
+/* Builds the parts of a panel that carry a value, on demand. Used when a tab
+   becomes visible for the first time in this session. */
+const replayed = new WeakSet();
+function replayPanel(panel) {
+  if (reduce || replayed.has(panel)) return;
+  replayed.add(panel);
+
+  const tl = gsap.timeline();
+
+  // Cards first, so the surfaces exist before anything grows inside them.
+  const cards = $$('eo-card, .stat', panel);
+  if (cards.length) {
+    tl.fromTo(
+      cards,
+      { opacity: 0, y: 26 },
+      { opacity: 1, y: 0, duration: 0.6, ease: 'siteOut', stagger: { each: 0.05, from: 'start' } },
+      0
+    );
+  }
+
+  // Then the bars, so "117 open" fills rather than appears. This is the whole
+  // point of the Delivery tab and it was the one thing not moving.
+  const bars = $$('.bar-track > span, .meter > span, .sbar .track > span, .d-bar', panel);
+  bars.forEach((el, i) => {
+    const to = el.dataset.w || el.style.width || '0%';
+    el.dataset.w = to;
+    tl.fromTo(el, { width: 0 }, { width: to, duration: 0.75, ease: 'siteOut' }, 0.25 + i * 0.045);
+  });
+
+  // Donuts sweep, pipelines wipe, trend lines draw.
+  $$('.c-donut-fill', panel).forEach((el, i) => {
+    const dash = el.getAttribute('stroke-dasharray');
+    if (!dash) return;
+    const [len, total] = dash.split(' ').map(Number);
+    tl.fromTo(
+      el,
+      { attr: { 'stroke-dasharray': `0 ${total}` } },
+      { attr: { 'stroke-dasharray': `${len} ${total}` }, duration: 1.1, ease: 'power2.inOut' },
+      0.3 + i * 0.12
+    );
+  });
+  $$('svg .pipe', panel).forEach((rect, i) => {
+    const w = rect.getAttribute('width');
+    tl.fromTo(rect, { attr: { width: 0 } }, { attr: { width: w }, duration: 0.65, ease: 'siteOut' }, 0.35 + i * 0.09);
+  });
+  $$('svg .c-line', panel).forEach((line) => {
+    const len = line.getTotalLength ? line.getTotalLength() : 400;
+    gsap.set(line, { strokeDasharray: len, strokeDashoffset: len });
+    tl.to(line, { strokeDashoffset: 0, duration: 0.9, ease: 'power2.inOut' }, 0.35);
+  });
+  $$('.chips > li', panel).forEach((li, i) => {
+    tl.fromTo(li, { opacity: 0, y: 8, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.4, ease: 'back.out(1.7)' }, 0.4 + i * 0.035);
+  });
+
+  // Never leave a value invisible if the timeline is interrupted.
+  setTimeout(() => {
+    gsap.set([...cards, ...$$('.chips > li', panel)], { clearProps: 'opacity,transform' });
+    bars.forEach((el) => { if (el.getBoundingClientRect().width < 0.5 && el.dataset.w) el.style.width = el.dataset.w; });
+  }, 4000);
+}
+
 
 /* -------------------------------------------------------------- failsafe ---
    Nothing here may leave content invisible. Reveals work by tweening from
@@ -844,9 +917,8 @@ function failsafe() {
   const SELECTOR =
     '.band-head, .bento > eo-card, .stat-row > eo-card, .tile, .stat, .panel, .hero-inner > *, ' +
     '.manifesto-text, .tile-in > *, .stat-in > *, .openlist li, .facts li, .matrix-detail, ' +
-    '.prov tbody tr, .change-row, .matrix-row .mname, .matrix-detail span, ' +
-    '.bars .bar-row, .tbl tbody tr, .keys > *, .legend > *, .pill-row > *, .chips > li, ' +
-    '.prov tbody tr, .matrix-row, .sbar';
+    '.change-row, .mcard, .mcard .mname, .mcard-detail > span, .pcard, ' +
+    '.bars .bar-row, .tbl tbody tr, .keys > *, .legend > *, .pill-row > *, .chips > li, .sbar';
   const clear = () => {
     $$(SELECTOR).forEach((el) => {
       if (el.closest('.panel[hidden]')) return; // genuinely hidden tabs stay hidden
@@ -877,6 +949,16 @@ function failsafe() {
 /* ------------------------------------------------------------------ init --- */
 function init() {
   smoothScroll();
+
+  // The sticky legends offset against the real nav height rather than a
+  // guessed one, and it is remeasured when the tab strip wraps.
+  const nav = $('.nav');
+  const measureNav = () => {
+    if (nav) document.documentElement.style.setProperty('--nav-h', nav.offsetHeight + 'px');
+  };
+  measureNav();
+  addEventListener('resize', measureNav);
+  customElements.whenDefined('eo-button').then(measureNav);
 
   // ORDER MATTERS, and getting it wrong is why several sections looked
   // un-animated. Pinning the KPI rail adds roughly four viewport heights to
