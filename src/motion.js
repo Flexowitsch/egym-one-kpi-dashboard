@@ -296,7 +296,13 @@ function reveals() {
     // The contents arrive just behind their own card, so the card reads as a
     // container that fills rather than a picture that appears.
     cards.forEach((card, i) => {
-      const inner = $$(':scope .tile-in > *, :scope .stat-in > *', card);
+      // Anything that choreographs its own rows is left alone here. Fading the
+      // container while its rows are independently fading in reads as a flicker,
+      // because both tweens write opacity on the same subtree.
+      const OWNS_ITS_ROWS = '.matrix, .prov, .sbars, .changes, .openlist, .facts';
+      const inner = $$(':scope .tile-in > *, :scope .stat-in > *', card).filter(
+        (el) => !el.matches(OWNS_ITS_ROWS) && !el.querySelector(OWNS_ITS_ROWS)
+      );
       if (inner.length < 2) return;
       gsap.fromTo(
         inner,
@@ -356,26 +362,16 @@ function reveals() {
     );
   });
 
-  // The matrix detail rows reveal on their own row, so scrolling the card
-  // walks down the argument a dimension at a time.
-  $$('.matrix-detail').forEach((row) => {
-    gsap.fromTo(
-      row,
-      { opacity: 0, y: 8 },
-      {
-        opacity: 1, y: 0, duration: 0.5, ease: 'siteOut',
-        scrollTrigger: { trigger: row, start: 'top 92%', once: true },
-      }
-    );
-  });
-
   // Tall cards build as you travel down them. These are several viewports
   // long, so a single reveal on the card is over before most of it is on
   // screen — each row has to answer to its own position instead. Rows rise a
   // little and settle, which is what makes a long table feel assembled rather
   // than pasted.
-  $$('.prov tbody, .matrix, .sbars').forEach((body) => {
-    const rows = $$(':scope > tr, :scope > .matrix-row, :scope > .sbar', body);
+  // Not .matrix: matrixReveal already choreographs those rows, and running a
+  // second tween over the same elements is exactly what made the section
+  // flicker — two timelines writing opacity on the same row on the same frame.
+  $$('.prov tbody, .sbars').forEach((body) => {
+    const rows = $$(':scope > tr, :scope > .sbar', body);
     if (rows.length < 3) return;
     rows.forEach((row) => {
       gsap.fromTo(

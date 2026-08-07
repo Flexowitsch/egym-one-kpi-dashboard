@@ -243,8 +243,12 @@ const overview = `
     ${tile(
       'span-4',
       `<p class="eyebrow">Trend</p>
-       <h3>Three inspections, four points</h3>
-       ${trend(inspection?.trend ?? [], { labels: ['3 Aug', '5 Aug'] })}
+       <h3>Three inspections, eight points</h3>
+       <!-- Labels come from the report's own matrix header, one per point.
+            They were hard-coded to two entries for a three-point line, so the
+            most recent inspection — the one the whole page is about — had no
+            date under it. -->
+       ${trend(inspection?.trend ?? [], { labels: inspection?.historyLabels ?? [] })}
        <p class="tile-text">Almost none of that movement is improvement — six stations moved because evidence surfaces were inspected for the first time.</p>`
     )}
     ${tile(

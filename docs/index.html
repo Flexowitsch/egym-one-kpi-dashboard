@@ -1359,17 +1359,21 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
 <section class="band tight">
   <div class="bento">
     <eo-card class="tile span-4" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Trend</p>
-       <h3>Three inspections, four points</h3>
+       <h3>Three inspections, eight points</h3>
+       <!-- Labels come from the report's own matrix header, one per point.
+            They were hard-coded to two entries for a three-point line, so the
+            most recent inspection — the one the whole page is about — had no
+            date under it. -->
        <svg class="chart" viewBox="0 0 260 90" style="max-width:260px" role="img"
     aria-label="Score trend: 47 then 51 then 55">
     <path class="c-line" d="M22,56.5 L130,45 L238,33.5"/>
     <circle class="c-dot-green" cx="22" cy="56.5" r="3.5"/>
       <text class="c-value" x="22" y="46.5" text-anchor="middle">47</text>
-      <text class="c-label" x="22" y="86" text-anchor="middle">3 Aug</text><circle class="c-dot-green" cx="130" cy="45" r="3.5"/>
+      <text class="c-label" x="22" y="86" text-anchor="middle">Aug 3</text><circle class="c-dot-green" cx="130" cy="45" r="3.5"/>
       <text class="c-value" x="130" y="35" text-anchor="middle">51</text>
-      <text class="c-label" x="130" y="86" text-anchor="middle">5 Aug</text><circle class="c-dot-green" cx="238" cy="33.5" r="3.5"/>
+      <text class="c-label" x="130" y="86" text-anchor="middle">Aug 5</text><circle class="c-dot-green" cx="238" cy="33.5" r="3.5"/>
       <text class="c-value" x="238" y="23.5" text-anchor="middle">55</text>
-      
+      <text class="c-label" x="238" y="86" text-anchor="middle">Aug 6</text>
   </svg>
        <p class="tile-text">Almost none of that movement is improvement — six stations moved because evidence surfaces were inspected for the first time.</p></div></eo-card>
     <eo-card class="tile span-4" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Coverage</p>
