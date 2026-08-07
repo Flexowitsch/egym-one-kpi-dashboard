@@ -8,6 +8,9 @@
     "eo-divider",
     "eo-tooltip"
   ],
+  "icons": [
+    "eo-icon-change-direction"
+  ],
   "tokenCount": 988,
-  "vendoredAt": "2026-08-07T07:42:07.861Z"
+  "vendoredAt": "2026-08-07T07:47:10.831Z"
 }

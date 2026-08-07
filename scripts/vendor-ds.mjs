@@ -30,10 +30,16 @@ mkdirSync(outDir, { recursive: true });
 // registers its custom element via lit's @customElement decorator.
 const COMPONENTS = ['eo-card', 'eo-label', 'eo-alert', 'eo-button', 'eo-divider', 'eo-tooltip'];
 
+// Icons ship as their own package of custom elements — one element per icon,
+// so only the ones actually used are pulled in rather than all 323.
+const ICONS = ['eo-icon-change-direction'];
+
 const entry = resolve(root, '.ds-entry.js');
 writeFileSync(
   entry,
   COMPONENTS.map((c) => `import '@egym-private/egym-one-design-system-web/${c}';`).join('\n') +
+    '\n' +
+    ICONS.map((c) => `import '@egym-private/egym-one-design-system-icons/${c}';`).join('\n') +
     `\nexport const DS_VERSION = ${JSON.stringify(dsVersion)};\n`
 );
 
@@ -62,7 +68,11 @@ writeFileSync(
 const tokenCount = new Set(tokensCss.match(/--eo-[a-z0-9-]+/g) || []).size;
 writeFileSync(
   resolve(outDir, 'ds-version.json'),
-  JSON.stringify({ version: dsVersion, components: COMPONENTS, tokenCount, vendoredAt: new Date().toISOString() }, null, 2)
+  JSON.stringify(
+    { version: dsVersion, components: COMPONENTS, icons: ICONS, tokenCount, vendoredAt: new Date().toISOString() },
+    null,
+    2
+  )
 );
 
 // GSAP is bundled locally too, so the published page has no external
@@ -79,4 +89,5 @@ await build({
 
 console.log(`Vendored design system ${dsVersion}`);
 console.log(`  components: ${COMPONENTS.join(', ')}`);
+console.log(`  icons:      ${ICONS.join(', ')}`);
 console.log(`  tokens:     ${tokenCount} --eo-* custom properties`);

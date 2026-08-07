@@ -1090,10 +1090,11 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     <eo-button class="brand-toggle" size="small" hierarchy="tertiary" intent="neutral"
       content="icon" data-token="eo-button · content=icon"
       aria-label="Switch brand — currently EGYM" title="Switch brand">
-      <svg slot="icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
-        <circle cx="12" cy="12" r="8" fill="var(--eo-color-content-accent)"/>
-        <path d="M12 4a8 8 0 0 1 0 16z" fill="var(--eo-color-content-emphasized)" opacity=".18"/>
-      </svg>
+      <!-- The real icon from the icon package, not a hand-drawn stand-in.
+           change-direction is the system's own "switch between two things"
+           mark; it inherits currentColor from the button, so it follows both
+           the brand it is switching to and the button's own state. -->
+      <eo-icon-change-direction slot="icon" size="small" variant="outlined"></eo-icon-change-direction>
     </eo-button>
   </div>
 </nav>
