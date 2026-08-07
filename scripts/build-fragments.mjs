@@ -389,10 +389,14 @@ const detailOf = (it) => {
   const pl = PLAIN[it.id];
   const explain = pl
     ? `<div class="d-plain">
-         <p class="d-what">${esc(pl.what)}</p>
-         <p class="d-why"><span>Why it matters</span> ${esc(pl.why)}</p>
-         ${pl.sides ? `<ul class="d-sides">${pl.sides.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
-         ${pl.note ? `<p class="d-caveat">${esc(pl.note)}</p>` : ''}
+         <div class="d-col">
+           <p class="d-what">${esc(pl.what)}</p>
+           ${pl.sides ? `<ul class="d-sides">${pl.sides.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+         </div>
+         <div class="d-col d-col-why">
+           <p class="d-why"><span>Why it matters</span>${esc(pl.why)}</p>
+           ${pl.note ? `<p class="d-caveat">${esc(pl.note)}</p>` : ''}
+         </div>
        </div>`
     : '';
 
@@ -545,23 +549,44 @@ body.is-detail .detail{display:block}
 /* The plain-language layer sits above the measurement, because the reader this
    is written for needs to know what is being counted before a percentage means
    anything to them. */
+/* Two columns: the claim and what it rests on down the left, the reasoning
+   down the right. In one column the whole block ran to a single wide measure
+   and the "why" read as a footnote to the headline rather than as its own
+   answer. */
 .d-plain{
   background:var(--eo-color-surface-default);
   border-radius:var(--eo-dimension-border-radius-large);
   padding:var(--eo-dimension-padding-block-large) var(--eo-dimension-padding-inline-default);
   margin-top:var(--eo-dimension-16);
-  max-width:78ch;
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+  gap:var(--eo-dimension-gap-largest);
+  align-items:start;
+}
+@media (max-width:820px){
+  .d-plain{grid-template-columns:1fr;gap:var(--eo-dimension-gap-large)}
+}
+.d-col{min-width:0}
+.d-col-why{
+  padding-left:var(--eo-dimension-gap-large);
+  border-left:1px solid var(--eo-color-border-subtle);
+}
+@media (max-width:820px){
+  .d-col-why{padding-left:0;border-left:0}
 }
 .d-what{
-  margin:0 0 var(--eo-dimension-12);
+  margin:0;
   font-family:var(--eo-typography-headline-300-font-family);
   font-size:var(--eo-typography-headline-300-font-size);
   line-height:1.3;letter-spacing:-.01em;
+  max-width:34ch;
 }
-.d-why{margin:0;color:var(--eo-color-content-subtle)}
+.d-why{margin:0;color:var(--eo-color-content-subtle);max-width:44ch}
 .d-why span{
+  display:block;
   font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;
-  color:var(--eo-color-content-accent);margin-right:.5rem;
+  color:var(--eo-color-content-accent);
+  margin-bottom:var(--eo-dimension-4);
 }
 .d-sides{
   margin:var(--eo-dimension-16) 0 0;padding:0;list-style:none;
