@@ -8,7 +8,10 @@
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { radar, donut, trend, stationBars, splitMatrix, changeList, pipeline, cascadeField } from '../src/charts.mjs';
+import {
+  radar, donut, trend, stationBars, splitMatrix, changeList, pipeline, cascadeField,
+  unitGrid, tierStack,
+} from '../src/charts.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const data = JSON.parse(readFileSync(resolve(root, 'ds-kpi-data.json'), 'utf8'));
@@ -180,6 +183,9 @@ const overview = `
     <div class="kpi-track">
       ${[
         {
+          // Every panel's motif is drawn from that panel's own figures, so the
+          // background is the number made countable rather than decoration.
+          art: unitGrid(24, 24, { cols: 6, tone: 'good' }),
           v: '100%',
           k: 'Wellpass design coverage',
           p: 'Every surface Wellpass needs has a finished, reviewed design in the UI Kit. Nothing on the design side is blocking that programme.',
@@ -187,6 +193,12 @@ const overview = `
           side: 'design',
         },
         {
+          art: tierStack([
+            { n: 335 },  // Core
+            { n: 1111 }, // Brand
+            { n: 165 },  // Breakpoint
+            { n: 7 },    // Appearance
+          ]),
           v: String(tokenAudit?.variables ?? 1619),
           k: 'Token variables, four tiers',
           p: `Core → Brand → Breakpoint → Appearance, with ${tokenAudit?.aliasPct ?? 72}% of values resolving through an alias rather than a literal. One change reaches every brand and breakpoint at once.`,
@@ -194,6 +206,7 @@ const overview = `
           side: 'design',
         },
         {
+          art: unitGrid(96, 100, { cols: 10, tone: 'good' }),
           v: '96%',
           k: 'Fills bound to design tokens',
           p: 'Counted across all 109,402 layers, not sampled — 98.6% excluding icon placeholders, 100% of strokes, and zero detached instances anywhere.',
@@ -201,6 +214,8 @@ const overview = `
           side: 'design',
         },
         {
+          // 15 of 37 — the actual component counts, not a percentage redrawn.
+          art: unitGrid(coverage.inCode, coverage.coreSetTotal, { cols: 7, tone: 'bad' }),
           v: `${coverage.inCodePct}%`,
           k: 'Of the core set exists in code',
           p: `${coverage.inCode} of ${coverage.coreSetTotal} components are built. Every one of the rest already has a finished design waiting on engineering capacity.`,
@@ -208,6 +223,7 @@ const overview = `
           side: 'code',
         },
         {
+          art: unitGrid(rfd.unassigned, rfd.count, { cols: 5, tone: 'bad' }),
           v: String(rfd.count),
           k: 'Tickets ready, unstarted',
           p: `Each one already carries a spec and a priority; ${rfd.unassigned} have nobody assigned. This is a queue waiting on capacity, not on decisions.`,
@@ -218,6 +234,7 @@ const overview = `
         .map(
           (p, i, all) => `
         <article class="kpi-panel ${p.side}">
+          <div class="kpi-art" aria-hidden="true">${p.art ?? ''}</div>
           <span class="kpi-ghost" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>
           <div class="kpi-body">
             <span class="kpi-kicker">${p.side === 'design' ? 'Design side' : 'Code side'} · ${String(
@@ -694,7 +711,10 @@ const TABS = [
   ['quality', 'Quality', qualityTab],
   ['delivery', 'Delivery', deliveryTab],
   ['governance', 'Governance', governanceTab],
-  ['roadmap', 'Roadmap', roadmapTab],
+  // Roadmap deliberately absent. This is a dashboard — it reports the state of
+  // the system. The plan lives in Notion, which is where it is maintained and
+  // where it would otherwise drift out of sync with this page. The section is
+  // still built below and simply not mounted, so it can return as a fragment.
 ];
 
 const html = `<!doctype html>
@@ -792,6 +812,9 @@ const html = `<!doctype html>
   <div class="closer-inner">
     <h2>Where these numbers come from</h2>
     <p>Station scores are parsed directly out of <code>${esc(inspection?.source ?? 'the inspection reports')}</code>, so this dashboard cannot drift from the inspection. Component counts, pull request ages, tags, releases and contributor counts refresh automatically from the GitHub API.</p>
+    <p><strong>The roadmap is not on this page.</strong> The twelve-week plan is maintained in Notion — <a href="${esc(
+      meta.sources.rolloutPlan
+    )}" rel="noreferrer">DS Engineering Rollout</a> — and duplicating it here would only give it a second place to go stale.</p>
     <p>Jira and Notion figures are as last reviewed — they need tokens this build does not have, and are not presented as live.</p>
     <p>Built with the real design system: <code>@egym-private/egym-one-design-system-web@${esc(
       dsInfo.version

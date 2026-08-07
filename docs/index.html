@@ -1009,6 +1009,40 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     --eo-color-surface-default: var(--eo-color-surface-subtle);
   }
 }
+
+/* ---------- the KPI panel motifs ----------
+   Each panel's background is a drawing of its own number: a field of units
+   with the stated proportion filled, or the four token tiers at their real
+   relative sizes. It sits opposite the reading column, low in contrast, and
+   is drawn from the same data as the headline — so it cannot say something
+   the number does not. */
+.kpi-art {
+  position: absolute;
+  right: clamp(2rem, 7vw, 8rem);
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(14rem, 24vw, 26rem);
+  z-index: 1;
+  pointer-events: none;
+}
+.kpi-art svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+.ug-dot { opacity: 0; }
+.ug-dot.off  { fill: color-mix(in srgb, var(--eo-color-content-on-emphasized) 22%, transparent); }
+.ug-dot.on.good { fill: var(--eo-color-content-utility-positive); }
+.ug-dot.on.bad  { fill: var(--eo-color-content-utility-negative); }
+
+.ts-bar { fill: color-mix(in srgb, var(--eo-color-content-accent) 55%, transparent); opacity: 0; }
+
+/* Resting state for no-JS and reduced motion: present, not animating. The
+   panel is a background, so it must never be the reason the page looks empty. */
+.kpi-art .ug-dot { opacity: 1; }
+.kpi-art .ts-bar { opacity: 0.7; }
+
+@media (max-width: 900px) {
+  /* Stacked panels put the text full width, so the motif would sit under it. */
+  .kpi-art { position: static; transform: none; width: 60%; margin: 2rem 0 0; }
+}
 </style>
 </head>
 <body data-tab-state="overview">
@@ -1077,11 +1111,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
              aria-selected="false" data-tab="governance" size="small" content="text"
              hierarchy="tertiary"
              intent="neutral"
-             data-token="eo-button · tertiary/neutral">Governance</eo-button><eo-button class="tab" role="tab" id="tab-roadmap" aria-controls="panel-roadmap"
-             aria-selected="false" data-tab="roadmap" size="small" content="text"
-             hierarchy="tertiary"
-             intent="neutral"
-             data-token="eo-button · tertiary/neutral">Roadmap</eo-button>
+             data-token="eo-button · tertiary/neutral">Governance</eo-button>
     </div>
     <!-- Brand switch. One icon-only button, no menu: the dropdown it replaced
          could not be clicked at all, because eo-button re-emits its click from
@@ -1303,6 +1333,32 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     <div class="kpi-track">
       
         <article class="kpi-panel design">
+          <div class="kpi-art" aria-hidden="true"><svg class="ug" viewBox="0 0 100 66.67" preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true" focusable="false"><circle class="ug-dot on good" cx="8.33" cy="8.33"
+      r="2.67" style="--d:0.03s"/><circle class="ug-dot on good" cx="25.00" cy="8.33"
+      r="2.67" style="--d:0.10s"/><circle class="ug-dot on good" cx="41.67" cy="8.33"
+      r="2.67" style="--d:0.06s"/><circle class="ug-dot on good" cx="58.33" cy="8.33"
+      r="2.67" style="--d:0.14s"/><circle class="ug-dot on good" cx="75.00" cy="8.33"
+      r="2.67" style="--d:0.14s"/><circle class="ug-dot on good" cx="91.67" cy="8.33"
+      r="2.67" style="--d:0.11s"/><circle class="ug-dot on good" cx="8.33" cy="25.00"
+      r="2.67" style="--d:0.14s"/><circle class="ug-dot on good" cx="25.00" cy="25.00"
+      r="2.67" style="--d:0.12s"/><circle class="ug-dot on good" cx="41.67" cy="25.00"
+      r="2.67" style="--d:0.12s"/><circle class="ug-dot on good" cx="58.33" cy="25.00"
+      r="2.67" style="--d:0.23s"/><circle class="ug-dot on good" cx="75.00" cy="25.00"
+      r="2.67" style="--d:0.15s"/><circle class="ug-dot on good" cx="91.67" cy="25.00"
+      r="2.67" style="--d:0.17s"/><circle class="ug-dot on good" cx="8.33" cy="41.67"
+      r="2.67" style="--d:0.23s"/><circle class="ug-dot on good" cx="25.00" cy="41.67"
+      r="2.67" style="--d:0.26s"/><circle class="ug-dot on good" cx="41.67" cy="41.67"
+      r="2.67" style="--d:0.21s"/><circle class="ug-dot on good" cx="58.33" cy="41.67"
+      r="2.67" style="--d:0.31s"/><circle class="ug-dot on good" cx="75.00" cy="41.67"
+      r="2.67" style="--d:0.28s"/><circle class="ug-dot on good" cx="91.67" cy="41.67"
+      r="2.67" style="--d:0.28s"/><circle class="ug-dot on good" cx="8.33" cy="58.33"
+      r="2.67" style="--d:0.36s"/><circle class="ug-dot on good" cx="25.00" cy="58.33"
+      r="2.67" style="--d:0.28s"/><circle class="ug-dot on good" cx="41.67" cy="58.33"
+      r="2.67" style="--d:0.40s"/><circle class="ug-dot on good" cx="58.33" cy="58.33"
+      r="2.67" style="--d:0.34s"/><circle class="ug-dot on good" cx="75.00" cy="58.33"
+      r="2.67" style="--d:0.40s"/><circle class="ug-dot on good" cx="91.67" cy="58.33"
+      r="2.67" style="--d:0.39s"/></svg></div>
           <span class="kpi-ghost" aria-hidden="true">01</span>
           <div class="kpi-body">
             <span class="kpi-kicker">Design side · 01 / 05</span>
@@ -1313,6 +1369,12 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
           </div>
         </article>
         <article class="kpi-panel design">
+          <div class="kpi-art" aria-hidden="true"><svg class="ts" viewBox="0 0 100 100" preserveAspectRatio="none"
+    aria-hidden="true" focusable="false"><rect class="ts-bar" x="0" y="0.00" width="100" height="19.50"
+        style="--d:0.00s"/><rect class="ts-bar" x="0" y="20.70" width="100" height="67.47"
+        style="--d:0.18s"/><rect class="ts-bar" x="0" y="89.37" width="100" height="9.00"
+        style="--d:0.36s"/><rect class="ts-bar" x="0" y="99.57" width="100" height="0.60"
+        style="--d:0.54s"/></svg></div>
           <span class="kpi-ghost" aria-hidden="true">02</span>
           <div class="kpi-body">
             <span class="kpi-kicker">Design side · 02 / 05</span>
@@ -1323,6 +1385,108 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
           </div>
         </article>
         <article class="kpi-panel design">
+          <div class="kpi-art" aria-hidden="true"><svg class="ug" viewBox="0 0 100 100.00" preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true" focusable="false"><circle class="ug-dot on good" cx="5.00" cy="5.00"
+      r="1.60" style="--d:0.03s"/><circle class="ug-dot on good" cx="15.00" cy="5.00"
+      r="1.60" style="--d:0.10s"/><circle class="ug-dot on good" cx="25.00" cy="5.00"
+      r="1.60" style="--d:0.06s"/><circle class="ug-dot on good" cx="35.00" cy="5.00"
+      r="1.60" style="--d:0.14s"/><circle class="ug-dot on good" cx="45.00" cy="5.00"
+      r="1.60" style="--d:0.14s"/><circle class="ug-dot on good" cx="55.00" cy="5.00"
+      r="1.60" style="--d:0.11s"/><circle class="ug-dot on good" cx="65.00" cy="5.00"
+      r="1.60" style="--d:0.14s"/><circle class="ug-dot on good" cx="75.00" cy="5.00"
+      r="1.60" style="--d:0.12s"/><circle class="ug-dot on good" cx="85.00" cy="5.00"
+      r="1.60" style="--d:0.12s"/><circle class="ug-dot on good" cx="95.00" cy="5.00"
+      r="1.60" style="--d:0.23s"/><circle class="ug-dot on good" cx="5.00" cy="15.00"
+      r="1.60" style="--d:0.15s"/><circle class="ug-dot on good" cx="15.00" cy="15.00"
+      r="1.60" style="--d:0.17s"/><circle class="ug-dot on good" cx="25.00" cy="15.00"
+      r="1.60" style="--d:0.23s"/><circle class="ug-dot on good" cx="35.00" cy="15.00"
+      r="1.60" style="--d:0.26s"/><circle class="ug-dot on good" cx="45.00" cy="15.00"
+      r="1.60" style="--d:0.21s"/><circle class="ug-dot on good" cx="55.00" cy="15.00"
+      r="1.60" style="--d:0.31s"/><circle class="ug-dot on good" cx="65.00" cy="15.00"
+      r="1.60" style="--d:0.28s"/><circle class="ug-dot on good" cx="75.00" cy="15.00"
+      r="1.60" style="--d:0.28s"/><circle class="ug-dot on good" cx="85.00" cy="15.00"
+      r="1.60" style="--d:0.36s"/><circle class="ug-dot on good" cx="95.00" cy="15.00"
+      r="1.60" style="--d:0.28s"/><circle class="ug-dot on good" cx="5.00" cy="25.00"
+      r="1.60" style="--d:0.40s"/><circle class="ug-dot on good" cx="15.00" cy="25.00"
+      r="1.60" style="--d:0.34s"/><circle class="ug-dot on good" cx="25.00" cy="25.00"
+      r="1.60" style="--d:0.40s"/><circle class="ug-dot on good" cx="35.00" cy="25.00"
+      r="1.60" style="--d:0.39s"/><circle class="ug-dot on good" cx="45.00" cy="25.00"
+      r="1.60" style="--d:0.41s"/><circle class="ug-dot on good" cx="55.00" cy="25.00"
+      r="1.60" style="--d:0.41s"/><circle class="ug-dot on good" cx="65.00" cy="25.00"
+      r="1.60" style="--d:0.48s"/><circle class="ug-dot on good" cx="75.00" cy="25.00"
+      r="1.60" style="--d:0.43s"/><circle class="ug-dot on good" cx="85.00" cy="25.00"
+      r="1.60" style="--d:0.45s"/><circle class="ug-dot on good" cx="95.00" cy="25.00"
+      r="1.60" style="--d:0.43s"/><circle class="ug-dot on good" cx="5.00" cy="35.00"
+      r="1.60" style="--d:0.45s"/><circle class="ug-dot on good" cx="15.00" cy="35.00"
+      r="1.60" style="--d:0.53s"/><circle class="ug-dot on good" cx="25.00" cy="35.00"
+      r="1.60" style="--d:0.47s"/><circle class="ug-dot on good" cx="35.00" cy="35.00"
+      r="1.60" style="--d:0.51s"/><circle class="ug-dot on good" cx="45.00" cy="35.00"
+      r="1.60" style="--d:0.59s"/><circle class="ug-dot on good" cx="55.00" cy="35.00"
+      r="1.60" style="--d:0.52s"/><circle class="ug-dot on good" cx="65.00" cy="35.00"
+      r="1.60" style="--d:0.61s"/><circle class="ug-dot on good" cx="75.00" cy="35.00"
+      r="1.60" style="--d:0.55s"/><circle class="ug-dot on good" cx="85.00" cy="35.00"
+      r="1.60" style="--d:0.59s"/><circle class="ug-dot on good" cx="95.00" cy="35.00"
+      r="1.60" style="--d:0.58s"/><circle class="ug-dot on good" cx="5.00" cy="45.00"
+      r="1.60" style="--d:0.67s"/><circle class="ug-dot on good" cx="15.00" cy="45.00"
+      r="1.60" style="--d:0.64s"/><circle class="ug-dot on good" cx="25.00" cy="45.00"
+      r="1.60" style="--d:0.64s"/><circle class="ug-dot on good" cx="35.00" cy="45.00"
+      r="1.60" style="--d:0.67s"/><circle class="ug-dot on good" cx="45.00" cy="45.00"
+      r="1.60" style="--d:0.63s"/><circle class="ug-dot on good" cx="55.00" cy="45.00"
+      r="1.60" style="--d:0.65s"/><circle class="ug-dot on good" cx="65.00" cy="45.00"
+      r="1.60" style="--d:0.65s"/><circle class="ug-dot on good" cx="75.00" cy="45.00"
+      r="1.60" style="--d:0.68s"/><circle class="ug-dot on good" cx="85.00" cy="45.00"
+      r="1.60" style="--d:0.77s"/><circle class="ug-dot on good" cx="95.00" cy="45.00"
+      r="1.60" style="--d:0.72s"/><circle class="ug-dot on good" cx="5.00" cy="55.00"
+      r="1.60" style="--d:0.71s"/><circle class="ug-dot on good" cx="15.00" cy="55.00"
+      r="1.60" style="--d:0.77s"/><circle class="ug-dot on good" cx="25.00" cy="55.00"
+      r="1.60" style="--d:0.75s"/><circle class="ug-dot on good" cx="35.00" cy="55.00"
+      r="1.60" style="--d:0.78s"/><circle class="ug-dot on good" cx="45.00" cy="55.00"
+      r="1.60" style="--d:0.76s"/><circle class="ug-dot on good" cx="55.00" cy="55.00"
+      r="1.60" style="--d:0.85s"/><circle class="ug-dot on good" cx="65.00" cy="55.00"
+      r="1.60" style="--d:0.81s"/><circle class="ug-dot on good" cx="75.00" cy="55.00"
+      r="1.60" style="--d:0.83s"/><circle class="ug-dot on good" cx="85.00" cy="55.00"
+      r="1.60" style="--d:0.88s"/><circle class="ug-dot on good" cx="95.00" cy="55.00"
+      r="1.60" style="--d:0.91s"/><circle class="ug-dot on good" cx="5.00" cy="65.00"
+      r="1.60" style="--d:0.89s"/><circle class="ug-dot on good" cx="15.00" cy="65.00"
+      r="1.60" style="--d:0.93s"/><circle class="ug-dot on good" cx="25.00" cy="65.00"
+      r="1.60" style="--d:0.89s"/><circle class="ug-dot on good" cx="35.00" cy="65.00"
+      r="1.60" style="--d:0.91s"/><circle class="ug-dot on good" cx="45.00" cy="65.00"
+      r="1.60" style="--d:0.91s"/><circle class="ug-dot on good" cx="55.00" cy="65.00"
+      r="1.60" style="--d:0.98s"/><circle class="ug-dot on good" cx="65.00" cy="65.00"
+      r="1.60" style="--d:1.03s"/><circle class="ug-dot on good" cx="75.00" cy="65.00"
+      r="1.60" style="--d:1.05s"/><circle class="ug-dot on good" cx="85.00" cy="65.00"
+      r="1.60" style="--d:0.96s"/><circle class="ug-dot on good" cx="95.00" cy="65.00"
+      r="1.60" style="--d:1.02s"/><circle class="ug-dot on good" cx="5.00" cy="75.00"
+      r="1.60" style="--d:1.00s"/><circle class="ug-dot on good" cx="15.00" cy="75.00"
+      r="1.60" style="--d:1.05s"/><circle class="ug-dot on good" cx="25.00" cy="75.00"
+      r="1.60" style="--d:1.02s"/><circle class="ug-dot on good" cx="35.00" cy="75.00"
+      r="1.60" style="--d:1.10s"/><circle class="ug-dot on good" cx="45.00" cy="75.00"
+      r="1.60" style="--d:1.13s"/><circle class="ug-dot on good" cx="55.00" cy="75.00"
+      r="1.60" style="--d:1.14s"/><circle class="ug-dot on good" cx="65.00" cy="75.00"
+      r="1.60" style="--d:1.10s"/><circle class="ug-dot on good" cx="75.00" cy="75.00"
+      r="1.60" style="--d:1.15s"/><circle class="ug-dot on good" cx="85.00" cy="75.00"
+      r="1.60" style="--d:1.20s"/><circle class="ug-dot on good" cx="95.00" cy="75.00"
+      r="1.60" style="--d:1.11s"/><circle class="ug-dot on good" cx="5.00" cy="85.00"
+      r="1.60" style="--d:1.20s"/><circle class="ug-dot on good" cx="15.00" cy="85.00"
+      r="1.60" style="--d:1.24s"/><circle class="ug-dot on good" cx="25.00" cy="85.00"
+      r="1.60" style="--d:1.15s"/><circle class="ug-dot on good" cx="35.00" cy="85.00"
+      r="1.60" style="--d:1.23s"/><circle class="ug-dot on good" cx="45.00" cy="85.00"
+      r="1.60" style="--d:1.29s"/><circle class="ug-dot on good" cx="55.00" cy="85.00"
+      r="1.60" style="--d:1.23s"/><circle class="ug-dot on good" cx="65.00" cy="85.00"
+      r="1.60" style="--d:1.32s"/><circle class="ug-dot on good" cx="75.00" cy="85.00"
+      r="1.60" style="--d:1.25s"/><circle class="ug-dot on good" cx="85.00" cy="85.00"
+      r="1.60" style="--d:1.26s"/><circle class="ug-dot on good" cx="95.00" cy="85.00"
+      r="1.60" style="--d:1.36s"/><circle class="ug-dot on good" cx="5.00" cy="95.00"
+      r="1.60" style="--d:1.28s"/><circle class="ug-dot on good" cx="15.00" cy="95.00"
+      r="1.60" style="--d:1.29s"/><circle class="ug-dot on good" cx="25.00" cy="95.00"
+      r="1.60" style="--d:1.37s"/><circle class="ug-dot on good" cx="35.00" cy="95.00"
+      r="1.60" style="--d:1.38s"/><circle class="ug-dot on good" cx="45.00" cy="95.00"
+      r="1.60" style="--d:1.38s"/><circle class="ug-dot on good" cx="55.00" cy="95.00"
+      r="1.60" style="--d:1.43s"/><circle class="ug-dot off" cx="65.00" cy="95.00"
+      r="1.60" style="--d:1.37s"/><circle class="ug-dot off" cx="75.00" cy="95.00"
+      r="1.60" style="--d:1.37s"/><circle class="ug-dot off" cx="85.00" cy="95.00"
+      r="1.60" style="--d:1.47s"/><circle class="ug-dot off" cx="95.00" cy="95.00"
+      r="1.60" style="--d:1.43s"/></svg></div>
           <span class="kpi-ghost" aria-hidden="true">03</span>
           <div class="kpi-body">
             <span class="kpi-kicker">Design side · 03 / 05</span>
@@ -1333,6 +1497,45 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
           </div>
         </article>
         <article class="kpi-panel code">
+          <div class="kpi-art" aria-hidden="true"><svg class="ug" viewBox="0 0 100 85.71" preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true" focusable="false"><circle class="ug-dot on bad" cx="7.14" cy="7.14"
+      r="2.29" style="--d:0.03s"/><circle class="ug-dot on bad" cx="21.43" cy="7.14"
+      r="2.29" style="--d:0.10s"/><circle class="ug-dot on bad" cx="35.71" cy="7.14"
+      r="2.29" style="--d:0.06s"/><circle class="ug-dot on bad" cx="50.00" cy="7.14"
+      r="2.29" style="--d:0.14s"/><circle class="ug-dot on bad" cx="64.29" cy="7.14"
+      r="2.29" style="--d:0.14s"/><circle class="ug-dot on bad" cx="78.57" cy="7.14"
+      r="2.29" style="--d:0.11s"/><circle class="ug-dot on bad" cx="92.86" cy="7.14"
+      r="2.29" style="--d:0.14s"/><circle class="ug-dot on bad" cx="7.14" cy="21.43"
+      r="2.29" style="--d:0.12s"/><circle class="ug-dot on bad" cx="21.43" cy="21.43"
+      r="2.29" style="--d:0.12s"/><circle class="ug-dot on bad" cx="35.71" cy="21.43"
+      r="2.29" style="--d:0.23s"/><circle class="ug-dot on bad" cx="50.00" cy="21.43"
+      r="2.29" style="--d:0.15s"/><circle class="ug-dot on bad" cx="64.29" cy="21.43"
+      r="2.29" style="--d:0.17s"/><circle class="ug-dot on bad" cx="78.57" cy="21.43"
+      r="2.29" style="--d:0.23s"/><circle class="ug-dot on bad" cx="92.86" cy="21.43"
+      r="2.29" style="--d:0.26s"/><circle class="ug-dot on bad" cx="7.14" cy="35.71"
+      r="2.29" style="--d:0.21s"/><circle class="ug-dot off" cx="21.43" cy="35.71"
+      r="2.29" style="--d:0.31s"/><circle class="ug-dot off" cx="35.71" cy="35.71"
+      r="2.29" style="--d:0.28s"/><circle class="ug-dot off" cx="50.00" cy="35.71"
+      r="2.29" style="--d:0.28s"/><circle class="ug-dot off" cx="64.29" cy="35.71"
+      r="2.29" style="--d:0.36s"/><circle class="ug-dot off" cx="78.57" cy="35.71"
+      r="2.29" style="--d:0.28s"/><circle class="ug-dot off" cx="92.86" cy="35.71"
+      r="2.29" style="--d:0.40s"/><circle class="ug-dot off" cx="7.14" cy="50.00"
+      r="2.29" style="--d:0.34s"/><circle class="ug-dot off" cx="21.43" cy="50.00"
+      r="2.29" style="--d:0.40s"/><circle class="ug-dot off" cx="35.71" cy="50.00"
+      r="2.29" style="--d:0.39s"/><circle class="ug-dot off" cx="50.00" cy="50.00"
+      r="2.29" style="--d:0.41s"/><circle class="ug-dot off" cx="64.29" cy="50.00"
+      r="2.29" style="--d:0.41s"/><circle class="ug-dot off" cx="78.57" cy="50.00"
+      r="2.29" style="--d:0.48s"/><circle class="ug-dot off" cx="92.86" cy="50.00"
+      r="2.29" style="--d:0.43s"/><circle class="ug-dot off" cx="7.14" cy="64.29"
+      r="2.29" style="--d:0.45s"/><circle class="ug-dot off" cx="21.43" cy="64.29"
+      r="2.29" style="--d:0.43s"/><circle class="ug-dot off" cx="35.71" cy="64.29"
+      r="2.29" style="--d:0.45s"/><circle class="ug-dot off" cx="50.00" cy="64.29"
+      r="2.29" style="--d:0.53s"/><circle class="ug-dot off" cx="64.29" cy="64.29"
+      r="2.29" style="--d:0.47s"/><circle class="ug-dot off" cx="78.57" cy="64.29"
+      r="2.29" style="--d:0.51s"/><circle class="ug-dot off" cx="92.86" cy="64.29"
+      r="2.29" style="--d:0.59s"/><circle class="ug-dot off" cx="7.14" cy="78.57"
+      r="2.29" style="--d:0.52s"/><circle class="ug-dot off" cx="21.43" cy="78.57"
+      r="2.29" style="--d:0.61s"/></svg></div>
           <span class="kpi-ghost" aria-hidden="true">04</span>
           <div class="kpi-body">
             <span class="kpi-kicker">Code side · 04 / 05</span>
@@ -1343,6 +1546,33 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
           </div>
         </article>
         <article class="kpi-panel code">
+          <div class="kpi-art" aria-hidden="true"><svg class="ug" viewBox="0 0 100 100.00" preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true" focusable="false"><circle class="ug-dot on bad" cx="10.00" cy="10.00"
+      r="3.20" style="--d:0.03s"/><circle class="ug-dot on bad" cx="30.00" cy="10.00"
+      r="3.20" style="--d:0.10s"/><circle class="ug-dot on bad" cx="50.00" cy="10.00"
+      r="3.20" style="--d:0.06s"/><circle class="ug-dot on bad" cx="70.00" cy="10.00"
+      r="3.20" style="--d:0.14s"/><circle class="ug-dot on bad" cx="90.00" cy="10.00"
+      r="3.20" style="--d:0.14s"/><circle class="ug-dot on bad" cx="10.00" cy="30.00"
+      r="3.20" style="--d:0.11s"/><circle class="ug-dot on bad" cx="30.00" cy="30.00"
+      r="3.20" style="--d:0.14s"/><circle class="ug-dot on bad" cx="50.00" cy="30.00"
+      r="3.20" style="--d:0.12s"/><circle class="ug-dot on bad" cx="70.00" cy="30.00"
+      r="3.20" style="--d:0.12s"/><circle class="ug-dot on bad" cx="90.00" cy="30.00"
+      r="3.20" style="--d:0.23s"/><circle class="ug-dot on bad" cx="10.00" cy="50.00"
+      r="3.20" style="--d:0.15s"/><circle class="ug-dot on bad" cx="30.00" cy="50.00"
+      r="3.20" style="--d:0.17s"/><circle class="ug-dot on bad" cx="50.00" cy="50.00"
+      r="3.20" style="--d:0.23s"/><circle class="ug-dot on bad" cx="70.00" cy="50.00"
+      r="3.20" style="--d:0.26s"/><circle class="ug-dot on bad" cx="90.00" cy="50.00"
+      r="3.20" style="--d:0.21s"/><circle class="ug-dot on bad" cx="10.00" cy="70.00"
+      r="3.20" style="--d:0.31s"/><circle class="ug-dot on bad" cx="30.00" cy="70.00"
+      r="3.20" style="--d:0.28s"/><circle class="ug-dot on bad" cx="50.00" cy="70.00"
+      r="3.20" style="--d:0.28s"/><circle class="ug-dot on bad" cx="70.00" cy="70.00"
+      r="3.20" style="--d:0.36s"/><circle class="ug-dot on bad" cx="90.00" cy="70.00"
+      r="3.20" style="--d:0.28s"/><circle class="ug-dot on bad" cx="10.00" cy="90.00"
+      r="3.20" style="--d:0.40s"/><circle class="ug-dot on bad" cx="30.00" cy="90.00"
+      r="3.20" style="--d:0.34s"/><circle class="ug-dot on bad" cx="50.00" cy="90.00"
+      r="3.20" style="--d:0.40s"/><circle class="ug-dot on bad" cx="70.00" cy="90.00"
+      r="3.20" style="--d:0.39s"/><circle class="ug-dot off" cx="90.00" cy="90.00"
+      r="3.20" style="--d:0.41s"/></svg></div>
           <span class="kpi-ghost" aria-hidden="true">05</span>
           <div class="kpi-body">
             <span class="kpi-kicker">Code side · 05 / 05</span>
@@ -1863,30 +2093,6 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
        <p class="tile-text">Stations 06, 09 and 10 are held down almost entirely by an AI-readiness repository sitting in a playground organisation that is not linked from either design system repo, from Notion, or from Slack. It holds a validated 3,061-token <code>design.md</code>, 127 machine-readable component contracts against a published JSON Schema, a working design-to-token drift detector, and an agent skill wired for both Claude Code and Copilot. Both of its validators pass, offline, in under a second.</p>
        <p class="tile-text">Promoting it is a move, not a build. It is the largest single score movement available.</p></div></eo-card>
   </div>
-</section></div><div class="panel " id="panel-roadmap" role="tabpanel" aria-labelledby="tab-roadmap" hidden>
-<section class="band">
-  <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Twelve weeks</p><h2 data-token="--eo-typography-headline-500">What two engineers would do</h2><p data-token="--eo-color-content-subtle">After tranche 1, two new engineers from another project take over (tranche 2). Alumni carry DS/package knowledge into their downstream teams → adoption via multipliers.</p></div>
-  <div class="bento">
-    <eo-card class="tile span-4" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Weeks 1-2</p>
-     <h3>Infrastructure &amp; Quick Wins</h3>
-     <ul class="ticket-list"><li>DSC-214</li><li>DSC-216</li><li>DSC-172</li><li>DSC-37</li><li>DSC-199</li><li>DSC-187</li><li>DSC-202</li><li>DSC-213</li></ul>
-     <p class="tile-text">Release tagging &amp; semver (pattern: egym-one-token-system) · Onboarding on DS standards</p></div></eo-card>
-    <eo-card class="tile span-4" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Weeks 3-8</p>
-     <h3>Core by BMA priority</h3>
-     <ul class="ticket-list"><li>DSC-64</li><li>DSC-63</li><li>DSC-200</li><li>DSC-208</li><li>DSC-205</li><li>DSC-175</li><li>DSC-78</li><li>DSC-206</li><li>DSC-58</li><li>DSC-203</li><li>DSC-100</li><li>DSC-204</li></ul>
-     </div></eo-card>
-    <eo-card class="tile span-4" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Weeks 9-12</p>
-     <h3>Clear the queue &amp; handover</h3>
-     <ul class="ticket-list"><li>DSC-113</li><li>DSC-90</li><li>DSC-92</li><li>DSC-197</li><li>DSC-189</li><li>DSC-159</li></ul>
-     <p class="tile-text">Component MDs &amp; documentation gaps · Establish contribution model · Buffer/spillover in week 12</p></div></eo-card>
-  </div>
-</section>
-
-<section class="band tight">
-  <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Targets</p><h2 data-token="--eo-typography-headline-500">How we would know it worked</h2></div>
-  <div class="stat-row">
-    <div class="stat bad"><div class="stat-in"><div class="v " data-token="--eo-color-content-utility-negative" data-count="43" data-tpl="__">43</div><p class="k" data-token="--eo-color-content-subtle">Core coverage in code</p><p class="t" data-token="--eo-color-content-hinted">→ 100 · 37/37</p></div></div><div class="stat bad"><div class="stat-in"><div class="v " data-token="--eo-color-content-utility-negative" data-count="25" data-tpl="__">25</div><p class="k" data-token="--eo-color-content-subtle">Jira queue &#39;Ready for Development&#39;</p><p class="t" data-token="--eo-color-content-hinted">→ 0</p></div></div><div class="stat "><div class="stat-in"><div class="v small" data-token="--eo-color-content-emphasized">&gt;100</div><p class="k" data-token="--eo-color-content-subtle">P90 time-to-merge (incl. community PRs)</p><p class="t" data-token="--eo-color-content-hinted">→ &lt;14</p></div></div><div class="stat "><div class="stat-in"><div class="v " data-token="--eo-color-content-emphasized" data-count="0" data-tpl="__">0</div><p class="k" data-token="--eo-color-content-subtle">Tagged, versioned releases</p><p class="t" data-token="--eo-color-content-hinted">→ every release</p></div></div><div class="stat "><div class="stat-in"><div class="v small" data-token="--eo-color-content-emphasized">—</div><p class="k" data-token="--eo-color-content-subtle">New BMA features built from DS components</p><p class="t" data-token="--eo-color-content-hinted">→ 100</p></div></div>
-  </div>
 </section></div>
 </main>
 
@@ -1894,6 +2100,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
   <div class="closer-inner">
     <h2>Where these numbers come from</h2>
     <p>Station scores are parsed directly out of <code>ds-inspection/reports/2026-08-06-inspection.md</code>, so this dashboard cannot drift from the inspection. Component counts, pull request ages, tags, releases and contributor counts refresh automatically from the GitHub API.</p>
+    <p><strong>The roadmap is not on this page.</strong> The twelve-week plan is maintained in Notion — <a href="https://app.notion.com/p/DS-Engineering-Rollout-12-Week-Detailed-Plan-2-Engineers-3b4d894dd22a8138af03fe4c3192ba19" rel="noreferrer">DS Engineering Rollout</a> — and duplicating it here would only give it a second place to go stale.</p>
     <p>Jira and Notion figures are as last reviewed — they need tokens this build does not have, and are not presented as live.</p>
     <p>Built with the real design system: <code>@egym-private/egym-one-design-system-web@0.1.25</code> — eo-card, eo-label, eo-alert, eo-button, eo-divider, eo-tooltip — styled entirely from the 988 published <code>--eo-*</code> tokens. Charts are hand-built from those tokens because the system has no chart or progress component in code yet (DSC-100).</p>
     <p><strong>Sources.</strong> <a href="https://egym.atlassian.net/jira/software/c/projects/DSC/boards/1072" rel="noreferrer">jiraBoard</a> · <a href="https://egym.github.io/lib-egym-one-design-system/" rel="noreferrer">storybook</a> · <a href="https://app.notion.com/p/2f4d894dd22a809980e3c19fa6c3edb3" rel="noreferrer">bmaBuildPlan</a> · <a href="https://app.notion.com/p/38fd894dd22a81f59f84e91978ad88f9" rel="noreferrer">coreComponentsMetadata</a> · <a href="https://app.notion.com/p/DS-Engineering-Rollout-12-Week-Detailed-Plan-2-Engineers-3b4d894dd22a8138af03fe4c3192ba19" rel="noreferrer">rolloutPlan</a> · governanceReport · deck</p>

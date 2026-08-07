@@ -402,3 +402,53 @@ export function cascadeField({ width = 1440, height = 2700, seed = 7, cycles = 2
   return `<svg class="cascade" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none"
     aria-hidden="true" focusable="false">${bands}</svg>`;
 }
+
+/* ------------------------------------------------------------- unit grid ---
+   A field of N cells with M of them filled. Behind a KPI panel it does one
+   job: make the ratio in the headline physically countable, so "41%" is not
+   just a number but a visible amount of a visible whole.
+
+   Deliberately not decoration — the counts are the real ones. If the data
+   changes, the field changes with it. */
+export function unitGrid(filled, total, { cols = 0, seed = 5, tone = 'good' } = {}) {
+  const n = Math.max(1, Math.round(total));
+  const c = cols || Math.ceil(Math.sqrt(n * 2.4));
+  const rows = Math.ceil(n / c);
+  const cell = 100 / c;
+  const r = cell * 0.16;
+
+  // Seeded, so the same data always draws the same field and a rebuild is a
+  // clean diff rather than a reshuffle.
+  let s = seed;
+  const rnd = () => ((s = (s * 1664525 + 1013904223) % 4294967296) / 4294967296);
+
+  const dots = Array.from({ length: n }, (_, i) => {
+    const x = (i % c) * cell + cell / 2;
+    const y = Math.floor(i / c) * cell + cell / 2;
+    const on = i < Math.round(filled);
+    return `<circle class="ug-dot ${on ? 'on ' + tone : 'off'}" cx="${x.toFixed(2)}" cy="${y.toFixed(2)}"
+      r="${r.toFixed(2)}" style="--d:${(i * 0.014 + rnd() * 0.12).toFixed(2)}s"/>`;
+  }).join('');
+
+  return `<svg class="ug" viewBox="0 0 100 ${(rows * cell).toFixed(2)}" preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true" focusable="false">${dots}</svg>`;
+}
+
+/* ------------------------------------------------------------ tier stack ---
+   Four bands, sized to the real collection counts, for the token panel. The
+   shape is the argument: Brand dwarfs everything, Appearance is a sliver. */
+export function tierStack(tiers) {
+  const total = tiers.reduce((a, t) => a + t.n, 0) || 1;
+  let y = 0;
+  const bars = tiers
+    .map((t, i) => {
+      const h = (t.n / total) * 100;
+      const bar = `<rect class="ts-bar" x="0" y="${y.toFixed(2)}" width="100" height="${Math.max(0.6, h - 1.2).toFixed(2)}"
+        style="--d:${(i * 0.18).toFixed(2)}s"/>`;
+      y += h;
+      return bar;
+    })
+    .join('');
+  return `<svg class="ts" viewBox="0 0 100 100" preserveAspectRatio="none"
+    aria-hidden="true" focusable="false">${bars}</svg>`;
+}

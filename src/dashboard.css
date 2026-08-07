@@ -1001,3 +1001,37 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     --eo-color-surface-default: var(--eo-color-surface-subtle);
   }
 }
+
+/* ---------- the KPI panel motifs ----------
+   Each panel's background is a drawing of its own number: a field of units
+   with the stated proportion filled, or the four token tiers at their real
+   relative sizes. It sits opposite the reading column, low in contrast, and
+   is drawn from the same data as the headline — so it cannot say something
+   the number does not. */
+.kpi-art {
+  position: absolute;
+  right: clamp(2rem, 7vw, 8rem);
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(14rem, 24vw, 26rem);
+  z-index: 1;
+  pointer-events: none;
+}
+.kpi-art svg { width: 100%; height: auto; display: block; overflow: visible; }
+
+.ug-dot { opacity: 0; }
+.ug-dot.off  { fill: color-mix(in srgb, var(--eo-color-content-on-emphasized) 22%, transparent); }
+.ug-dot.on.good { fill: var(--eo-color-content-utility-positive); }
+.ug-dot.on.bad  { fill: var(--eo-color-content-utility-negative); }
+
+.ts-bar { fill: color-mix(in srgb, var(--eo-color-content-accent) 55%, transparent); opacity: 0; }
+
+/* Resting state for no-JS and reduced motion: present, not animating. The
+   panel is a background, so it must never be the reason the page looks empty. */
+.kpi-art .ug-dot { opacity: 1; }
+.kpi-art .ts-bar { opacity: 0.7; }
+
+@media (max-width: 900px) {
+  /* Stacked panels put the text full width, so the motif would sit under it. */
+  .kpi-art { position: static; transform: none; width: 60%; margin: 2rem 0 0; }
+}

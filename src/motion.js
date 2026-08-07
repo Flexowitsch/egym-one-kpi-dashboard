@@ -738,7 +738,25 @@ function kpiRail() {
           scrollTrigger: { containerAnimation: tween, trigger: panel, start: 'left right', end: 'right left', scrub: true },
         }
       );
-      // The number counts as its panel arrives, not on page load.
+      // The motif drifts against the panel too, a little further than the body,
+      // so the three planes read as three distances.
+      const art = $('.kpi-art', panel);
+      if (art) {
+        gsap.fromTo(
+          art,
+          { x: 110, opacity: 0.35 },
+          {
+            x: -110,
+            opacity: 1,
+            ease: 'none',
+            scrollTrigger: { containerAnimation: tween, trigger: panel, start: 'left right', end: 'right left', scrub: true },
+          }
+        );
+      }
+
+      // The number counts as its panel arrives, not on page load — and the
+      // motif fills in step with it, so the field and the figure are visibly
+      // the same measurement rather than two separate things.
       const v = $('.kpi-value', panel);
       if (v) {
         ScrollTrigger.create({
@@ -746,7 +764,25 @@ function kpiRail() {
           trigger: panel,
           start: 'left 70%',
           once: true,
-          onEnter: () => countUp(v, panel),
+          onEnter: () => {
+            countUp(v, panel);
+            const dots = $$('.ug-dot', panel);
+            if (dots.length) {
+              gsap.fromTo(
+                dots,
+                { opacity: 0, scale: 0.3, transformOrigin: '50% 50%' },
+                { opacity: 1, scale: 1, duration: 0.5, ease: 'back.out(2)', stagger: { each: 0.012, from: 'start' } }
+              );
+            }
+            const bars = $$('.ts-bar', panel);
+            if (bars.length) {
+              gsap.fromTo(
+                bars,
+                { opacity: 0, scaleX: 0, transformOrigin: '0% 50%' },
+                { opacity: 0.7, scaleX: 1, duration: 0.8, ease: 'siteOut', stagger: 0.12 }
+              );
+            }
+          },
         });
       }
     });
