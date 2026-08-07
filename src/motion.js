@@ -38,6 +38,23 @@ const onOverview = () => document.body.dataset.tabState === 'overview';
    around it is the card looking like it has not finished loading. */
 const still = (el) => !!el?.closest?.('.is-still');
 
+/* Reveals never render their hidden state at creation.
+   A fromTo applies its "from" the moment it is built, so a card already on
+   screen was blanked and faded back in — the reader watched it disappear.
+   Deciding at creation whether an element was on screen did not work either:
+   the layout is not final at that point. immediateRender:false leaves every
+   element in its natural, visible state until its trigger is reached, and
+   ScrollTrigger sets anything already scrolled past straight to the end. So a
+   card is either revealed on arrival or simply there — never hidden first. */
+const REVEAL = { immediateRender: false };
+
+/* Only build a reveal for something that has not reached the line yet.
+   A tween created for an element already on screen renders its "from" state the
+   moment it is built — so the reader watches a card appear, blank out, and fade
+   back in. That was always latent; deferring trigger creation until the cards
+   have laid out is what made it visible every time. Anything already in view,
+   or already scrolled past, is simply left alone: it is correct on screen and
+   nothing needs to animate it there. */
 const live = (el) => {
   if (!el) return false;
   const panel = el.closest?.('.panel');
@@ -225,6 +242,7 @@ function matrixReveal() {
       card,
       { opacity: 0, y: 34, scale: 0.985 },
       {
+        ...REVEAL,
         opacity: 1, y: 0, scale: 1, duration: 0.75, ease: 'siteOut',
         scrollTrigger: { trigger: card, start: 'top 90%', once: true },
       }
@@ -270,7 +288,7 @@ function reveals() {
     gsap.fromTo(
       el,
       { opacity: 0, y: 22 },
-      { opacity: 1, y: 0, duration: 0.8, ease: 'siteOut', scrollTrigger: { trigger: el, start: 'top 88%', once: true } }
+      { ...REVEAL, opacity: 1, y: 0, duration: 0.8, ease: 'siteOut', scrollTrigger: { trigger: el, start: 'top 88%', once: true } }
     );
   });
   // Cards build rather than fade. Each one wipes up from its own bottom edge
@@ -285,6 +303,7 @@ function reveals() {
       cards,
       { opacity: 0, y: 46, scale: 0.965, clipPath: 'inset(0% 0% 100% 0%)' },
       {
+        ...REVEAL,
         opacity: 1,
         y: 0,
         scale: 1,
@@ -314,6 +333,7 @@ function reveals() {
         inner,
         { opacity: 0, y: 12 },
         {
+          ...REVEAL,
           opacity: 1,
           y: 0,
           duration: 0.6,
@@ -387,6 +407,7 @@ function reveals() {
       rows,
       { opacity: 0, x: -14 },
       {
+        ...REVEAL,
         opacity: 1,
         x: 0,
         duration: 0.55,
@@ -409,6 +430,7 @@ function reveals() {
       cards,
       { opacity: 0, y: 18 },
       {
+        ...REVEAL,
         opacity: 1, y: 0, duration: 0.55, ease: 'siteOut', stagger: 0.05,
         scrollTrigger: { trigger: set, start: 'top 82%', once: true },
       }
@@ -962,8 +984,11 @@ function replayPanel(panel) {
 
   // Never leave a value invisible if the timeline is interrupted.
   setTimeout(() => {
-    gsap.set([...cards, ...$$('.chips > li', panel)], { clearProps: 'opacity,transform' });
-    bars.forEach((el) => { if (el.getBoundingClientRect().width < 0.5 && el.dataset.w) el.style.width = el.dataset.w; });
+    const reached = (el) => el.getBoundingClientRect().top <= innerHeight;
+    gsap.set([...cards, ...$$('.chips > li', panel)].filter(reached), { clearProps: 'opacity,transform' });
+    bars.filter(reached).forEach((el) => {
+      if (el.getBoundingClientRect().width < 0.5 && el.dataset.w) el.style.width = el.dataset.w;
+    });
   }, 4000);
 }
 
@@ -983,9 +1008,15 @@ function failsafe() {
     '.manifesto-text, .tile-in > *, .stat-in > *, .openlist li, .facts li, .matrix-detail, ' +
     '.change-row, .mcard, .mcard .mname, .mcard-detail > span, .pcard, ' +
     '.bars .bar-row, .tbl tbody tr, .keys > *, .legend > *, .pill-row > *, .chips > li, .sbar';
+  // Below the fold and transparent is not a failure, it is a reveal waiting its
+  // turn. Rescuing those was this function quietly undoing every pending
+  // animation on the page a few seconds after load — which is why cards and
+  // bars kept arriving already finished.
+  const waiting = (el) => el.getBoundingClientRect().top > innerHeight;
   const clear = () => {
     $$(SELECTOR).forEach((el) => {
       if (el.closest('.panel[hidden]')) return; // genuinely hidden tabs stay hidden
+      if (waiting(el)) return;
       const cs = getComputedStyle(el);
       if (parseFloat(cs.opacity) < 0.05) {
         gsap.set(el, { clearProps: 'opacity,transform,y,scale' });
@@ -995,6 +1026,7 @@ function failsafe() {
     });
     // charts too — a zero-width bar reads as a real zero, which is a lie
     $$('.d-bar, .bar-track > span, .meter > span, .sbar .track > span').forEach((el) => {
+      if (waiting(el)) return;
       if (el.getBoundingClientRect().width < 0.5 && el.dataset.w) el.style.width = el.dataset.w;
     });
     // manifesto words rest at 0.14 waiting for the scrub; if the scrub never
