@@ -1019,13 +1019,17 @@ function sectionRail(panel) {
   // inside the first card, so keying off <h2> found one or two entries and the
   // rail removed itself. A section is the thing you actually jump to.
   const sections = $$(':scope > section', panel);
+  // The eyebrow is the section's name; the h2 is its argument. A rail wants the
+  // name — "Contribution", not "The channel is open; the review queue is not".
+  // Sentence-length labels overran the rail's width and were clipped mid-word.
   const label = (sec) => {
-    const h2 = $('.band-head h2', sec);
-    if (h2) return h2.textContent.trim();
-    const eyebrow = $('.eyebrow', sec);
-    const h3 = $('h3', sec);
-    if (eyebrow && h3) return h3.textContent.trim();
-    return (eyebrow || h3)?.textContent.trim() || '';
+    const head = $('.band-head', sec);
+    const text =
+      $('.eyebrow', head || sec)?.textContent.trim() ||
+      $('h2', head || sec)?.textContent.trim() ||
+      $('h3', sec)?.textContent.trim() ||
+      '';
+    return text.length > 32 ? text.slice(0, 31).trimEnd() + '…' : text;
   };
 
   const items = sections.map((sec) => ({ sec, text: label(sec) })).filter((x) => x.text);

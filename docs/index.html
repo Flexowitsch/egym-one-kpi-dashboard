@@ -1206,12 +1206,16 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
   background: var(--eo-color-border-default);
   transition: width 0.25s var(--ease-out), background-color 0.25s var(--ease-out);
 }
+/* The label is revealed by growing its max-width from zero, which means the
+   open width is also a clip. Anything wider than it was cut mid-word, so the
+   open state is wider than any label the rail produces and ellipsis catches
+   the case where it is not — a cut glyph reads as a rendering fault. */
 .rail .lbl {
-  max-width: 0; overflow: hidden; white-space: nowrap;
+  max-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
   opacity: 0;
   transition: max-width 0.32s var(--ease-out), opacity 0.22s var(--ease-out);
 }
-.rail:hover .lbl, .rail:focus-within .lbl { max-width: 15rem; opacity: 1; }
+.rail:hover .lbl, .rail:focus-within .lbl { max-width: 18rem; opacity: 1; }
 .rail:hover, .rail:focus-within {
   background: color-mix(in srgb, var(--eo-color-surface-subtle) 88%, transparent);
   backdrop-filter: blur(12px);
@@ -2261,6 +2265,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
 </section>
 
 <section class="band tight">
+  <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Contrast and focus</p><h2 data-token="--eo-typography-headline-500">Every governed colour pair passes</h2></div>
   <div class="bento">
     <eo-card class="tile span-7" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Design side · measured</p>
        <h3>Every governed colour pair passes</h3>
@@ -2285,6 +2290,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
   </div>
 </section>
 <section class="band tight">
+  <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Station by station</p><h2 data-token="--eo-typography-headline-500">What each of the three scores rests on</h2></div>
   <div class="bento">
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Station 02 · best practices</p>
        <h3>One component is the whole problem</h3>

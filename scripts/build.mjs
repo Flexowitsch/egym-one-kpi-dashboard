@@ -510,6 +510,7 @@ const qualityTab = `
 </section>
 
 <section class="band tight">
+  ${bandHead('Contrast and focus', 'Every governed colour pair passes')}
   <div class="bento">
     ${tile(
       'span-7',
@@ -553,6 +554,7 @@ const qualityTab = `
   </div>
 </section>
 <section class="band tight">
+  ${bandHead('Station by station', 'What each of the three scores rests on')}
   <div class="bento">
     ${tile(
       'span-6',
