@@ -848,8 +848,13 @@ const html = `<!doctype html>
     </div>
     <!-- Brand switch. Secondary, icon-only, from the component package — the
          earlier version used tertiary, which renders as a bare glyph with no
-         affordance at all. -->
-    <eo-button class="brand-toggle" size="small" hierarchy="secondary" intent="neutral"
+         affordance at all.
+
+         Default size, not small: the reference in the presentation file
+         (488:3614) is the 44px button — 12px padding-action-icon around a 20px
+         icon. At size="small" the button is 32px and takes a 16px icon, so the
+         20px glyph filled the circle edge to edge. -->
+    <eo-button class="brand-toggle" hierarchy="secondary" intent="neutral"
       content="icon" data-token="eo-button · secondary/icon"
       aria-label="Switch brand — currently EGYM" title="Switch brand">
       <span slot="icon" class="brand-icon">${paletteIcon}</span>
