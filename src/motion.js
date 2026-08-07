@@ -32,6 +32,12 @@ const onOverview = () => document.body.dataset.tabState === 'overview';
    any trigger created afterwards. Everything that creates triggers checks this
    first; panels that are not visible get their build from replayPanel the
    moment they are shown. */
+/* Sections and cards marked .is-still hold their content from the first frame.
+   Only the graphs inside them animate — a bar growing is the measurement being
+   drawn, which is worth watching; a heading and a list assembling themselves
+   around it is the card looking like it has not finished loading. */
+const still = (el) => !!el?.closest?.('.is-still');
+
 const live = (el) => {
   if (!el) return false;
   const panel = el.closest?.('.panel');
@@ -299,6 +305,7 @@ function reveals() {
       // container while its rows are independently fading in reads as a flicker,
       // because both tweens write opacity on the same subtree.
       const OWNS_ITS_ROWS = '.matrix, .prov, .sbars, .changes, .openlist, .facts';
+      if (still(card)) return;
       const inner = $$(':scope .tile-in > *, :scope .stat-in > *', card).filter(
         (el) => !el.matches(OWNS_ITS_ROWS) && !el.querySelector(OWNS_ITS_ROWS)
       );
@@ -373,6 +380,7 @@ function reveals() {
   // row does, so tying the rows to the card meant the bottom half had already
   // animated somewhere above the fold and arrived static.
   $$('.openlist, .facts, .prov tbody, .rows').filter(live).forEach((list) => {
+    if (still(list)) return;
     const rows = $$(':scope > li, :scope > tr', list);
     if (rows.length < 2) return;
     gsap.fromTo(
@@ -416,6 +424,7 @@ function reveals() {
   // second tween over the same elements is exactly what made the section
   // flicker — two timelines writing opacity on the same row on the same frame.
   $$('.sbars').filter(live).forEach((body) => {
+    if (still(body)) return;
     const rows = $$(':scope > .sbar', body);
     if (rows.length < 3) return;
     rows.forEach((row) => {
@@ -1133,13 +1142,32 @@ function init() {
   //
   // So: the pinned trigger is created first, everything else measures against
   // the final layout, and the sort below puts them in scroll order regardless.
-  step('kpiRail', kpiRail);
+  // ...and every card on this page is an <eo-card>. Until that element is
+  // defined it has no shadow root, no padding and no height, so the document is
+  // a fraction of its final length and a trigger 2,700px down measures as
+  // already past its start. It then fires at creation, off screen, and by the
+  // time the reader gets there the bar has already grown. settle() cannot undo
+  // it: a `once` trigger that has fired is done.
+  //
+  // So everything that measures the page waits for the component to define. The
+  // race is the fallback — if the bundle never loads, the animations still run
+  // against whatever layout exists rather than not at all.
+  const laidOut = Promise.race([
+    customElements.whenDefined('eo-card'),
+    new Promise((r) => setTimeout(r, 1500)),
+  ]).then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
-  step('counters', () => $$('[data-count]').forEach((el) => countUp(el, el.closest('eo-card') || el)));
-  step('drawCharts', drawCharts);
-  step('matrixReveal', matrixReveal);
-  step('changeReveal', changeReveal);
-  step('reveals', reveals);
+  laidOut.then(() => {
+    step('kpiRail', kpiRail);
+    step('counters', () => $$('[data-count]').forEach((el) => countUp(el, el.closest('eo-card') || el)));
+    step('drawCharts', drawCharts);
+    step('matrixReveal', matrixReveal);
+    step('changeReveal', changeReveal);
+    step('reveals', reveals);
+    step('sectionRail', () => sectionRail($('.panel.is-active')));
+    settle();
+  });
+
   const heroTl = step('hero', hero);
   // The loading sequence owns when the hero reveals. If it does not play — a
   // returning visit, reduced motion, no preloader in the markup — the hero
@@ -1149,7 +1177,6 @@ function init() {
   step('manifesto', manifesto);
   step('cursor', cursor);
   step('velocity', velocity);
-  step('sectionRail', () => sectionRail($('.panel.is-active')));
   failsafe();
 
   // Pinned triggers have to be evaluated before the ones that sit after them,

@@ -166,7 +166,7 @@ const overview = `
   </div>
 </section>
 
-<section class="band">
+<section class="band is-still">
   ${bandHead('Ten stations', 'Where the system is strong, and where it is not', 'Scored against the design system multi-point inspection. The dashed ring is a perfect score — the gap between the shape and the ring is the work left.', inspection?.date)}
   <div class="bento">
     ${tile('span-7', radar(inspection?.stations ?? []))}
@@ -317,7 +317,7 @@ const overview = `
   <div class="bento">
     <div class="span-12">${splitMatrix(designVsCode?.dimensions ?? [])}</div>
     ${tile(
-      'span-12 solid fairness',
+      'span-12 solid fairness is-still',
       `<p class="eyebrow">In fairness — what is open on our side</p>
        <h3>Strong, not spotless</h3>
        <p class="tile-text">${esc(designOpen?.note ?? '')}</p>
@@ -328,13 +328,23 @@ const overview = `
   </div>
 </section>
 
-<section class="band tight">
+<section class="band tight is-still">
   ${bandHead('Progress', 'What actually moved', 'Station scores between the last two full inspections. Six of ten did not move at all — that is the finding, not the exceptions.', inspection?.date)}
   <div class="bento">
-    ${tile('span-7', changeList(inspection?.stations ?? [], {
-      prevLabel: inspection?.historyLabels?.[1] ?? '',
-      nowLabel: inspection?.historyLabels?.[2] ?? '',
-    }))}
+    ${tile(
+      'span-7',
+      // The eyebrow and heading are not decoration: without them this card
+      // opened straight into its column headers while the card beside it
+      // opened with two lines above its chart, so the two never lined up.
+      `<p class="eyebrow">Station scores</p>
+       <h3>${(inspection?.stations ?? []).filter((x) => x.history?.[1] != null && x.score !== x.history[1]).length} moved, ${
+         (inspection?.stations ?? []).filter((x) => x.history?.[1] != null && x.score === x.history[1]).length
+       } did not</h3>
+       ${changeList(inspection?.stations ?? [], {
+         prevLabel: inspection?.historyLabels?.[1] ?? '',
+         nowLabel: inspection?.historyLabels?.[2] ?? '',
+       })}`
+    )}
     ${tile(
       'span-5',
       `<p class="eyebrow">Component pipeline</p>
