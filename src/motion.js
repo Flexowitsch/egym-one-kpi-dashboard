@@ -320,10 +320,38 @@ function reveals() {
     });
   });
 
+  // Chip runs land one after another rather than as a block. On Coverage these
+  // are the actual list of what is shipped, ready and in development — the
+  // whole point of the card — and watching them arrive in order reads as a
+  // tally being counted out. Each group triggers on itself, so the three
+  // groups in one card fire as you reach each heading, not all at once.
+  $$('.chips, .pill-row').forEach((group) => {
+    // The hero's pill row is part of the intro timeline; a second tween here
+    // would fight it on the same frame.
+    if (group.closest('.hero')) return;
+    const items = $$(':scope > li, :scope > *', group);
+    if (!items.length) return;
+    gsap.fromTo(
+      items,
+      { opacity: 0, y: 10, scale: 0.94 },
+      {
+        opacity: 1,
+        y: 0,
+        scale: 1,
+        duration: 0.45,
+        ease: 'back.out(1.7)',
+        // Fast enough that fifteen chips still finish inside a second — a
+        // long stagger over a long list stops being a build and becomes a wait.
+        stagger: { each: 0.045, from: 'start' },
+        scrollTrigger: { trigger: group, start: 'top 92%', once: true },
+      }
+    );
+  });
+
   // Every repeating run of rows on every tab, not just the ones on the
   // overview. Delivery is almost entirely tables and bar rows, so without
   // this it was the one tab that arrived fully formed with nothing to watch.
-  $$('.bars, .tbl tbody, .keys, .legend, .pill-row').forEach((group) => {
+  $$('.bars, .tbl tbody, .keys, .legend').forEach((group) => {
     const rows = $$(':scope > .bar-row, :scope > tr, :scope > li, :scope > *', group);
     if (rows.length < 2) return;
     gsap.fromTo(
@@ -781,7 +809,7 @@ function failsafe() {
     '.band-head, .bento > eo-card, .stat-row > eo-card, .tile, .stat, .panel, .hero-inner > *, ' +
     '.manifesto-text, .tile-in > *, .stat-in > *, .openlist li, .facts li, .matrix-detail, ' +
     '.prov tbody tr, .change-row, .matrix-row .mname, .matrix-detail span, ' +
-    '.bars .bar-row, .tbl tbody tr, .keys > *, .legend > *, .pill-row > *, ' +
+    '.bars .bar-row, .tbl tbody tr, .keys > *, .legend > *, .pill-row > *, .chips > li, ' +
     '.prov tbody tr, .matrix-row, .sbar';
   const clear = () => {
     $$(SELECTOR).forEach((el) => {

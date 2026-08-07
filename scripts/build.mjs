@@ -873,8 +873,15 @@ const html = `<!doctype html>
     applyBrand(brand);
   });
 
-  const initial = location.hash.slice(1);
-  if (initial && tabs.some((t) => t.dataset.tab === initial)) show(initial, false);
+  const fromHash = (push) => {
+    const id = location.hash.slice(1);
+    if (id && tabs.some((t) => t.dataset.tab === id)) show(id, push);
+  };
+  fromHash(false);
+  // A hash change is a same-document navigation, so nothing re-runs on its own
+  // — without this, editing the address bar or following a #tab link from
+  // elsewhere on the page left the dashboard on whatever tab it was already on.
+  window.addEventListener('hashchange', () => fromHash(false));
 </script>
 </body>
 </html>
