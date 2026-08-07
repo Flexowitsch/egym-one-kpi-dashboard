@@ -973,6 +973,42 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
    =========================================================================== */
 .brand-toggle { margin-left: var(--eo-dimension-gap-small); cursor: pointer; }
 .brand-toggle svg { display: block; }
+
+/* ===========================================================================
+   GLASS CARDS — overview only
+   The cards sit over the token cascade, so making them translucent lets the
+   field read through instead of being blocked by a run of white slabs. The
+   surface token is overridden on the host rather than in the shadow root:
+   custom properties inherit through the shadow boundary, so eo-card paints
+   itself translucent without this stylesheet reaching inside it.
+
+   Scoped to the overview because the other tabs are the technical read and a
+   blurred backdrop behind a table of numbers costs legibility for nothing.
+   =========================================================================== */
+body[data-tab-state="overview"] .bento > eo-card {
+  --eo-color-surface-default: color-mix(in srgb, var(--eo-color-surface-subtle) 62%, transparent);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  border-radius: var(--eo-dimension-border-radius-default);
+}
+/* A hairline so the edge still reads where the card meets a pale patch of the
+   field. Without it a translucent card over a light ground has no boundary. */
+body[data-tab-state="overview"] .bento > eo-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  border: 1px solid color-mix(in srgb, var(--eo-color-border-subtle) 70%, transparent);
+  border-radius: inherit;
+  pointer-events: none;
+}
+body[data-tab-state="overview"] .bento > eo-card { position: relative; }
+
+@supports not (backdrop-filter: blur(1px)) {
+  /* No blur means no frosting, and a flat 62% card over a busy field is worse
+     than an opaque one — so fall back to solid rather than to transparent. */
+  body[data-tab-state="overview"] .bento > eo-card {
+    --eo-color-surface-default: var(--eo-color-surface-subtle);
+  }
+}
 </style>
 </head>
 <body data-tab-state="overview">
@@ -1127,7 +1163,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
       <text class="c-value" x="179.84" y="95.14" text-anchor="end" dominant-baseline="middle">4</text>
   </svg></div></eo-card>
     <eo-card class="tile span-5" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Station by station</p>
-       <div class="sbars"><div class="sbar">
+       <div class="sbars"><div class="sbar" data-token="--eo-color-surface-subtle">
         <span class="i">01</span>
         <span class="nm">Coverage &amp; gaps</span>
         <span class="track">
@@ -1139,7 +1175,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
              the column restless. The lighter bar behind the fill carries the
              same information calmly, and the footnote says what it means. -->
         <span class="sc">3</span>
-      </div><div class="sbar">
+      </div><div class="sbar" data-token="--eo-color-surface-subtle">
         <span class="i">02</span>
         <span class="nm">Best practices</span>
         <span class="track">
@@ -1151,7 +1187,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
              the column restless. The lighter bar behind the fill carries the
              same information calmly, and the footnote says what it means. -->
         <span class="sc">8</span>
-      </div><div class="sbar">
+      </div><div class="sbar" data-token="--eo-color-surface-subtle">
         <span class="i">03</span>
         <span class="nm">Accessibility</span>
         <span class="track">
@@ -1163,7 +1199,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
              the column restless. The lighter bar behind the fill carries the
              same information calmly, and the footnote says what it means. -->
         <span class="sc">5</span>
-      </div><div class="sbar">
+      </div><div class="sbar" data-token="--eo-color-surface-subtle">
         <span class="i">04</span>
         <span class="nm">Shared language</span>
         <span class="track">
@@ -1175,7 +1211,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
              the column restless. The lighter bar behind the fill carries the
              same information calmly, and the footnote says what it means. -->
         <span class="sc">8</span>
-      </div><div class="sbar">
+      </div><div class="sbar" data-token="--eo-color-surface-subtle">
         <span class="i">05</span>
         <span class="nm">Testing &amp; validation</span>
         <span class="track">
@@ -1187,7 +1223,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
              the column restless. The lighter bar behind the fill carries the
              same information calmly, and the footnote says what it means. -->
         <span class="sc">4</span>
-      </div><div class="sbar">
+      </div><div class="sbar" data-token="--eo-color-surface-subtle">
         <span class="i">06</span>
         <span class="nm">Orchestration</span>
         <span class="track">
@@ -1199,7 +1235,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
              the column restless. The lighter bar behind the fill carries the
              same information calmly, and the footnote says what it means. -->
         <span class="sc">6</span>
-      </div><div class="sbar">
+      </div><div class="sbar" data-token="--eo-color-surface-subtle">
         <span class="i">07</span>
         <span class="nm">Governance</span>
         <span class="track">
@@ -1211,7 +1247,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
              the column restless. The lighter bar behind the fill carries the
              same information calmly, and the footnote says what it means. -->
         <span class="sc">6</span>
-      </div><div class="sbar">
+      </div><div class="sbar" data-token="--eo-color-surface-subtle">
         <span class="i">08</span>
         <span class="nm">Feedback &amp; adoption</span>
         <span class="track">
@@ -1223,7 +1259,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
              the column restless. The lighter bar behind the fill carries the
              same information calmly, and the footnote says what it means. -->
         <span class="sc">5</span>
-      </div><div class="sbar">
+      </div><div class="sbar" data-token="--eo-color-surface-subtle">
         <span class="i">09</span>
         <span class="nm">Machine-readable docs</span>
         <span class="track">
@@ -1235,7 +1271,7 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
              the column restless. The lighter bar behind the fill carries the
              same information calmly, and the footnote says what it means. -->
         <span class="sc">6</span>
-      </div><div class="sbar">
+      </div><div class="sbar" data-token="--eo-color-surface-subtle">
         <span class="i">10</span>
         <span class="nm">Agent access</span>
         <span class="track">
@@ -1360,9 +1396,9 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
   <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Two sides, two speeds</p><h2 data-token="--eo-typography-headline-500">The design system is in good shape. Getting it into code is the work.</h2><p data-token="--eo-color-content-subtle">Each row attributes the inspection findings to the side of the system they belong to. Every cell rests on a measurement, not an opinion — including the two where the design side is only partial.</p><p class="stamp"><span class="dot live"></span>Updated 6 Aug 2026 · refreshes automatically</p></div>
   <div class="bento">
     <eo-card class="tile span-12" full-height data-token="eo-card · full-height"><div class="tile-in"><div class="legend">
-         <span><span class="cell in-place"><span></span></span> In place</span>
-         <span><span class="cell partial"><span></span></span> Partial</span>
-         <span><span class="cell absent"><span></span></span> Absent</span>
+         <span data-token="--eo-color-content-utility-positive"><span class="cell in-place"><span></span></span> In place</span>
+         <span data-token="--eo-color-content-utility-warning"><span class="cell partial"><span></span></span> Partial</span>
+         <span data-token="--eo-color-content-utility-negative"><span class="cell absent"><span></span></span> Absent</span>
        </div>
        <div class="matrix">
     <div class="matrix-head">
@@ -1370,64 +1406,64 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
     </div>
     <div class="matrix-row">
           <span class="mname">Component coverage</span>
-          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
-          <span class="cell partial" role="img" aria-label="partial"><span></span></span>
+          <span class="cell in-place" role="img" data-token="--eo-color-content-utility-positive" aria-label="in place"><span></span></span>
+          <span class="cell partial" role="img" data-token="--eo-color-content-utility-warning" aria-label="partial"><span></span></span>
         </div>
         <div class="matrix-detail">
           <span><b>Design</b> 127 in-scope components in the UI Kit; Wellpass design coverage at 100%</span>
           <span><b>Code</b> 15 of those exist in code — 12%</span>
         </div><div class="matrix-row">
           <span class="mname">Accessibility</span>
-          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
-          <span class="cell absent" role="img" aria-label="absent"><span></span></span>
+          <span class="cell in-place" role="img" data-token="--eo-color-content-utility-positive" aria-label="in place"><span></span></span>
+          <span class="cell absent" role="img" data-token="--eo-color-content-utility-negative" aria-label="absent"><span></span></span>
         </div>
         <div class="matrix-detail">
           <span><b>Design</b> Measured, not just specified: 18 of 20 token pairs pass WCAG AA and 11 reach AAA, with the only two below the threshold being disabled text, which WCAG exempts. 94% of stateful components model a focus state. The contribution checklist gates WCAG 2.2 AA on every new component.</span>
           <span><b>Code</b> Zero axe assertions. The a11y gate is set to test: todo. Storybook accessibility tests have never run because vitest.config.ts points at two paths that do not exist. eo-link fails WCAG 4.1.2 and 2.1.1.</span>
         </div><div class="matrix-row">
           <span class="mname">Release governance</span>
-          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
-          <span class="cell absent" role="img" aria-label="absent"><span></span></span>
+          <span class="cell in-place" role="img" data-token="--eo-color-content-utility-positive" aria-label="in place"><span></span></span>
+          <span class="cell absent" role="img" data-token="--eo-color-content-utility-negative" aria-label="absent"><span></span></span>
         </div>
         <div class="matrix-detail">
           <span><b>Design</b> Two-track process documented and practised across v0.0.14 to v0.0.25, with migration guides and a six-week deprecation grace period</span>
           <span><b>Code</b> 0 git tags, 0 releases, no CHANGELOG; the version is a CI build counter</span>
         </div><div class="matrix-row">
           <span class="mname">Craft and hygiene</span>
-          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
-          <span class="cell partial" role="img" aria-label="partial"><span></span></span>
+          <span class="cell in-place" role="img" data-token="--eo-color-content-utility-positive" aria-label="in place"><span></span></span>
+          <span class="cell partial" role="img" data-token="--eo-color-content-utility-warning" aria-label="partial"><span></span></span>
         </div>
         <div class="matrix-detail">
           <span><b>Design</b> Measured across all 109,402 layers: 0.54% generic names, zero detached instances, 96% of fills and 100% of strokes bound to variables (98.6% of fills once icon placeholders are excluded)</span>
           <span><b>Code</b> 14 of 15 components follow the house pattern; nothing enforces it — no lint rule catches a deviation</span>
         </div><div class="matrix-row">
           <span class="mname">Naming and API language</span>
-          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
-          <span class="cell absent" role="img" aria-label="absent"><span></span></span>
+          <span class="cell in-place" role="img" data-token="--eo-color-content-utility-positive" aria-label="in place"><span></span></span>
+          <span class="cell absent" role="img" data-token="--eo-color-content-utility-negative" aria-label="absent"><span></span></span>
         </div>
         <div class="matrix-detail">
           <span><b>Design</b> Properties Glossary: 34 system-wide properties with types, values and defaults</span>
           <span><b>Code</b> 33 of 34 glossary entries are scoped Design only; no code-side counterpart or validator</span>
         </div><div class="matrix-row">
           <span class="mname">Documentation for machines</span>
-          <span class="cell partial" role="img" aria-label="partial"><span></span></span>
-          <span class="cell partial" role="img" aria-label="partial"><span></span></span>
+          <span class="cell partial" role="img" data-token="--eo-color-content-utility-warning" aria-label="partial"><span></span></span>
+          <span class="cell partial" role="img" data-token="--eo-color-content-utility-warning" aria-label="partial"><span></span></span>
         </div>
         <div class="matrix-detail">
           <span><b>Design</b> 2,263 DTCG token descriptions. 62 of 128 components carry a description, but those average 1,342 characters — thorough where present, absent for the other half</span>
           <span><b>Code</b> JSDoc on 3 of 15 components; no custom-elements.json; token descriptions never leave the repo</span>
         </div><div class="matrix-row">
           <span class="mname">Usage telemetry</span>
-          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
-          <span class="cell absent" role="img" aria-label="absent"><span></span></span>
+          <span class="cell in-place" role="img" data-token="--eo-color-content-utility-positive" aria-label="in place"><span></span></span>
+          <span class="cell absent" role="img" data-token="--eo-color-content-utility-negative" aria-label="absent"><span></span></span>
         </div>
         <div class="matrix-detail">
           <span><b>Design</b> Figma library analytics live — button at 49k uses, filter-tag at 9,499, detach rates per component</span>
           <span><b>Code</b> No code-side telemetry; every consumer figure was reverse-engineered by hand</span>
         </div><div class="matrix-row">
           <span class="mname">Contribution process</span>
-          <span class="cell in-place" role="img" aria-label="in place"><span></span></span>
-          <span class="cell partial" role="img" aria-label="partial"><span></span></span>
+          <span class="cell in-place" role="img" data-token="--eo-color-content-utility-positive" aria-label="in place"><span></span></span>
+          <span class="cell partial" role="img" data-token="--eo-color-content-utility-warning" aria-label="partial"><span></span></span>
         </div>
         <div class="matrix-detail">
           <span><b>Design</b> Seven-phase checklist with a mandatory Phase 0 intake gate</span>
@@ -1446,52 +1482,52 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
   <div class="bento">
     <eo-card class="tile span-7" full-height data-token="eo-card · full-height"><div class="tile-in"><div class="changes">
     <div class="change-head"><span></span><span>Aug 5</span><span></span><span>Aug 6</span></div>
-    <div class="change-row up">
+    <div class="change-row up" data-token="--eo-color-border-subtle">
           <span class="c-name">Best practices</span>
           <span class="c-prev">7</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar up" style="width:50%;left:50%"></span></span>
           <span class="c-now up">8 <b>+1</b></span>
-        </div><div class="change-row up">
+        </div><div class="change-row up" data-token="--eo-color-border-subtle">
           <span class="c-name">Shared language</span>
           <span class="c-prev">7</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar up" style="width:50%;left:50%"></span></span>
           <span class="c-now up">8 <b>+1</b></span>
-        </div><div class="change-row up">
+        </div><div class="change-row up" data-token="--eo-color-border-subtle">
           <span class="c-name">Orchestration</span>
           <span class="c-prev">5</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar up" style="width:50%;left:50%"></span></span>
           <span class="c-now up">6 <b>+1</b></span>
-        </div><div class="change-row up">
+        </div><div class="change-row up" data-token="--eo-color-border-subtle">
           <span class="c-name">Machine-readable docs</span>
           <span class="c-prev">5</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar up" style="width:50%;left:50%"></span></span>
           <span class="c-now up">6 <b>+1</b></span>
-        </div><div class="change-row flat">
+        </div><div class="change-row flat" data-token="--eo-color-border-subtle">
           <span class="c-name">Coverage &amp; gaps</span>
           <span class="c-prev">3</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
           <span class="c-now flat">3</span>
-        </div><div class="change-row flat">
+        </div><div class="change-row flat" data-token="--eo-color-border-subtle">
           <span class="c-name">Accessibility</span>
           <span class="c-prev">5</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
           <span class="c-now flat">5</span>
-        </div><div class="change-row flat">
+        </div><div class="change-row flat" data-token="--eo-color-border-subtle">
           <span class="c-name">Testing &amp; validation</span>
           <span class="c-prev">4</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
           <span class="c-now flat">4</span>
-        </div><div class="change-row flat">
+        </div><div class="change-row flat" data-token="--eo-color-border-subtle">
           <span class="c-name">Governance</span>
           <span class="c-prev">6</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
           <span class="c-now flat">6</span>
-        </div><div class="change-row flat">
+        </div><div class="change-row flat" data-token="--eo-color-border-subtle">
           <span class="c-name">Feedback &amp; adoption</span>
           <span class="c-prev">5</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
           <span class="c-now flat">5</span>
-        </div><div class="change-row flat">
+        </div><div class="change-row flat" data-token="--eo-color-border-subtle">
           <span class="c-name">Agent access</span>
           <span class="c-prev">4</span>
           <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
@@ -1570,33 +1606,33 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
   <div class="bento">
     <eo-card class="tile span-12" full-height data-token="eo-card · full-height"><div class="tile-in"><div class="table-scroll"><table class="prov">
         <thead><tr><th>Measurement</th><th>Updated</th><th>How</th></tr></thead>
-        <tbody><tr><td>Inspection station scores</td>
-              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
-              <td class="how">Parsed from ds-inspection/reports/2026-08-06-inspection.md</td></tr><tr><td>UI Kit craft — binding, layers, detached instances</td>
-              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
-              <td class="how">Full traversal of 109,402 layers via the Figma plugin bridge</td></tr><tr><td>UI Kit auto-layout coverage</td>
-              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
-              <td class="how">Full traversal of 43,551 frames</td></tr><tr><td>Token system — variables, descriptions, cascade</td>
-              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
-              <td class="how">Full read of 1,619 variables across 5 collections</td></tr><tr><td>WCAG contrast ratios</td>
-              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
-              <td class="how">Computed from resolved token values across both brand modes</td></tr><tr><td>Focus-state coverage</td>
-              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
-              <td class="how">Variant options across 92 in-scope component sets</td></tr><tr><td>Icon library documentation</td>
-              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
-              <td class="how">Full read of 348 public components</td></tr><tr><td>Property naming consistency</td>
-              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
-              <td class="how">All property definitions across UI Kit and Icons</td></tr><tr><td>Components in code, PR ages, tags, contributors</td>
-              <td class="when">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
-              <td class="how">GitHub API</td></tr><tr><td>Consumer adoption — legacy deps, raw inputs</td>
-              <td class="when">3 Aug 2026 <eo-label intent="warning" size="small" data-token="eo-label · intent=warning">manual</eo-label></td>
-              <td class="how">Org-wide GitHub code search, by hand</td></tr><tr><td>Jira DSC queue</td>
-              <td class="when">6 Aug 2026 <eo-label intent="warning" size="small" data-token="eo-label · intent=warning">manual</eo-label></td>
-              <td class="how">Manual export — no unattended token</td></tr><tr><td>BMA build plan</td>
-              <td class="when">6 Aug 2026 <eo-label intent="warning" size="small" data-token="eo-label · intent=warning">manual</eo-label></td>
-              <td class="how">Manual read from Notion</td></tr><tr><td>Figma library analytics</td>
-              <td class="when">5 Aug 2026 <eo-label intent="warning" size="small" data-token="eo-label · intent=warning">manual</eo-label></td>
-              <td class="how">Cited from the AI-Readiness plan</td></tr></tbody>
+        <tbody><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">Inspection station scores</td>
+              <td class="when" data-token="--eo-color-content-default">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">Parsed from ds-inspection/reports/2026-08-06-inspection.md</td></tr><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">UI Kit craft — binding, layers, detached instances</td>
+              <td class="when" data-token="--eo-color-content-default">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">Full traversal of 109,402 layers via the Figma plugin bridge</td></tr><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">UI Kit auto-layout coverage</td>
+              <td class="when" data-token="--eo-color-content-default">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">Full traversal of 43,551 frames</td></tr><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">Token system — variables, descriptions, cascade</td>
+              <td class="when" data-token="--eo-color-content-default">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">Full read of 1,619 variables across 5 collections</td></tr><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">WCAG contrast ratios</td>
+              <td class="when" data-token="--eo-color-content-default">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">Computed from resolved token values across both brand modes</td></tr><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">Focus-state coverage</td>
+              <td class="when" data-token="--eo-color-content-default">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">Variant options across 92 in-scope component sets</td></tr><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">Icon library documentation</td>
+              <td class="when" data-token="--eo-color-content-default">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">Full read of 348 public components</td></tr><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">Property naming consistency</td>
+              <td class="when" data-token="--eo-color-content-default">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">All property definitions across UI Kit and Icons</td></tr><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">Components in code, PR ages, tags, contributors</td>
+              <td class="when" data-token="--eo-color-content-default">6 Aug 2026 <eo-label intent="positive" size="small" data-token="eo-label · intent=positive">auto</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">GitHub API</td></tr><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">Consumer adoption — legacy deps, raw inputs</td>
+              <td class="when" data-token="--eo-color-content-default">3 Aug 2026 <eo-label intent="warning" size="small" data-token="eo-label · intent=warning">manual</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">Org-wide GitHub code search, by hand</td></tr><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">Jira DSC queue</td>
+              <td class="when" data-token="--eo-color-content-default">6 Aug 2026 <eo-label intent="warning" size="small" data-token="eo-label · intent=warning">manual</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">Manual export — no unattended token</td></tr><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">BMA build plan</td>
+              <td class="when" data-token="--eo-color-content-default">6 Aug 2026 <eo-label intent="warning" size="small" data-token="eo-label · intent=warning">manual</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">Manual read from Notion</td></tr><tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">Figma library analytics</td>
+              <td class="when" data-token="--eo-color-content-default">5 Aug 2026 <eo-label intent="warning" size="small" data-token="eo-label · intent=warning">manual</eo-label></td>
+              <td class="how" data-token="--eo-color-content-subtle">Cited from the AI-Readiness plan</td></tr></tbody>
       </table></div></div></eo-card>
   </div>
 </section>

@@ -283,9 +283,9 @@ const overview = `
     ${tile(
       'span-12',
       `<div class="legend">
-         <span><span class="cell in-place"><span></span></span> In place</span>
-         <span><span class="cell partial"><span></span></span> Partial</span>
-         <span><span class="cell absent"><span></span></span> Absent</span>
+         <span data-token="--eo-color-content-utility-positive"><span class="cell in-place"><span></span></span> In place</span>
+         <span data-token="--eo-color-content-utility-warning"><span class="cell partial"><span></span></span> Partial</span>
+         <span data-token="--eo-color-content-utility-negative"><span class="cell absent"><span></span></span> Absent</span>
        </div>
        ${splitMatrix(designVsCode?.dimensions ?? [])}`
     )}
@@ -394,9 +394,9 @@ const overview = `
         <thead><tr><th>Measurement</th><th>Updated</th><th>How</th></tr></thead>
         <tbody>${provenance.measurements
           .map(
-            (m) => `<tr><td>${esc(m.what)}</td>
-              <td class="when">${esc(fmt(m.date))} ${chip(m.live ? 'auto' : 'manual', m.live ? 'positive' : 'warning')}</td>
-              <td class="how">${esc(m.method)}</td></tr>`
+            (m) => `<tr data-token="--eo-color-border-subtle"><td data-token="--eo-color-content-emphasized">${esc(m.what)}</td>
+              <td class="when" data-token="--eo-color-content-default">${esc(fmt(m.date))} ${chip(m.live ? 'auto' : 'manual', m.live ? 'positive' : 'warning')}</td>
+              <td class="how" data-token="--eo-color-content-subtle">${esc(m.method)}</td></tr>`
           )
           .join('')}</tbody>
       </table></div>`

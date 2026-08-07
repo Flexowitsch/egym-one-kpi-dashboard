@@ -965,3 +965,39 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
    =========================================================================== */
 .brand-toggle { margin-left: var(--eo-dimension-gap-small); cursor: pointer; }
 .brand-toggle svg { display: block; }
+
+/* ===========================================================================
+   GLASS CARDS — overview only
+   The cards sit over the token cascade, so making them translucent lets the
+   field read through instead of being blocked by a run of white slabs. The
+   surface token is overridden on the host rather than in the shadow root:
+   custom properties inherit through the shadow boundary, so eo-card paints
+   itself translucent without this stylesheet reaching inside it.
+
+   Scoped to the overview because the other tabs are the technical read and a
+   blurred backdrop behind a table of numbers costs legibility for nothing.
+   =========================================================================== */
+body[data-tab-state="overview"] .bento > eo-card {
+  --eo-color-surface-default: color-mix(in srgb, var(--eo-color-surface-subtle) 62%, transparent);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  border-radius: var(--eo-dimension-border-radius-default);
+}
+/* A hairline so the edge still reads where the card meets a pale patch of the
+   field. Without it a translucent card over a light ground has no boundary. */
+body[data-tab-state="overview"] .bento > eo-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  border: 1px solid color-mix(in srgb, var(--eo-color-border-subtle) 70%, transparent);
+  border-radius: inherit;
+  pointer-events: none;
+}
+body[data-tab-state="overview"] .bento > eo-card { position: relative; }
+
+@supports not (backdrop-filter: blur(1px)) {
+  /* No blur means no frosting, and a flat 62% card over a busy field is worse
+     than an opaque one — so fall back to solid rather than to transparent. */
+  body[data-tab-state="overview"] .bento > eo-card {
+    --eo-color-surface-default: var(--eo-color-surface-subtle);
+  }
+}

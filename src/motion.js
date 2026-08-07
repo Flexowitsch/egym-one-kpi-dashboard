@@ -368,6 +368,29 @@ function reveals() {
       }
     );
   });
+
+  // Tall cards build as you travel down them. These are several viewports
+  // long, so a single reveal on the card is over before most of it is on
+  // screen — each row has to answer to its own position instead. Rows rise a
+  // little and settle, which is what makes a long table feel assembled rather
+  // than pasted.
+  $$('.prov tbody, .matrix, .sbars').forEach((body) => {
+    const rows = $$(':scope > tr, :scope > .matrix-row, :scope > .sbar', body);
+    if (rows.length < 3) return;
+    rows.forEach((row) => {
+      gsap.fromTo(
+        row,
+        { opacity: 0, y: 18 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+          ease: 'siteOut',
+          scrollTrigger: { trigger: row, start: 'top 94%', once: true },
+        }
+      );
+    });
+  });
 }
 
 /* ------------------------------------------------ smooth scroll (Lenis) --- */
@@ -762,7 +785,8 @@ function failsafe() {
     '.band-head, .bento > eo-card, .stat-row > eo-card, .tile, .stat, .panel, .hero-inner > *, ' +
     '.manifesto-text, .tile-in > *, .stat-in > *, .openlist li, .facts li, .matrix-detail, ' +
     '.prov tbody tr, .change-row, .matrix-row .mname, .matrix-detail span, ' +
-    '.bars .bar-row, .tbl tbody tr, .keys > *, .legend > *, .pill-row > *';
+    '.bars .bar-row, .tbl tbody tr, .keys > *, .legend > *, .pill-row > *, ' +
+    '.prov tbody tr, .matrix-row, .sbar';
   const clear = () => {
     $$(SELECTOR).forEach((el) => {
       if (el.closest('.panel[hidden]')) return; // genuinely hidden tabs stay hidden

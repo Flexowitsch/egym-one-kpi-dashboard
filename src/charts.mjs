@@ -135,7 +135,7 @@ export function trend(values, { width = 260, height = 90, labels = [] } = {}) {
 export function stationBars(stations, { max = 10 } = {}) {
   return `<div class="sbars">${stations
     .map(
-      (s) => `<div class="sbar">
+      (s) => `<div class="sbar" data-token="--eo-color-surface-subtle">
         <span class="i">${String(s.n).padStart(2, '0')}</span>
         <span class="nm">${esc(s.name)}</span>
         <span class="track">
@@ -156,8 +156,16 @@ export function stationBars(stations, { max = 10 } = {}) {
    Attribution of the inspection findings to the side of the system they belong
    to. Three states, so it reads at a glance from the back of a room. */
 export function splitMatrix(dimensions) {
+  // Each state names the token it is painted with, so the overview's cursor
+  // can answer on the cells themselves rather than falling back to the card
+  // they happen to sit in.
+  const STATE_TOKEN = {
+    'in-place': '--eo-color-content-utility-positive',
+    partial: '--eo-color-content-utility-warning',
+    absent: '--eo-color-content-utility-negative',
+  };
   const dot = (state) =>
-    `<span class="cell ${state}" role="img" aria-label="${
+    `<span class="cell ${state}" role="img" data-token="${STATE_TOKEN[state] ?? '--eo-color-border-default'}" aria-label="${
       state === 'in-place' ? 'in place' : state
     }"><span></span></span>`;
   return `<div class="matrix">
@@ -213,7 +221,7 @@ export function changeList(stations, { prevLabel = '', nowLabel = '' } = {}) {
             : `<span class="d-bar ${dir}" style="width:${r2(w)}%;${
                 r.delta > 0 ? 'left:50%' : `right:50%`
               }"></span>`;
-        return `<div class="change-row ${dir}">
+        return `<div class="change-row ${dir}" data-token="--eo-color-border-subtle">
           <span class="c-name">${esc(r.name)}</span>
           <span class="c-prev">${r.prev}</span>
           <span class="c-track"><span class="c-mid"></span>${bar}</span>
