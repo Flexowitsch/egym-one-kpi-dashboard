@@ -329,8 +329,8 @@ const cascadeFragment = () => visPage(
      <div class="cf-bg">${cascadeField({ width: 900, height: 420, seed: 11, cycles: 1 })}</div>
      <div style="position:relative;z-index:1">
        <p class="v-eyebrow">Token system</p>
-       <p class="v-title">${data.tokenAudit.variables.toLocaleString('en-GB')} variables, four tiers</p>
-       <p class="v-note">Core → Brand → Breakpoint → Appearance. ${data.tokenAudit.aliasPct}% of values resolve through an alias rather than a literal, which is what lets one change reach every brand and breakpoint at once.</p>
+       <p class="v-title">${data.tokenAudit.variables.toLocaleString('en-GB')} variables, three tiers</p>
+       <p class="v-note">Core → Brand (semantic) → Component, with Breakpoint and Appearance as mode layers across them. ${data.tokenAudit.aliasPct}% of values resolve through an alias rather than a literal, which is what lets one change reach every brand and breakpoint at once.</p>
      </div>
      <p class="v-meta" style="position:relative;z-index:1"><span>Full read of the token system</span><span>Updated ${esc(fmt(fragments.updated))}</span></p>
    </div>`,
@@ -342,7 +342,7 @@ const cascadeFragment = () => visPage(
             mask-image:linear-gradient(to right,transparent 0,transparent 38%,#000 78%,#000 100%)}
    .cf-bg svg{width:100%;height:100%;display:block}
    /* Delay comes off the tier the element belongs to, so the cascade resolves
-      Core → Brand → Breakpoint → Appearance. No JS: this fragment is an iframe
+      resolution order. No JS: this fragment is an iframe
       in Notion and has to animate on its own. */
    .cf-link{fill:none;stroke:var(--eo-color-content-accent);stroke-width:1;opacity:.16;
      stroke-dasharray:1400;stroke-dashoffset:1400;

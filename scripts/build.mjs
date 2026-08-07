@@ -200,8 +200,12 @@ const overview = `
             { n: 7 },    // Appearance
           ]),
           v: String(tokenAudit?.variables ?? 1619),
-          k: 'Token variables, four tiers',
-          p: `Core → Brand → Breakpoint → Appearance, with ${tokenAudit?.aliasPct ?? 72}% of values resolving through an alias rather than a literal. One change reaches every brand and breakpoint at once.`,
+          k: 'Token variables, three tiers',
+          // Three tiers, not four. Breakpoint and Appearance are mode layers
+          // that cut across the tiers rather than sitting on top of them — the
+          // team's own Token Architecture page corrects this, and this page had
+          // been contradicting it.
+          p: `Core → Brand (semantic) → Component, with Breakpoint and Appearance as mode layers across them. ${tokenAudit?.aliasPct ?? 72}% of values resolve through an alias rather than a literal, which is how one change reaches every brand and breakpoint at once.`,
           tags: ['Core', 'Brand', 'Breakpoint', 'Appearance'],
           side: 'design',
         },
@@ -733,7 +737,7 @@ const html = `<!doctype html>
      working dashboard. Everything in this block belongs to the overview and is
      switched off the moment another tab is selected. -->
 
-<!-- The four-tier token cascade, fixed behind the whole page. Scroll draws it:
+<!-- The token cascade, fixed behind the whole page. Scroll draws it:
      Core resolves first, Appearance last. Marked up once, not per section. -->
 <div class="cascade-field" aria-hidden="true"><div class="cascade-track">${cascadeField()}</div></div>
 

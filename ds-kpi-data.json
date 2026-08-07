@@ -1239,7 +1239,7 @@
         "id": "tokens",
         "value": "98%",
         "label": "Token variables described",
-        "proof": "1,584 of 1,619 across the four-tier cascade. 72% resolve through aliases.",
+        "proof": "1,584 of 1,619 across the token system. 72% resolve through aliases.",
         "tone": "good",
         "date": "2026-08-06",
         "source": "Full read of the token system"
