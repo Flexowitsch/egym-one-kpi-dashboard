@@ -96,7 +96,7 @@ const stamp = (date, live = true) =>
 const bandHead = (eyebrow, title, sub, date, live = true) =>
   `<div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">${esc(
     eyebrow
-  )}</p><h2 data-token="--eo-typography-headline-500">${esc(title)}</h2>${
+  )}</p><h2 data-token="--eo-typography-headline-500">${esc(title).replace(/\|/g, '<br class="hb">')}</h2>${
     sub ? `<p data-token="--eo-color-content-subtle">${sub}</p>` : ''
   }${date ? stamp(date, live) : ''}</div>`;
 
@@ -303,7 +303,7 @@ const overview = `
 <section class="band">
   ${bandHead(
     'Two sides, two speeds',
-    'The design system is in good shape. Getting it into code is the work.',
+    'The design system is in good shape.|Getting it into code is the work.',
     'Each row attributes the inspection findings to the side of the system they belong to. Every cell rests on a measurement, not an opinion — including the two where the design side is only partial.',
     '2026-08-06'
   )}

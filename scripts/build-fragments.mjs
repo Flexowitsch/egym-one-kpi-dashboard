@@ -109,8 +109,7 @@ const TONE_OF_LIGHT = { green: 'good', yellow: 'warn', red: 'bad' };
 const catalogue = [
   {
     group: 'Inspection stations',
-    note:
-      'Each of the ten stations as its own embeddable page — dial, history across the inspections, and the finding. Animated, self-contained, no JavaScript.',
+    note: `Ten stations, scored out of ten. Last inspected ${fmt(data.inspection.date)}.`,
     items: data.inspection.stations.map((s) => {
       const h = s.history || [];
       const delta = h.length > 1 ? s.score - h[0] : 0;
@@ -132,7 +131,7 @@ const catalogue = [
   },
   {
     group: 'Visual',
-    note: 'The four that carry a drawing rather than a number. These are the ones worth putting on a slide.',
+    note: 'The four that carry a drawing rather than a number.',
     items: [
       { id: 'cascade', h: 340, eyebrow: 'Token system', metric: '1,619', unit: 'variables', title: 'Three tiers, two mode layers', note: 'The cascade, drawn — how one change reaches every brand and breakpoint.', tone: 'good' },
       { id: 'coverage-rings', h: 340, eyebrow: 'Coverage', metric: '100%', unit: 'design', title: 'Design is done. Code is not.', note: 'The two coverage figures side by side, which is the whole argument in one image.', tone: 'warn' },
@@ -142,7 +141,7 @@ const catalogue = [
   },
   {
     group: 'Measurements',
-    note: 'One fragment per number. Each states the figure, what proves it, and when it was last read.',
+    note: 'One number each, with what proves it and when it was last read.',
     items: fragments.items.map((f) => ({
       id: f.id,
       eyebrow: f.source,
@@ -152,10 +151,10 @@ const catalogue = [
       note: f.proof,
       tone: f.tone,
       date: f.date,
-      // A percentage is a ring; an absolute count has no denominator to draw.
-      ring: /^\d+(\.\d+)?%$/.test(String(f.value))
-        ? { value: f.value, max: 100, at: parseFloat(f.value), label: f.label, sub: f.source }
-        : null,
+      // No ring here. Half of these are counts with no denominator to draw, and
+      // ringing only the other half put two anatomies in one grid. One
+      // treatment per group: stations get rings, measurements get the numeral.
+      ring: null,
       h: 230,
     })),
   },
@@ -166,6 +165,17 @@ const catalogue = [
    Coverage, Quality, Delivery and Governance tabs use. A fragment that looks
    nothing like the page it came from is a fragment nobody trusts is the same
    number. The ring carries the tone, so the coloured top edge is gone with it. */
+/* The open affordance is the design system's own button — secondary, neutral,
+   icon-only, small (32px box, 8px padding-action-icon, 16px icon), per node
+   489:3614. It is drawn in CSS rather than mounted as <eo-button> because these
+   pages ship no JavaScript on purpose: they have to render inside a Notion
+   embed with nothing but a stylesheet. The card itself is the link, so this is
+   an affordance and not a second control — hence a span, and aria-hidden. */
+const ARROW_ICON = `<svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true" focusable="false">
+  <path d="M3 8h9.5M9 4.5 12.5 8 9 11.5" stroke="currentColor" stroke-width="1.5"
+    stroke-linecap="round" stroke-linejoin="round"/>
+</svg>`;
+
 const cardOf = (it) => `
   <a class="card" href="#${it.id}" data-id="${it.id}">
     <span class="c-eyebrow">${esc(it.eyebrow || '')}</span>
@@ -174,8 +184,152 @@ const cardOf = (it) => `
       ? scoreRing(it.ring.value, { max: it.ring.max, at: it.ring.at, label: it.ring.label, sub: it.ring.sub, tone: it.tone, size: 118 })
       : `<span class="c-metric ${it.tone}">${esc(it.metric || '')}</span>`}
     <span class="c-note">${esc(it.note || '')}</span>
-    <span class="c-foot">${esc(it.delta || 'Open fragment')}<span class="c-go" aria-hidden="true">→</span></span>
+    <span class="c-foot">
+      <span class="c-meta">${esc(it.delta || 'Open fragment')}</span>
+      <span class="c-btn" aria-hidden="true">${ARROW_ICON}</span>
+    </span>
   </a>`;
+
+/* ---- plain language -------------------------------------------------------
+   These fragments get read by people who do not build design systems — product
+   managers, engineering managers, stakeholders in a review. For them a figure
+   like "96% fills bound to design tokens" is not a result, it is vocabulary.
+
+   So every fragment carries three plain lines: what is actually being counted,
+   why it matters to someone shipping a product, and — where the design side
+   and the code side disagree, which is most of this system's story — which of
+   the two the number is about. Several of these scores read as bad news until
+   you know that: accessibility is one of the strongest parts of the design
+   side and entirely unverified in code, and the single score averages the two.
+   The card stays terse for embedding; this is what the detail page explains. */
+const PLAIN = {
+  'station-01': {
+    what: 'How much of the design system actually exists as code an engineer can install.',
+    why: 'Every component that exists only as a design has to be rebuilt by hand in each product, which is where inconsistency and rework come from.',
+    sides: ['Designed and reviewed: all 37', 'Built in code: 15'],
+  },
+  'station-02': {
+    what: 'Whether the design files are built cleanly — colours and spacing coming from the shared system rather than typed in by hand.',
+    why: 'Clean files are what makes a change reach every screen at once. A hand-typed colour has to be found and fixed one by one.',
+    sides: ['Design side: strong, and measured across every layer', 'Code side: the same pattern, with nothing checking it automatically'],
+  },
+  'station-03': {
+    what: 'Whether the system is usable by people using a screen reader, a keyboard, or needing high contrast.',
+    why: 'This is a legal requirement in the EU from June 2025, and it is far cheaper to build in than to retrofit.',
+    sides: [
+      'Design side: strong. Contrast, focus states and a required accessibility step in the contribution checklist — all measured, all passing',
+      'Code side: unverified. No automated accessibility check has ever run against the built components',
+    ],
+    note: 'The score is the average of the two, which is why a genuinely strong design practice still reads as a five.',
+  },
+  'station-04': {
+    what: 'Whether designers and engineers use the same words for the same things.',
+    why: 'When a property is called one thing in the design file and another in code, every handover needs a translation step — and translations are where things get lost.',
+    sides: ['Design side: consistent and now measurable', 'Code side: matches, but nothing validates it when either side changes'],
+  },
+  'station-05': {
+    what: 'Whether automated tests actually run when someone changes a component.',
+    why: 'Without them, a change that breaks a component reaches products before anyone notices — and the design system is used by twenty-plus teams.',
+    sides: ['Tests exist and are written', 'They resolve zero projects because of two typos in a config file, so they pass without running anything'],
+    note: 'This is the cheapest fix on the whole board: two paths in one file.',
+  },
+  'station-06': {
+    what: 'Whether the pipeline from design decision to shipped code runs on its own or needs someone to push it along.',
+    why: 'Manual steps are where delay accumulates, and they stop entirely when the person who knows them is away.',
+    sides: ['The token pipeline is automated end to end', 'Release and publish still need hand-holding'],
+  },
+  'station-07': {
+    what: 'Whether a team using the design system can tell what changed between two versions.',
+    why: 'Without release notes a consumer upgrading has no way to know what broke, so they stop upgrading — and the system fragments.',
+    sides: [
+      'Design side: a real release process, two tracks, with comms attached',
+      'Code side: no tags, no releases, no changelog. The published version number is a build counter',
+    ],
+  },
+  'station-08': {
+    what: 'Whether the team knows how the system is actually used, and whether users can get help.',
+    why: 'Without adoption data, priorities are guesswork — you cannot tell a component nobody uses from one everybody depends on.',
+    sides: ['Figma usage data is live', 'No equivalent for the code side; every figure there is reverse-engineered'],
+  },
+  'station-09': {
+    what: 'Whether the system is documented in a form a machine can read, not just a person.',
+    why: 'This is what lets AI tooling, linters and code generators use the system correctly instead of inventing their own version of it.',
+    sides: ['Icons: fully documented to convention', 'Components: descriptions exist for half the set, and never leave the repository'],
+  },
+  'station-10': {
+    what: 'Whether an AI coding assistant working in one of these repositories can find and follow the design system.',
+    why: 'Engineers increasingly write code with an assistant. If it cannot see the system, it will confidently produce something that ignores it.',
+    sides: ['The groundwork exists, in a repository nothing links to', 'Neither design system repository points at it'],
+  },
+
+  cascade: {
+    what: 'The chain a single colour or spacing value travels: one core value, named for its purpose, adjusted per brand and per screen size.',
+    why: 'This is the mechanism behind "change it once, it changes everywhere". It is also why EGYM and Wellpass can look different without maintaining two systems.',
+  },
+  'coverage-rings': {
+    what: 'The same set of components, counted twice: how many are designed, and how many are built.',
+    why: 'The distance between the two rings is the entire delivery problem in one picture. Nothing is blocked on design.',
+  },
+  stations: {
+    what: 'The ten areas the design system is inspected against, each scored out of ten.',
+    why: 'One number per area makes it possible to argue about where to spend the next month rather than about whether things are broadly fine.',
+  },
+  now: {
+    what: 'What is in flight in the design system today, straight from the ticket board.',
+    why: 'A live view, so a status meeting can start from what is true rather than from what was true when the slide was made.',
+  },
+
+  'wellpass-coverage': {
+    what: 'Every screen Wellpass needs has a finished, reviewed design in the shared library.',
+    why: 'Nothing on the design side is holding the Wellpass programme up. If it is waiting, it is waiting on engineering capacity.',
+  },
+  'ui-kit': {
+    what: 'How many components the shared library offers, counting every state and size.',
+    why: 'This is the menu a product team can build from without designing anything from scratch.',
+  },
+  bma: {
+    what: 'How far the BMA product has got through design quality review.',
+    why: 'Work past this point is agreed and specified — it is ready for engineers to pick up.',
+  },
+  contrast: {
+    what: 'Whether text is readable against its background, checked against the international accessibility standard.',
+    why: 'Failing pairs are unreadable for anyone with low vision, and they are a compliance risk. Every pair the system governs passes.',
+    note: 'The two not counted are disabled text, which the standard explicitly exempts.',
+  },
+  binding: {
+    what: 'How many colours in the design files come from the shared system rather than being typed in by hand.',
+    why: 'A hand-typed colour will not follow a rebrand or a dark mode. This number is how confident the team can be that one change reaches everything.',
+  },
+  icons: {
+    what: 'Whether every icon carries the description and tags needed to find and use it correctly.',
+    why: 'An icon nobody can find gets redrawn, and then there are two of them.',
+  },
+  tokens: {
+    what: 'Whether each value in the system says what it is for, not just what it is.',
+    why: 'This is what lets a designer or an engineer pick the right value without asking someone.',
+  },
+  hygiene: {
+    what: 'How many layers in the design files still carry a default name like "Rectangle 12".',
+    why: 'A low number here means files a new joiner can read, and it is the difference between a library and a pile of files.',
+  },
+  focus: {
+    what: 'How many interactive components show a visible outline when reached with the keyboard.',
+    why: 'Without it, anyone navigating by keyboard cannot see where they are. This is a design-side strength: it is a required step before a component ships.',
+  },
+  'code-coverage': {
+    what: 'How much of the core component set an engineer can actually install today.',
+    why: 'The design for all of these is finished and signed off. This is the gap between what is decided and what is available.',
+  },
+  'code-a11y': {
+    what: 'How many automated accessibility checks run against the built components.',
+    why: 'The design side is measured and passing. Nothing checks that the shipped code kept those properties — so nobody can currently say whether it did.',
+    note: 'The tests exist. They have never run, because of two wrong paths in a config file.',
+  },
+  queue: {
+    what: 'Tickets that are fully specified, prioritised, and waiting for someone to start them.',
+    why: 'These are not blocked on decisions or design. They are waiting on engineering time, which is why this number is the ask.',
+  },
+};
 
 /* ---- detail bodies ---------------------------------------------------------
    Built here, at build time, one per fragment. The detail is not a bigger copy
@@ -232,7 +386,18 @@ const detailOf = (it) => {
         it.date ? factRow('Last read', fmt(it.date)) : '',
       ].join('');
 
+  const pl = PLAIN[it.id];
+  const explain = pl
+    ? `<div class="d-plain">
+         <p class="d-what">${esc(pl.what)}</p>
+         <p class="d-why"><span>Why it matters</span> ${esc(pl.why)}</p>
+         ${pl.sides ? `<ul class="d-sides">${pl.sides.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}
+         ${pl.note ? `<p class="d-caveat">${esc(pl.note)}</p>` : ''}
+       </div>`
+    : '';
+
   return `
+    ${explain}
     <div class="d-top">
       <div class="d-ring">${ring}</div>
       <div class="d-body">
@@ -253,10 +418,8 @@ const groupOf = (g) => `
 const GALLERY_CSS = `
 body{background:var(--eo-color-surface-subtle);padding:var(--eo-dimension-40) clamp(1.25rem,4vw,4rem);min-height:100vh}
 .wrap{max-width:1240px;margin:0 auto}
-h1{font-family:var(--eo-typography-headline-500-font-family);font-size:var(--eo-typography-headline-500-font-size);line-height:1.1;margin:0 0 var(--eo-dimension-8)}
-.intro{margin:0 0 var(--eo-dimension-8);color:var(--eo-color-content-subtle);max-width:70ch}
-.stamp{margin:0 0 var(--eo-dimension-40);color:var(--eo-color-content-hinted);font-size:var(--eo-typography-body-50-font-size)}
 h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-typography-headline-300-font-size);margin:var(--eo-dimension-40) 0 var(--eo-dimension-8)}
+.overview .group:first-child h2{margin-top:0}
 .group .lede{margin:0 0 var(--eo-dimension-16);color:var(--eo-color-content-subtle);max-width:70ch;font-size:var(--eo-typography-body-50-font-size)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:var(--eo-dimension-gap-large)}
 
@@ -288,9 +451,11 @@ h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-
 .c-metric{
   font-family:var(--eo-typography-headline-500-font-family);
   font-size:var(--eo-typography-headline-500-font-size);
-  line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+  line-height:1;letter-spacing:-.02em;
   margin:var(--eo-dimension-8) 0;
 }
+/* Nothing to show is not a gap to reserve. */
+.c-metric:empty{display:none}
 .c-metric.good{color:var(--eo-color-content-utility-positive)}
 .c-metric.warn{color:var(--eo-color-content-utility-warning)}
 .c-metric.bad{color:var(--eo-color-content-utility-negative)}
@@ -301,8 +466,35 @@ h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-
   font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-hinted);
   display:flex;justify-content:space-between;align-items:center;gap:var(--eo-dimension-gap-small);
 }
-.c-go{transition:transform .22s cubic-bezier(.2,.7,.3,1)}
-.card:hover .c-go{transform:translateX(4px);color:var(--eo-color-content-accent)}
+.c-meta{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* secondary · neutral · icon-only · small */
+.c-btn{
+  flex:none;
+  width:32px;height:32px;
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:var(--eo-dimension-padding-action-icon-small,8px);
+  border:var(--eo-dimension-border-width-default,1px) solid var(--eo-color-border-emphasized);
+  border-radius:var(--eo-dimension-border-radius-round);
+  background:var(--eo-color-surface-transparent,transparent);
+  color:var(--eo-color-content-emphasized);
+  transition:background-color .22s cubic-bezier(.2,.7,.3,1),transform .22s cubic-bezier(.2,.7,.3,1);
+}
+.c-btn svg{display:block;width:16px;height:16px}
+.card:hover .c-btn,.card:focus-visible .c-btn{background:var(--eo-color-surface-hovered);transform:translateX(2px)}
+
+/* The same reveal the dashboard uses: rise and fade as each card crosses the
+   line, staggered along the row. Driven by IntersectionObserver rather than
+   the dashboard's GSAP, because these pages carry no bundle — the motion is
+   the same, the weight is a few lines. */
+.card{opacity:1}
+body.js .card{opacity:0;transform:translateY(18px)}
+body.js .card.in{opacity:1;transform:translateY(0);transition:opacity .5s cubic-bezier(.2,.7,.3,1),transform .5s cubic-bezier(.2,.7,.3,1)}
+@media (prefers-reduced-motion:reduce){
+  body.js .card{opacity:1;transform:none}
+  body.js .card.in{transition:none}
+  .c-btn{transition:none}
+  .card:hover .c-btn{transform:none}
+}
 
 /* The score ring, lifted verbatim from the dashboard stylesheet so the two
    cannot drift apart. */
@@ -319,9 +511,13 @@ h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-
 .sring.bad .sring-n{fill:var(--eo-color-content-utility-negative)}
 .sring-k{margin:0;font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-default);font-weight:600;text-wrap:balance}
 .sring-t{margin:0;font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-hinted)}
-/* The card already names the station above the ring; the ring's own label
-   would say it a second time. */
-.card .sring-k{display:none}
+/* The card already names the station in its eyebrow and headline; the ring's
+   own label and caption said both a second time. */
+.card .sring-k,.card .sring-t{display:none}
+
+/* One line. A source string long enough to wrap pushed the headline down and
+   broke the alignment across the row. */
+.c-eyebrow{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ---- detail ---- */
 .detail{display:none}
@@ -346,6 +542,43 @@ body.is-detail .detail{display:block}
 /* The worked-out view: the arc, the finding and the run of inspections behind
    the number, side by side. The embeddable card is one number by design; this
    is where that number shows what it rests on. */
+/* The plain-language layer sits above the measurement, because the reader this
+   is written for needs to know what is being counted before a percentage means
+   anything to them. */
+.d-plain{
+  background:var(--eo-color-surface-default);
+  border-radius:var(--eo-dimension-border-radius-large);
+  padding:var(--eo-dimension-padding-block-large) var(--eo-dimension-padding-inline-default);
+  margin-top:var(--eo-dimension-16);
+  max-width:78ch;
+}
+.d-what{
+  margin:0 0 var(--eo-dimension-12);
+  font-family:var(--eo-typography-headline-300-font-family);
+  font-size:var(--eo-typography-headline-300-font-size);
+  line-height:1.3;letter-spacing:-.01em;
+}
+.d-why{margin:0;color:var(--eo-color-content-subtle)}
+.d-why span{
+  font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--eo-color-content-accent);margin-right:.5rem;
+}
+.d-sides{
+  margin:var(--eo-dimension-16) 0 0;padding:0;list-style:none;
+  display:grid;gap:var(--eo-dimension-gap-small);
+}
+.d-sides li{
+  padding-left:var(--eo-dimension-12);
+  border-left:2px solid var(--eo-color-border-subtle);
+  color:var(--eo-color-content-default);
+  font-size:var(--eo-typography-body-50-font-size);
+  line-height:var(--eo-typography-body-50-line-height);
+}
+.d-caveat{
+  margin:var(--eo-dimension-16) 0 0;
+  color:var(--eo-color-content-hinted);
+  font-size:var(--eo-typography-body-50-font-size);
+}
 .d-work{
   background:var(--eo-color-surface-default);
   border-radius:var(--eo-dimension-border-radius-large);
@@ -372,7 +605,7 @@ body.is-detail .detail{display:block}
   font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-subtle);
 }
 .d-fact:last-child{border-bottom:0}
-.d-fact b{color:var(--eo-color-content-emphasized);font-variant-numeric:tabular-nums}
+.d-fact b{color:var(--eo-color-content-emphasized)}
 .d-fact b.good{color:var(--eo-color-content-utility-positive)}
 .d-chart{margin:0;min-width:0}
 .d-chart figcaption{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--eo-color-content-hinted);margin-bottom:var(--eo-dimension-8)}
@@ -432,10 +665,6 @@ ${GALLERY_CSS}
 </head>
 <body>
 <div class="wrap">
-  <h1>KPI fragments</h1>
-  <p class="intro">${esc(fragments.note)}</p>
-  <p class="stamp">Updated ${esc(fmt(fragments.updated))} · open any fragment for its embed URL, then paste that into Notion, FigJam or Confluence and choose Embed</p>
-
   <div class="overview">
     ${catalogue.map(groupOf).join('')}
   </div>
@@ -533,6 +762,23 @@ document.addEventListener('keydown', (e) => {
 
 addEventListener('hashchange', render);
 render();
+
+/* Cards rise as they cross the line, staggered along the row — the dashboard's
+   reveal, without its bundle. The class goes on from script so a page with no
+   JavaScript shows every card rather than a blank grid. */
+document.body.classList.add('js');
+const cards = [...document.querySelectorAll('.card')];
+if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
+  const io = new IntersectionObserver((entries) => {
+    entries.filter((e) => e.isIntersecting).forEach((e, i) => {
+      setTimeout(() => e.target.classList.add('in'), i * 60);
+      io.unobserve(e.target);
+    });
+  }, { rootMargin: '0px 0px -8% 0px' });
+  cards.forEach((c) => io.observe(c));
+} else {
+  cards.forEach((c) => c.classList.add('in'));
+}
 </script>
 </body>
 </html>

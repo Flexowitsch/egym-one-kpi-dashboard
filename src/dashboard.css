@@ -155,6 +155,11 @@ body.rail-pinned .nav {
   letter-spacing: -0.01em;
   text-wrap: balance;
 }
+/* A break authored with "|" in the title. Where a headline is a claim and its
+   consequence, balancing both sentences into one ragged block buries the break
+   that carries the meaning. Below the breakpoint there is no room for it, so
+   the text wraps on its own instead. */
+@media (max-width: 720px) { .band-head h2 br.hb { display: none; } }
 .band-head p {
   margin: var(--eo-dimension-16) auto 0;
   color: var(--eo-color-content-subtle);
@@ -312,6 +317,9 @@ body.rail-pinned .nav {
 .c-line { fill: none; stroke: var(--eo-color-surface-accent); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
 .c-donut-track { fill: none; stroke: var(--eo-color-surface-subtle); }
 .c-donut-fill  { fill: none; stroke: var(--eo-color-surface-accent); stroke-linecap: round; }
+/* good was missing, so a green score drew an accent-orange arc around a green
+   numeral — the ring and the number disagreed on the same card. */
+.c-donut-fill.good { stroke: var(--eo-color-surface-utility-positive); }
 .c-donut-fill.warn { stroke: var(--eo-color-surface-utility-warning); }
 .c-donut-fill.bad  { stroke: var(--eo-color-surface-utility-negative); }
 .c-donut-label { fill: var(--eo-color-content-emphasized); font-weight: 700; }
