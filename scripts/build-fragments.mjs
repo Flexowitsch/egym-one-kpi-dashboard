@@ -676,14 +676,6 @@ ${GALLERY_CSS}
       <h2 id="d-title"></h2>
     </div>
     <div class="d-work" id="d-work"></div>
-    <h3 class="d-sub">The embeddable card</h3>
-    <div class="stage"><iframe id="d-frame" title="Fragment preview"></iframe></div>
-    <div class="embed">
-      <code id="d-url"></code>
-      <button type="button" id="d-copy">Copy embed URL</button>
-      <a class="open" id="d-open" target="_blank" rel="noopener">Open standalone</a>
-    </div>
-    <p class="hint">The URL above is the published one. It works as an embed once this build is on GitHub Pages.</p>
     <div class="d-nav">
       <a href="#" id="d-prev"></a>
       <a href="#" id="d-next"></a>
@@ -694,24 +686,20 @@ ${GALLERY_CSS}
 <script>
 /* The catalogue is emitted once and used by both levels, so the detail view
    can never describe a fragment the overview does not list. */
-const BASE = ${JSON.stringify(BASE)};
 const ITEMS = ${JSON.stringify(
   catalogue.flatMap((g) =>
-    g.items.map((it) => ({ id: it.id, title: it.title, eyebrow: it.eyebrow || '', h: it.h, body: detailOf(it) }))
+    g.items.map((it) => ({ id: it.id, title: it.title, eyebrow: it.eyebrow || '', body: detailOf(it) }))
   )
 )};
 const byId = Object.fromEntries(ITEMS.map((it) => [it.id, it]));
 
 const $ = (s) => document.querySelector(s);
-const frame = $('#d-frame');
 
 function render() {
   const id = location.hash.replace(/^#/, '');
   const it = byId[id];
   if (!it) {
     document.body.classList.remove('is-detail');
-    // Unmount the frame so a closed fragment stops running.
-    frame.removeAttribute('src');
     document.title = 'EGYM One — KPI fragments';
     return;
   }
@@ -719,13 +707,6 @@ function render() {
   $('#d-title').textContent = it.title;
   $('#d-eyebrow').textContent = it.eyebrow;
   $('#d-work').innerHTML = it.body;
-  const url = BASE + '/' + id + '.html';
-  $('#d-url').textContent = url;
-  $('#d-open').href = './' + id + '.html';
-  // Each fragment is drawn for its own height; a shared stage left the
-  // one-number cards floating in half a screen of nothing.
-  frame.style.height = (it.h || 380) + 'px';
-  frame.src = './' + id + '.html';
   document.body.classList.add('is-detail');
   document.title = it.title + ' — KPI fragments';
 
@@ -737,23 +718,6 @@ function render() {
   $('#d-next').href = '#' + next.id;
   window.scrollTo(0, 0);
 }
-
-$('#d-copy').addEventListener('click', async (e) => {
-  const btn = e.currentTarget;
-  try {
-    await navigator.clipboard.writeText($('#d-url').textContent);
-    btn.textContent = 'Copied';
-  } catch {
-    // Clipboard is permission-gated; selecting the text is the honest fallback.
-    const r = document.createRange();
-    r.selectNodeContents($('#d-url'));
-    const sel = getSelection();
-    sel.removeAllRanges();
-    sel.addRange(r);
-    btn.textContent = 'Selected — press ⌘C';
-  }
-  setTimeout(() => { btn.textContent = 'Copy embed URL'; }, 2000);
-});
 
 // Escape closes the detail, which is what every reader tries first.
 document.addEventListener('keydown', (e) => {

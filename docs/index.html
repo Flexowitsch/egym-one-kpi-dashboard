@@ -542,6 +542,10 @@ eo-card > * { width: 100%; }
   font-size: var(--eo-typography-body-50-font-size);
   letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--eo-color-content-hinted);
+  /* The column it heads is 2rem wide — narrower than the date it names — so
+     the label wrapped to two lines and stopped lining up with the column on
+     the other side. It overflows into the gutter instead. */
+  white-space: nowrap;
 }
 .change-head span:nth-child(2) { text-align: center; }
 .change-head span:nth-child(4) { text-align: right; }
