@@ -89,14 +89,188 @@ const page = (f) => `<!doctype html>
 
 fragments.items.forEach((f) => writeFileSync(resolve(outDir, `${f.id}.html`), page(f)));
 
-/* ---- gallery, with the embed URL next to each card ---- */
-const card = (f) => `
-  <figure class="cell">
-    <iframe src="./${f.id}.html" title="${esc(f.label)}" loading="lazy"></iframe>
-    <figcaption>
-      <code>${BASE}/${f.id}.html</code>
-    </figcaption>
-  </figure>`;
+/* ---- gallery ---------------------------------------------------------------
+   Two levels, not one wall. The old gallery rendered all 27 fragments as live
+   iframes at once: 27 documents to lay out before anything was readable, no
+   way to tell the ten stations apart at a glance, and — because the embed URL
+   was printed as text rather than linked — nothing to click.
+
+   Now the top level is a summary card per fragment, drawn from the same data
+   the fragment itself is drawn from, so the overview is scannable without
+   loading a single frame. Opening one mounts exactly one iframe. The detail
+   is addressed by hash, so a fragment can be linked to directly and the
+   browser's back button behaves. */
+
+const TONE_OF_LIGHT = { green: 'good', yellow: 'warn', red: 'bad' };
+
+// One catalogue for every level of the page: the cards are rendered from it at
+// build time and the detail view reads it at runtime, so the two can never
+// describe different sets.
+const catalogue = [
+  {
+    group: 'Inspection stations',
+    note:
+      'Each of the ten stations as its own embeddable page — dial, history across the inspections, and the finding. Animated, self-contained, no JavaScript.',
+    items: data.inspection.stations.map((s) => {
+      const h = s.history || [];
+      const delta = h.length > 1 ? s.score - h[0] : 0;
+      return {
+        id: 'station-' + String(s.n).padStart(2, '0'),
+        eyebrow: `Station ${String(s.n).padStart(2, '0')}`,
+        metric: String(s.score),
+        unit: '/10',
+        title: s.name,
+        note: s.note,
+        tone: TONE_OF_LIGHT[s.light] || 'warn',
+        h: 430,
+        delta: delta > 0 ? `+${delta} since first inspection` : delta < 0 ? `${delta} since first inspection` : 'unchanged',
+      };
+    }),
+  },
+  {
+    group: 'Visual',
+    note: 'The four that carry a drawing rather than a number. These are the ones worth putting on a slide.',
+    items: [
+      { id: 'cascade', h: 340, eyebrow: 'Token system', metric: '1,619', unit: 'variables', title: 'Three tiers, two mode layers', note: 'The cascade, drawn — how one change reaches every brand and breakpoint.', tone: 'good' },
+      { id: 'coverage-rings', h: 340, eyebrow: 'Coverage', metric: '100%', unit: 'design', title: 'Design is done. Code is not.', note: 'The two coverage figures side by side, which is the whole argument in one image.', tone: 'warn' },
+      { id: 'stations', h: 340, eyebrow: 'Inspection', metric: String(data.inspection.shippedTotal ?? ''), unit: '/100', title: 'All ten stations at once', note: 'The full inspection strip — every station, its score and its light.', tone: 'warn' },
+      { id: 'now', h: 400, eyebrow: 'Right now', metric: '', unit: '', title: 'What is moving today', note: 'Live from the Jira queue: what is ready for release and what is in development.', tone: 'good' },
+    ],
+  },
+  {
+    group: 'Measurements',
+    note: 'One fragment per number. Each states the figure, what proves it, and when it was last read.',
+    items: fragments.items.map((f) => ({
+      id: f.id,
+      eyebrow: f.source,
+      metric: f.value,
+      unit: '',
+      title: f.label,
+      note: f.proof,
+      tone: f.tone,
+      h: 230,
+    })),
+  },
+];
+
+const cardOf = (it) => `
+  <a class="card ${it.tone}" href="#${it.id}" data-id="${it.id}">
+    <span class="c-eyebrow">${esc(it.eyebrow || '')}</span>
+    <span class="c-metric">${esc(it.metric || '')}${it.unit ? `<span class="c-unit">${esc(it.unit)}</span>` : ''}</span>
+    <span class="c-title">${esc(it.title)}</span>
+    <span class="c-note">${esc(it.note || '')}</span>
+    <span class="c-foot">${esc(it.delta || 'Open fragment')}<span class="c-go" aria-hidden="true">→</span></span>
+  </a>`;
+
+const groupOf = (g) => `
+  <section class="group">
+    <h2>${esc(g.group)}</h2>
+    <p class="lede">${esc(g.note)}</p>
+    <div class="grid">${g.items.map(cardOf).join('')}</div>
+  </section>`;
+
+const GALLERY_CSS = `
+body{background:var(--eo-color-surface-subtle);padding:var(--eo-dimension-40) clamp(1.25rem,4vw,4rem);min-height:100vh}
+.wrap{max-width:1240px;margin:0 auto}
+h1{font-family:var(--eo-typography-headline-500-font-family);font-size:var(--eo-typography-headline-500-font-size);line-height:1.1;margin:0 0 var(--eo-dimension-8)}
+.intro{margin:0 0 var(--eo-dimension-8);color:var(--eo-color-content-subtle);max-width:70ch}
+.stamp{margin:0 0 var(--eo-dimension-40);color:var(--eo-color-content-hinted);font-size:var(--eo-typography-body-50-font-size)}
+h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-typography-headline-300-font-size);margin:var(--eo-dimension-40) 0 var(--eo-dimension-8)}
+.group .lede{margin:0 0 var(--eo-dimension-16);color:var(--eo-color-content-subtle);max-width:70ch;font-size:var(--eo-typography-body-50-font-size)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:var(--eo-dimension-gap-large)}
+
+/* The card is the fragment in summary: same figure, same tone, no iframe. */
+.card{
+  display:flex;flex-direction:column;gap:var(--eo-dimension-gap-small);
+  background:var(--eo-color-surface-default);
+  border-radius:var(--eo-dimension-border-radius-large);
+  padding:var(--eo-dimension-padding-block-large);
+  border-top:3px solid var(--eo-color-border-hinted);
+  text-decoration:none;color:inherit;
+  transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s cubic-bezier(.2,.7,.3,1);
+}
+.card.good{border-top-color:var(--eo-color-border-utility-positive)}
+.card.warn{border-top-color:var(--eo-color-border-utility-warning)}
+.card.bad{border-top-color:var(--eo-color-border-utility-negative)}
+.card:hover,.card:focus-visible{
+  transform:translateY(-3px);
+  box-shadow:
+    var(--eo-shadow-all-around-level-1-base-x) var(--eo-shadow-all-around-level-1-base-y)
+    var(--eo-shadow-all-around-level-1-base-blur) var(--eo-shadow-all-around-level-1-base-spread)
+    var(--eo-shadow-all-around-level-1-base-color);
+}
+.card:focus-visible{outline:2px solid var(--eo-color-border-accent);outline-offset:3px}
+.c-eyebrow{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--eo-color-content-accent)}
+.c-metric{
+  font-family:var(--eo-typography-headline-500-font-family);
+  font-size:var(--eo-typography-headline-500-font-size);
+  line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+  display:flex;align-items:baseline;gap:.28rem;
+}
+.card:empty{display:none}
+.card.good .c-metric{color:var(--eo-color-content-utility-positive)}
+.card.warn .c-metric{color:var(--eo-color-content-utility-warning)}
+.card.bad .c-metric{color:var(--eo-color-content-utility-negative)}
+.c-unit{font-size:var(--eo-typography-body-100-font-size);color:var(--eo-color-content-hinted);letter-spacing:0}
+.c-title{font-weight:600;font-size:var(--eo-typography-body-100-font-size)}
+.c-note{font-size:var(--eo-typography-body-50-font-size);line-height:var(--eo-typography-body-50-line-height);color:var(--eo-color-content-subtle)}
+.c-foot{
+  margin-top:auto;padding-top:var(--eo-dimension-12);
+  border-top:1px solid var(--eo-color-border-subtle);
+  font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-hinted);
+  display:flex;justify-content:space-between;align-items:center;gap:var(--eo-dimension-gap-small);
+}
+.c-go{transition:transform .22s cubic-bezier(.2,.7,.3,1)}
+.card:hover .c-go{transform:translateX(4px);color:var(--eo-color-content-accent)}
+
+/* ---- detail ---- */
+.detail{display:none}
+body.is-detail .overview{display:none}
+body.is-detail .detail{display:block}
+.back{
+  display:inline-flex;align-items:center;gap:.4rem;
+  margin:0 0 var(--eo-dimension-16);
+  font-size:var(--eo-typography-body-50-font-size);
+  color:var(--eo-color-content-subtle);text-decoration:none;
+}
+.back:hover{color:var(--eo-color-content-accent)}
+.d-head{margin:0 0 var(--eo-dimension-16)}
+.d-head h2{margin:0}
+.stage{
+  background:var(--eo-color-surface-default);
+  border-radius:var(--eo-dimension-border-radius-large);
+  border:1px solid var(--eo-color-border-subtle);
+  overflow:hidden;
+}
+.stage iframe{width:100%;height:380px;border:0;display:block;background:var(--eo-color-surface-default)}
+.embed{
+  margin-top:var(--eo-dimension-16);
+  display:flex;flex-wrap:wrap;align-items:center;gap:var(--eo-dimension-gap-default);
+}
+.embed code{
+  flex:1 1 22rem;min-width:0;
+  font-size:.72rem;word-break:break-all;color:var(--eo-color-content-subtle);
+  background:var(--eo-color-surface-default);
+  border:1px solid var(--eo-color-border-subtle);
+  border-radius:var(--eo-dimension-border-radius-default);
+  padding:var(--eo-dimension-8) var(--eo-dimension-12);
+}
+.embed button,.embed a.open{
+  font:inherit;font-size:var(--eo-typography-body-50-font-size);
+  padding:var(--eo-dimension-8) var(--eo-dimension-16);
+  border-radius:var(--eo-dimension-border-radius-round);
+  border:1px solid var(--eo-color-border-emphasized);
+  background:var(--eo-color-surface-transparent);
+  color:var(--eo-color-content-emphasized);
+  cursor:pointer;text-decoration:none;white-space:nowrap;
+}
+.embed button:hover,.embed a.open:hover{background:var(--eo-color-surface-hovered)}
+.hint{margin:var(--eo-dimension-8) 0 0;font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-hinted)}
+.d-nav{display:flex;justify-content:space-between;gap:var(--eo-dimension-gap-default);margin-top:var(--eo-dimension-24)}
+.d-nav a{font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-subtle);text-decoration:none}
+.d-nav a:hover{color:var(--eo-color-content-accent)}
+@media (prefers-reduced-motion:reduce){.card,.c-go{transition:none}.card:hover{transform:none}}
+`;
 
 const index = `<!doctype html>
 <html lang="en" class="brand-egym light">
@@ -107,58 +281,110 @@ const index = `<!doctype html>
 <link rel="stylesheet" href="../vendor/egym-one-tokens.css">
 <style>
 ${CSS}
-body{background:var(--eo-color-surface-subtle);padding:var(--eo-dimension-40) clamp(1.25rem,4vw,4rem)}
-h1{font-family:var(--eo-typography-headline-500-font-family);font-size:var(--eo-typography-headline-500-font-size);line-height:1.1;margin:0 0 var(--eo-dimension-8)}
-.lede{margin:0 0 var(--eo-dimension-8);color:var(--eo-color-content-subtle);max-width:70ch}
-.stamp{margin:0 0 var(--eo-dimension-40);color:var(--eo-color-content-hinted);font-size:var(--eo-typography-body-50-font-size)}
-h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-typography-headline-300-font-size);margin:var(--eo-dimension-40) 0 var(--eo-dimension-16)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:var(--eo-dimension-gap-extra-large)}
-.cell{margin:0}
-.cell iframe{width:100%;height:230px;}
-.grid.station{grid-template-columns:repeat(auto-fill,minmax(360px,1fr))}
-.grid.station .cell iframe{height:430px;border:0;display:block;background:var(--eo-color-surface-default);border-radius:var(--eo-dimension-border-radius-large)}
-.grid.tall .cell iframe{height:300px;border:0;display:block;background:var(--eo-color-surface-default);border-radius:var(--eo-dimension-border-radius-large)}
-figcaption{margin-top:var(--eo-dimension-8)}
-figcaption code{font-size:.72rem;color:var(--eo-color-content-hinted);word-break:break-all}
+${GALLERY_CSS}
 </style>
 </head>
 <body>
+<div class="wrap">
   <h1>KPI fragments</h1>
-  <p class="lede">${esc(fragments.note)}</p>
-  <p class="stamp">Updated ${esc(fmt(fragments.updated))} · paste any URL below into Notion, FigJam or Confluence and choose Embed</p>
+  <p class="intro">${esc(fragments.note)}</p>
+  <p class="stamp">Updated ${esc(fmt(fragments.updated))} · open any fragment for its embed URL, then paste that into Notion, FigJam or Confluence and choose Embed</p>
 
-  <h2>Visual</h2>
-  <div class="grid tall">
-    ${['cascade','coverage-rings','stations','now']
-      .map((id) => `<figure class="cell">
-        <iframe src="./${id}.html" title="${id}" loading="lazy"></iframe>
-        <figcaption><code>${BASE}/${id}.html</code></figcaption>
-      </figure>`)
-      .join('')}
+  <div class="overview">
+    ${catalogue.map(groupOf).join('')}
   </div>
 
-  <h2>One per inspection station</h2>
-  <p class="lede">Each of the ten stations as its own embeddable page — dial, history across the three inspections, and the finding. Animated, self-contained, no JavaScript.</p>
-  <div class="grid station">
-    ${data.inspection.stations
-      .map((s) => {
-        const id = 'station-' + String(s.n).padStart(2, '0');
-        return `<figure class="cell">
-          <iframe src="./${id}.html" title="${esc(s.name)}" loading="lazy"></iframe>
-          <figcaption><code>${BASE}/${id}.html</code></figcaption>
-        </figure>`;
-      })
-      .join('')}
+  <div class="detail" id="detail">
+    <a class="back" href="#" id="back">← All fragments</a>
+    <div class="d-head">
+      <h2 id="d-title"></h2>
+    </div>
+    <div class="stage"><iframe id="d-frame" title="Fragment preview"></iframe></div>
+    <div class="embed">
+      <code id="d-url"></code>
+      <button type="button" id="d-copy">Copy embed URL</button>
+      <a class="open" id="d-open" target="_blank" rel="noopener">Open standalone</a>
+    </div>
+    <p class="hint">The URL above is the published one. It works as an embed once this build is on GitHub Pages.</p>
+    <div class="d-nav">
+      <a href="#" id="d-prev"></a>
+      <a href="#" id="d-next"></a>
+    </div>
   </div>
+</div>
 
-  <h2>Ready — design side</h2>
-  <div class="grid">${fragments.items.filter((f) => f.tone === 'good').map(card).join('')}</div>
+<script>
+/* The catalogue is emitted once and used by both levels, so the detail view
+   can never describe a fragment the overview does not list. */
+const BASE = ${JSON.stringify(BASE)};
+const ITEMS = ${JSON.stringify(
+  catalogue.flatMap((g) => g.items.map((it) => ({ id: it.id, title: it.title, h: it.h })))
+)};
+const byId = Object.fromEntries(ITEMS.map((it) => [it.id, it]));
 
-  <h2>Lagging — code side</h2>
-  <div class="grid">${fragments.items.filter((f) => f.tone !== 'good').map(card).join('')}</div>
+const $ = (s) => document.querySelector(s);
+const frame = $('#d-frame');
+
+function render() {
+  const id = location.hash.replace(/^#/, '');
+  const it = byId[id];
+  if (!it) {
+    document.body.classList.remove('is-detail');
+    // Unmount the frame so a closed fragment stops running.
+    frame.removeAttribute('src');
+    document.title = 'EGYM One — KPI fragments';
+    return;
+  }
+  const i = ITEMS.findIndex((x) => x.id === id);
+  $('#d-title').textContent = it.title;
+  const url = BASE + '/' + id + '.html';
+  $('#d-url').textContent = url;
+  $('#d-open').href = './' + id + '.html';
+  // Each fragment is drawn for its own height; a shared stage left the
+  // one-number cards floating in half a screen of nothing.
+  frame.style.height = (it.h || 380) + 'px';
+  frame.src = './' + id + '.html';
+  document.body.classList.add('is-detail');
+  document.title = it.title + ' — KPI fragments';
+
+  const prev = ITEMS[(i - 1 + ITEMS.length) % ITEMS.length];
+  const next = ITEMS[(i + 1) % ITEMS.length];
+  $('#d-prev').textContent = '← ' + prev.title;
+  $('#d-prev').href = '#' + prev.id;
+  $('#d-next').textContent = next.title + ' →';
+  $('#d-next').href = '#' + next.id;
+  window.scrollTo(0, 0);
+}
+
+$('#d-copy').addEventListener('click', async (e) => {
+  const btn = e.currentTarget;
+  try {
+    await navigator.clipboard.writeText($('#d-url').textContent);
+    btn.textContent = 'Copied';
+  } catch {
+    // Clipboard is permission-gated; selecting the text is the honest fallback.
+    const r = document.createRange();
+    r.selectNodeContents($('#d-url'));
+    const sel = getSelection();
+    sel.removeAllRanges();
+    sel.addRange(r);
+    btn.textContent = 'Selected — press ⌘C';
+  }
+  setTimeout(() => { btn.textContent = 'Copy embed URL'; }, 2000);
+});
+
+// Escape closes the detail, which is what every reader tries first.
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && document.body.classList.contains('is-detail')) location.hash = '';
+});
+
+addEventListener('hashchange', render);
+render();
+</script>
 </body>
 </html>
 `;
+
 writeFileSync(resolve(outDir, 'index.html'), index);
 
 console.log(`Built ${fragments.items.length} fragments + gallery in docs/fragments/`);
