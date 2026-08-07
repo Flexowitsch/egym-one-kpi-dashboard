@@ -52,19 +52,17 @@ h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-
 .group .lede{margin:0 0 var(--eo-dimension-16);color:var(--eo-color-content-subtle);max-width:70ch;font-size:var(--eo-typography-body-50-font-size)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:var(--eo-dimension-gap-large)}
 
-/* The card is the fragment in summary: same figure, same tone, no iframe. */
+/* The card is the dashboard's card: white surface, accent eyebrow, headline,
+   score ring. The ring carries the tone, so there is no coloured top edge —
+   that stripe was the main thing making these read as a different system. */
 .card{
   display:flex;flex-direction:column;gap:var(--eo-dimension-gap-small);
   background:var(--eo-color-surface-default);
   border-radius:var(--eo-dimension-border-radius-large);
-  padding:var(--eo-dimension-padding-block-large);
-  border-top:3px solid var(--eo-color-border-hinted);
+  padding:var(--eo-dimension-padding-block-large) var(--eo-dimension-padding-inline-default);
   text-decoration:none;color:inherit;
   transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s cubic-bezier(.2,.7,.3,1);
 }
-.card.good{border-top-color:var(--eo-color-border-utility-positive)}
-.card.warn{border-top-color:var(--eo-color-border-utility-warning)}
-.card.bad{border-top-color:var(--eo-color-border-utility-negative)}
 .card:hover,.card:focus-visible{
   transform:translateY(-3px);
   box-shadow:
@@ -74,18 +72,20 @@ h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-
 }
 .card:focus-visible{outline:2px solid var(--eo-color-border-accent);outline-offset:3px}
 .c-eyebrow{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--eo-color-content-accent)}
+.c-title{
+  font-family:var(--eo-typography-headline-300-font-family);
+  font-size:var(--eo-typography-headline-300-font-size);
+  line-height:1.2;letter-spacing:-.01em;
+}
 .c-metric{
   font-family:var(--eo-typography-headline-500-font-family);
   font-size:var(--eo-typography-headline-500-font-size);
   line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
-  display:flex;align-items:baseline;gap:.28rem;
+  margin:var(--eo-dimension-8) 0;
 }
-.card:empty{display:none}
-.card.good .c-metric{color:var(--eo-color-content-utility-positive)}
-.card.warn .c-metric{color:var(--eo-color-content-utility-warning)}
-.card.bad .c-metric{color:var(--eo-color-content-utility-negative)}
-.c-unit{font-size:var(--eo-typography-body-100-font-size);color:var(--eo-color-content-hinted);letter-spacing:0}
-.c-title{font-weight:600;font-size:var(--eo-typography-body-100-font-size)}
+.c-metric.good{color:var(--eo-color-content-utility-positive)}
+.c-metric.warn{color:var(--eo-color-content-utility-warning)}
+.c-metric.bad{color:var(--eo-color-content-utility-negative)}
 .c-note{font-size:var(--eo-typography-body-50-font-size);line-height:var(--eo-typography-body-50-line-height);color:var(--eo-color-content-subtle)}
 .c-foot{
   margin-top:auto;padding-top:var(--eo-dimension-12);
@@ -95,6 +95,25 @@ h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-
 }
 .c-go{transition:transform .22s cubic-bezier(.2,.7,.3,1)}
 .card:hover .c-go{transform:translateX(4px);color:var(--eo-color-content-accent)}
+
+/* The score ring, lifted verbatim from the dashboard stylesheet so the two
+   cannot drift apart. */
+.c-donut-track{fill:none;stroke:var(--eo-color-surface-subtle)}
+.c-donut-fill{fill:none;stroke:var(--eo-color-surface-accent);stroke-linecap:round}
+.c-donut-fill.good{stroke:var(--eo-color-surface-utility-positive)}
+.c-donut-fill.warn{stroke:var(--eo-color-surface-utility-warning)}
+.c-donut-fill.bad{stroke:var(--eo-color-surface-utility-negative)}
+.sring{text-align:center;display:grid;justify-items:center;gap:var(--eo-dimension-gap-small);margin:var(--eo-dimension-8) 0}
+.sring .chart{width:100%}
+.sring-n{font-family:var(--eo-typography-headline-500-font-family);font-size:38px;font-weight:700;fill:var(--eo-color-content-emphasized)}
+.sring.good .sring-n{fill:var(--eo-color-content-utility-positive)}
+.sring.warn .sring-n{fill:var(--eo-color-content-utility-warning)}
+.sring.bad .sring-n{fill:var(--eo-color-content-utility-negative)}
+.sring-k{margin:0;font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-default);font-weight:600;text-wrap:balance}
+.sring-t{margin:0;font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-hinted)}
+/* The card already names the station above the ring; the ring's own label
+   would say it a second time. */
+.card .sring-k{display:none}
 
 /* ---- detail ---- */
 .detail{display:none}
@@ -109,6 +128,52 @@ body.is-detail .detail{display:block}
 .back:hover{color:var(--eo-color-content-accent)}
 .d-head{margin:0 0 var(--eo-dimension-16)}
 .d-head h2{margin:0}
+.d-eyebrow{margin:0 0 var(--eo-dimension-4);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--eo-color-content-accent)}
+.d-sub{
+  font-family:var(--eo-typography-headline-300-font-family);
+  font-size:var(--eo-typography-headline-300-font-size);
+  margin:var(--eo-dimension-40) 0 var(--eo-dimension-12);
+}
+
+/* The worked-out view: the arc, the finding and the run of inspections behind
+   the number, side by side. The embeddable card is one number by design; this
+   is where that number shows what it rests on. */
+.d-work{
+  background:var(--eo-color-surface-default);
+  border-radius:var(--eo-dimension-border-radius-large);
+  padding:var(--eo-dimension-padding-block-large) var(--eo-dimension-padding-inline-default);
+  margin-top:var(--eo-dimension-16);
+}
+.d-top{display:grid;grid-template-columns:minmax(170px,200px) minmax(260px,1fr) auto;gap:var(--eo-dimension-gap-largest);align-items:start}
+@media (max-width:900px){.d-top{grid-template-columns:1fr}}
+.d-ring{min-width:0}
+.d-big{
+  font-family:var(--eo-typography-headline-500-font-family);
+  font-size:var(--eo-typography-headline-500-font-size);
+  margin:0;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+}
+.d-big.good{color:var(--eo-color-content-utility-positive)}
+.d-big.warn{color:var(--eo-color-content-utility-warning)}
+.d-big.bad{color:var(--eo-color-content-utility-negative)}
+.d-finding{margin:0 0 var(--eo-dimension-16);color:var(--eo-color-content-default);max-width:60ch}
+.d-facts{display:grid;gap:0}
+.d-fact{
+  display:flex;justify-content:space-between;gap:var(--eo-dimension-gap-default);
+  padding:var(--eo-dimension-8) 0;
+  border-bottom:1px solid var(--eo-color-border-subtle);
+  font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-subtle);
+}
+.d-fact:last-child{border-bottom:0}
+.d-fact b{color:var(--eo-color-content-emphasized);font-variant-numeric:tabular-nums}
+.d-fact b.good{color:var(--eo-color-content-utility-positive)}
+.d-chart{margin:0;min-width:0}
+.d-chart figcaption{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--eo-color-content-hinted);margin-bottom:var(--eo-dimension-8)}
+.dhist{width:100%;max-width:300px;height:auto;overflow:visible}
+.dhist-base{stroke:var(--eo-color-border-subtle);stroke-width:1}
+.dhist-line{fill:none;stroke:var(--eo-color-content-accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.dhist-dot{fill:var(--eo-color-content-accent)}
+.dhist-v{font-size:12px;font-weight:700;fill:var(--eo-color-content-emphasized);font-variant-numeric:tabular-nums}
+.dhist-x{font-size:10px;fill:var(--eo-color-content-hinted)}
 .stage{
   background:var(--eo-color-surface-default);
   border-radius:var(--eo-dimension-border-radius-large);
@@ -158,73 +223,193 @@ body.is-detail .detail{display:block}
     <h2>Inspection stations</h2>
     <p class="lede">Each of the ten stations as its own embeddable page — dial, history across the inspections, and the finding. Animated, self-contained, no JavaScript.</p>
     <div class="grid">
-  <a class="card bad" href="#station-01" data-id="station-01">
+  <a class="card" href="#station-01" data-id="station-01">
     <span class="c-eyebrow">Station 01</span>
-    <span class="c-metric">3<span class="c-unit">/10</span></span>
     <span class="c-title">Coverage &amp; gaps</span>
+    <div class="sring bad">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Coverage &amp; gaps 3 of 10">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill bad" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="97.08 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">3</text>
+    </svg>
+    <p class="sring-k">Coverage &amp; gaps</p>
+    <p class="sring-t">of 10</p>
+  </div>
     <span class="c-note">15 of 37 in code; the form-control hole is unchanged</span>
     <span class="c-foot">unchanged<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card good" href="#station-02" data-id="station-02">
+  <a class="card" href="#station-02" data-id="station-02">
     <span class="c-eyebrow">Station 02</span>
-    <span class="c-metric">8<span class="c-unit">/10</span></span>
     <span class="c-title">Best practices</span>
+    <div class="sring good">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Best practices 8 of 10">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill good" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="258.87 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">8</text>
+    </svg>
+    <p class="sring-k">Best practices</p>
+    <p class="sring-t">of 10</p>
+  </div>
     <span class="c-note">measured: 96% fills bound, zero local styles, zero detached</span>
     <span class="c-foot">+1 since first inspection<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card warn" href="#station-03" data-id="station-03">
+  <a class="card" href="#station-03" data-id="station-03">
     <span class="c-eyebrow">Station 03</span>
-    <span class="c-metric">5<span class="c-unit">/10</span></span>
     <span class="c-title">Accessibility</span>
+    <div class="sring warn">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Accessibility 5 of 10">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="161.79 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">5</text>
+    </svg>
+    <p class="sring-k">Accessibility</p>
+    <p class="sring-t">of 10</p>
+  </div>
     <span class="c-note">gate still test: &#39;todo&#39;, zero axe assertions</span>
     <span class="c-foot">unchanged<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card good" href="#station-04" data-id="station-04">
+  <a class="card" href="#station-04" data-id="station-04">
     <span class="c-eyebrow">Station 04</span>
-    <span class="c-metric">8<span class="c-unit">/10</span></span>
     <span class="c-title">Shared language</span>
+    <div class="sring good">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Shared language 8 of 10">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill good" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="258.87 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">8</text>
+    </svg>
+    <p class="sring-k">Shared language</p>
+    <p class="sring-t">of 10</p>
+  </div>
     <span class="c-note">41 property renames this pass; naming now measurable</span>
     <span class="c-foot">+2 since first inspection<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card warn" href="#station-05" data-id="station-05">
+  <a class="card" href="#station-05" data-id="station-05">
     <span class="c-eyebrow">Station 05</span>
-    <span class="c-metric">4<span class="c-unit">/10</span></span>
     <span class="c-title">Testing &amp; validation</span>
+    <div class="sring warn">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Testing &amp; validation 4 of 10">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="129.43 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">4</text>
+    </svg>
+    <p class="sring-k">Testing &amp; validation</p>
+    <p class="sring-t">of 10</p>
+  </div>
     <span class="c-note">both config typos survive a fifth inspection</span>
     <span class="c-foot">-1 since first inspection<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card warn" href="#station-06" data-id="station-06">
+  <a class="card" href="#station-06" data-id="station-06">
     <span class="c-eyebrow">Station 06</span>
-    <span class="c-metric">6<span class="c-unit">/10</span></span>
     <span class="c-title">Orchestration</span>
+    <div class="sring warn">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Orchestration 6 of 10">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="194.15 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">6</text>
+    </svg>
+    <p class="sring-k">Orchestration</p>
+    <p class="sring-t">of 10</p>
+  </div>
     <span class="c-note">the token &quot;drift&quot; was mostly a submodule pin</span>
     <span class="c-foot">+1 since first inspection<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card warn" href="#station-07" data-id="station-07">
+  <a class="card" href="#station-07" data-id="station-07">
     <span class="c-eyebrow">Station 07</span>
-    <span class="c-metric">6<span class="c-unit">/10</span></span>
     <span class="c-title">Governance</span>
+    <div class="sring warn">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Governance 6 of 10">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="194.15 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">6</text>
+    </svg>
+    <p class="sring-k">Governance</p>
+    <p class="sring-t">of 10</p>
+  </div>
     <span class="c-note">PR #84 still an open draft; still zero tags</span>
     <span class="c-foot">+2 since first inspection<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card warn" href="#station-08" data-id="station-08">
+  <a class="card" href="#station-08" data-id="station-08">
     <span class="c-eyebrow">Station 08</span>
-    <span class="c-metric">5<span class="c-unit">/10</span></span>
     <span class="c-title">Feedback &amp; adoption</span>
+    <div class="sring warn">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Feedback &amp; adoption 5 of 10">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="161.79 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">5</text>
+    </svg>
+    <p class="sring-k">Feedback &amp; adoption</p>
+    <p class="sring-t">of 10</p>
+  </div>
     <span class="c-note">no new evidence this pass</span>
     <span class="c-foot">+2 since first inspection<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card warn" href="#station-09" data-id="station-09">
+  <a class="card" href="#station-09" data-id="station-09">
     <span class="c-eyebrow">Station 09</span>
-    <span class="c-metric">6<span class="c-unit">/10</span></span>
     <span class="c-title">Machine-readable docs</span>
+    <div class="sring warn">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Machine-readable docs 6 of 10">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="194.15 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">6</text>
+    </svg>
+    <p class="sring-k">Machine-readable docs</p>
+    <p class="sring-t">of 10</p>
+  </div>
     <span class="c-note">icons now 100% documented to convention</span>
     <span class="c-foot">+1 since first inspection<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card warn" href="#station-10" data-id="station-10">
+  <a class="card" href="#station-10" data-id="station-10">
     <span class="c-eyebrow">Station 10</span>
-    <span class="c-metric">4<span class="c-unit">/10</span></span>
     <span class="c-title">Agent access</span>
+    <div class="sring warn">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Agent access 4 of 10">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="129.43 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">4</text>
+    </svg>
+    <p class="sring-k">Agent access</p>
+    <p class="sring-t">of 10</p>
+  </div>
     <span class="c-note">skills still user-level; no CLAUDE.md</span>
     <span class="c-foot">unchanged<span class="c-go" aria-hidden="true">→</span></span>
   </a></div>
@@ -233,31 +418,31 @@ body.is-detail .detail{display:block}
     <h2>Visual</h2>
     <p class="lede">The four that carry a drawing rather than a number. These are the ones worth putting on a slide.</p>
     <div class="grid">
-  <a class="card good" href="#cascade" data-id="cascade">
+  <a class="card" href="#cascade" data-id="cascade">
     <span class="c-eyebrow">Token system</span>
-    <span class="c-metric">1,619<span class="c-unit">variables</span></span>
     <span class="c-title">Three tiers, two mode layers</span>
+    <span class="c-metric good">1,619</span>
     <span class="c-note">The cascade, drawn — how one change reaches every brand and breakpoint.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card warn" href="#coverage-rings" data-id="coverage-rings">
+  <a class="card" href="#coverage-rings" data-id="coverage-rings">
     <span class="c-eyebrow">Coverage</span>
-    <span class="c-metric">100%<span class="c-unit">design</span></span>
     <span class="c-title">Design is done. Code is not.</span>
+    <span class="c-metric warn">100%</span>
     <span class="c-note">The two coverage figures side by side, which is the whole argument in one image.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card warn" href="#stations" data-id="stations">
+  <a class="card" href="#stations" data-id="stations">
     <span class="c-eyebrow">Inspection</span>
-    <span class="c-metric">55<span class="c-unit">/100</span></span>
     <span class="c-title">All ten stations at once</span>
+    <span class="c-metric warn">55</span>
     <span class="c-note">The full inspection strip — every station, its score and its light.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card good" href="#now" data-id="now">
+  <a class="card" href="#now" data-id="now">
     <span class="c-eyebrow">Right now</span>
-    <span class="c-metric"></span>
     <span class="c-title">What is moving today</span>
+    <span class="c-metric good"></span>
     <span class="c-note">Live from the Jira queue: what is ready for release and what is in development.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a></div>
@@ -266,87 +451,171 @@ body.is-detail .detail{display:block}
     <h2>Measurements</h2>
     <p class="lede">One fragment per number. Each states the figure, what proves it, and when it was last read.</p>
     <div class="grid">
-  <a class="card good" href="#wellpass-coverage" data-id="wellpass-coverage">
+  <a class="card" href="#wellpass-coverage" data-id="wellpass-coverage">
     <span class="c-eyebrow">Design coverage review</span>
-    <span class="c-metric">100%</span>
     <span class="c-title">Wellpass design coverage</span>
+    <div class="sring good">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Wellpass design coverage 100% of 100">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill good" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="323.58 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">100%</text>
+    </svg>
+    <p class="sring-k">Wellpass design coverage</p>
+    <p class="sring-t">Design coverage review</p>
+  </div>
     <span class="c-note">Every Wellpass surface has a design system component behind it.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card good" href="#ui-kit" data-id="ui-kit">
+  <a class="card" href="#ui-kit" data-id="ui-kit">
     <span class="c-eyebrow">Full traversal of the UI Kit</span>
-    <span class="c-metric">128</span>
     <span class="c-title">Components in the UI Kit</span>
+    <span class="c-metric good">128</span>
     <span class="c-note">2,889 variants across two brands and five breakpoints. The basic kit is complete and shipping.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card good" href="#bma" data-id="bma">
+  <a class="card" href="#bma" data-id="bma">
     <span class="c-eyebrow">Notion BMA build plan</span>
-    <span class="c-metric">72%</span>
     <span class="c-title">BMA integration at or past design QA</span>
+    <div class="sring good">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="BMA integration at or past design QA 72% of 100">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill good" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="232.98 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">72%</text>
+    </svg>
+    <p class="sring-k">BMA integration at or past design QA</p>
+    <p class="sring-t">Notion BMA build plan</p>
+  </div>
     <span class="c-note">28 of 39 in-scope items. Only 6 remain in backlog, all Low or Medium impact.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card good" href="#contrast" data-id="contrast">
+  <a class="card" href="#contrast" data-id="contrast">
     <span class="c-eyebrow">Computed from resolved token values, both brands</span>
-    <span class="c-metric">18/20</span>
     <span class="c-title">Colour pairs passing WCAG AA</span>
+    <span class="c-metric good">18/20</span>
     <span class="c-note">11 reach AAA. The two below are disabled text, which WCAG exempts — so every governed pair passes.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card good" href="#binding" data-id="binding">
+  <a class="card" href="#binding" data-id="binding">
     <span class="c-eyebrow">Full traversal of 109,402 layers</span>
-    <span class="c-metric">96%</span>
     <span class="c-title">Fills bound to design tokens</span>
+    <div class="sring good">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Fills bound to design tokens 96% of 100">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill good" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="310.64 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">96%</text>
+    </svg>
+    <p class="sring-k">Fills bound to design tokens</p>
+    <p class="sring-t">Full traversal of 109,402 layers</p>
+  </div>
     <span class="c-note">98.6% excluding icon placeholders. Strokes are at 100%. Zero local styles remain.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card good" href="#icons" data-id="icons">
+  <a class="card" href="#icons" data-id="icons">
     <span class="c-eyebrow">Full read of the icon library</span>
-    <span class="c-metric">348/348</span>
     <span class="c-title">Icons documented to convention</span>
+    <span class="c-metric good">348/348</span>
     <span class="c-note">Every public icon carries tags, description, use case and category. 69,182 characters.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card good" href="#tokens" data-id="tokens">
+  <a class="card" href="#tokens" data-id="tokens">
     <span class="c-eyebrow">Full read of the token system</span>
-    <span class="c-metric">98%</span>
     <span class="c-title">Token variables described</span>
+    <div class="sring good">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Token variables described 98% of 100">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill good" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="317.11 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">98%</text>
+    </svg>
+    <p class="sring-k">Token variables described</p>
+    <p class="sring-t">Full read of the token system</p>
+  </div>
     <span class="c-note">1,584 of 1,619 across the token system. 72% resolve through aliases.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card good" href="#hygiene" data-id="hygiene">
+  <a class="card" href="#hygiene" data-id="hygiene">
     <span class="c-eyebrow">Full traversal of the UI Kit</span>
-    <span class="c-metric">0.54%</span>
     <span class="c-title">Generic layer names</span>
+    <div class="sring good">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Generic layer names 0.54% of 100">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill good" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="1.75 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">0.54%</text>
+    </svg>
+    <p class="sring-k">Generic layer names</p>
+    <p class="sring-t">Full traversal of the UI Kit</p>
+  </div>
     <span class="c-note">591 of 109,402 layers, and zero detached instances anywhere.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card good" href="#focus" data-id="focus">
+  <a class="card" href="#focus" data-id="focus">
     <span class="c-eyebrow">Variant options across 92 component sets</span>
-    <span class="c-metric">94%</span>
     <span class="c-title">Stateful components with a focus state</span>
+    <div class="sring good">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Stateful components with a focus state 94% of 100">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill good" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="304.17 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">94%</text>
+    </svg>
+    <p class="sring-k">Stateful components with a focus state</p>
+    <p class="sring-t">Variant options across 92 component sets</p>
+  </div>
     <span class="c-note">32 of 34. Accessibility is a required phase in the contribution checklist, not a review note.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card bad" href="#code-coverage" data-id="code-coverage">
+  <a class="card" href="#code-coverage" data-id="code-coverage">
     <span class="c-eyebrow">GitHub API</span>
-    <span class="c-metric">41%</span>
     <span class="c-title">Core set built in code</span>
+    <div class="sring bad">
+    <svg class="chart" viewBox="0 0 118 118" style="max-width:118px" role="img"
+      aria-label="Core set built in code 41% of 100">
+      <g transform="rotate(-90 59 59)">
+        <circle class="c-donut-track" cx="59" cy="59" r="51.5" stroke-width="11"/>
+        <circle class="c-donut-fill bad" cx="59" cy="59" r="51.5" stroke-width="11"
+          stroke-dasharray="132.67 323.58"/>
+      </g>
+      <text class="sring-n" x="59" y="59" text-anchor="middle" dominant-baseline="central">41%</text>
+    </svg>
+    <p class="sring-k">Core set built in code</p>
+    <p class="sring-t">GitHub API</p>
+  </div>
     <span class="c-note">15 of 37. The design is finished for all of them — this is the gap.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card bad" href="#code-a11y" data-id="code-a11y">
+  <a class="card" href="#code-a11y" data-id="code-a11y">
     <span class="c-eyebrow">GitHub API</span>
-    <span class="c-metric">0</span>
     <span class="c-title">Accessibility assertions in code</span>
+    <span class="c-metric bad">0</span>
     <span class="c-note">Storybook accessibility tests have never run — two typos in vitest.config.ts.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a>
-  <a class="card bad" href="#queue" data-id="queue">
+  <a class="card" href="#queue" data-id="queue">
     <span class="c-eyebrow">Jira DSC board</span>
-    <span class="c-metric">25</span>
     <span class="c-title">Specified tickets waiting, unstarted</span>
+    <span class="c-metric bad">25</span>
     <span class="c-note">24 unassigned. Nine have been waiting 297 days with finished designs.</span>
     <span class="c-foot">Open fragment<span class="c-go" aria-hidden="true">→</span></span>
   </a></div>
@@ -356,8 +625,11 @@ body.is-detail .detail{display:block}
   <div class="detail" id="detail">
     <a class="back" href="#" id="back">← All fragments</a>
     <div class="d-head">
+      <p class="d-eyebrow" id="d-eyebrow"></p>
       <h2 id="d-title"></h2>
     </div>
+    <div class="d-work" id="d-work"></div>
+    <h3 class="d-sub">The embeddable card</h3>
     <div class="stage"><iframe id="d-frame" title="Fragment preview"></iframe></div>
     <div class="embed">
       <code id="d-url"></code>
@@ -376,7 +648,7 @@ body.is-detail .detail{display:block}
 /* The catalogue is emitted once and used by both levels, so the detail view
    can never describe a fragment the overview does not list. */
 const BASE = "https://flexowitsch.github.io/egym-one-kpi-dashboard/fragments";
-const ITEMS = [{"id":"station-01","title":"Coverage & gaps","h":430},{"id":"station-02","title":"Best practices","h":430},{"id":"station-03","title":"Accessibility","h":430},{"id":"station-04","title":"Shared language","h":430},{"id":"station-05","title":"Testing & validation","h":430},{"id":"station-06","title":"Orchestration","h":430},{"id":"station-07","title":"Governance","h":430},{"id":"station-08","title":"Feedback & adoption","h":430},{"id":"station-09","title":"Machine-readable docs","h":430},{"id":"station-10","title":"Agent access","h":430},{"id":"cascade","title":"Three tiers, two mode layers","h":340},{"id":"coverage-rings","title":"Design is done. Code is not.","h":340},{"id":"stations","title":"All ten stations at once","h":340},{"id":"now","title":"What is moving today","h":400},{"id":"wellpass-coverage","title":"Wellpass design coverage","h":230},{"id":"ui-kit","title":"Components in the UI Kit","h":230},{"id":"bma","title":"BMA integration at or past design QA","h":230},{"id":"contrast","title":"Colour pairs passing WCAG AA","h":230},{"id":"binding","title":"Fills bound to design tokens","h":230},{"id":"icons","title":"Icons documented to convention","h":230},{"id":"tokens","title":"Token variables described","h":230},{"id":"hygiene","title":"Generic layer names","h":230},{"id":"focus","title":"Stateful components with a focus state","h":230},{"id":"code-coverage","title":"Core set built in code","h":230},{"id":"code-a11y","title":"Accessibility assertions in code","h":230},{"id":"queue","title":"Specified tickets waiting, unstarted","h":230}];
+const ITEMS = [{"id":"station-01","title":"Coverage & gaps","eyebrow":"Station 01","h":430,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring bad\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 3 of 10\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill bad\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"144.2 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">3</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">of 10</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">15 of 37 in code; the form-control hole is unchanged</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>First inspection</span><b class=\"\">3 / 10</b></div><div class=\"d-fact\"><span>This inspection</span><b class=\"\">3 / 10</b></div><div class=\"d-fact\"><span>Movement</span><b class=\"\">unchanged</b></div></div>\n      </div>\n      <figure class=\"d-chart\">\n         <figcaption>Across the inspections</figcaption>\n         <svg class=\"dhist\" viewBox=\"0 0 300 108\" role=\"img\"\n    aria-label=\"Score across inspections: 3, 3, 3\">\n    <line class=\"dhist-base\" x1=\"30\" y1=\"78\" x2=\"270\" y2=\"78\"/>\n    <path class=\"dhist-line\" d=\"M30.0,61.2 L150.0,61.2 L270.0,61.2\"/>\n    <circle class=\"dhist-dot\" cx=\"30.0\" cy=\"61.2\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"30.0\" y=\"50.2\" text-anchor=\"middle\">3</text><circle class=\"dhist-dot\" cx=\"150.0\" cy=\"61.2\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"150.0\" y=\"50.2\" text-anchor=\"middle\">3</text><circle class=\"dhist-dot\" cx=\"270.0\" cy=\"61.2\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"270.0\" y=\"50.2\" text-anchor=\"middle\">3</text>\n    <text class=\"dhist-x\" x=\"30.0\" y=\"99\" text-anchor=\"middle\">3 Aug</text><text class=\"dhist-x\" x=\"150.0\" y=\"99\" text-anchor=\"middle\">5 Aug</text><text class=\"dhist-x\" x=\"270.0\" y=\"99\" text-anchor=\"middle\">6 Aug</text>\n  </svg>\n       </figure>\n    </div>"},{"id":"station-02","title":"Best practices","eyebrow":"Station 02","h":430,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring good\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 8 of 10\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill good\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"384.53 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">8</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">of 10</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">measured: 96% fills bound, zero local styles, zero detached</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>First inspection</span><b class=\"\">7 / 10</b></div><div class=\"d-fact\"><span>This inspection</span><b class=\"\">8 / 10</b></div><div class=\"d-fact\"><span>Movement</span><b class=\"good\">+1 since first inspection</b></div></div>\n      </div>\n      <figure class=\"d-chart\">\n         <figcaption>Across the inspections</figcaption>\n         <svg class=\"dhist\" viewBox=\"0 0 300 108\" role=\"img\"\n    aria-label=\"Score across inspections: 7, 7, 8\">\n    <line class=\"dhist-base\" x1=\"30\" y1=\"78\" x2=\"270\" y2=\"78\"/>\n    <path class=\"dhist-line\" d=\"M30.0,38.8 L150.0,38.8 L270.0,33.2\"/>\n    <circle class=\"dhist-dot\" cx=\"30.0\" cy=\"38.8\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"30.0\" y=\"27.8\" text-anchor=\"middle\">7</text><circle class=\"dhist-dot\" cx=\"150.0\" cy=\"38.8\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"150.0\" y=\"27.8\" text-anchor=\"middle\">7</text><circle class=\"dhist-dot\" cx=\"270.0\" cy=\"33.2\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"270.0\" y=\"22.2\" text-anchor=\"middle\">8</text>\n    <text class=\"dhist-x\" x=\"30.0\" y=\"99\" text-anchor=\"middle\">3 Aug</text><text class=\"dhist-x\" x=\"150.0\" y=\"99\" text-anchor=\"middle\">5 Aug</text><text class=\"dhist-x\" x=\"270.0\" y=\"99\" text-anchor=\"middle\">6 Aug</text>\n  </svg>\n       </figure>\n    </div>"},{"id":"station-03","title":"Accessibility","eyebrow":"Station 03","h":430,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring warn\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 5 of 10\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill warn\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"240.33 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">5</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">of 10</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">gate still test: &#39;todo&#39;, zero axe assertions</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>First inspection</span><b class=\"\">5 / 10</b></div><div class=\"d-fact\"><span>This inspection</span><b class=\"\">5 / 10</b></div><div class=\"d-fact\"><span>Movement</span><b class=\"\">unchanged</b></div></div>\n      </div>\n      <figure class=\"d-chart\">\n         <figcaption>Across the inspections</figcaption>\n         <svg class=\"dhist\" viewBox=\"0 0 300 108\" role=\"img\"\n    aria-label=\"Score across inspections: 5, 5, 5\">\n    <line class=\"dhist-base\" x1=\"30\" y1=\"78\" x2=\"270\" y2=\"78\"/>\n    <path class=\"dhist-line\" d=\"M30.0,50.0 L150.0,50.0 L270.0,50.0\"/>\n    <circle class=\"dhist-dot\" cx=\"30.0\" cy=\"50.0\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"30.0\" y=\"39.0\" text-anchor=\"middle\">5</text><circle class=\"dhist-dot\" cx=\"150.0\" cy=\"50.0\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"150.0\" y=\"39.0\" text-anchor=\"middle\">5</text><circle class=\"dhist-dot\" cx=\"270.0\" cy=\"50.0\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"270.0\" y=\"39.0\" text-anchor=\"middle\">5</text>\n    <text class=\"dhist-x\" x=\"30.0\" y=\"99\" text-anchor=\"middle\">3 Aug</text><text class=\"dhist-x\" x=\"150.0\" y=\"99\" text-anchor=\"middle\">5 Aug</text><text class=\"dhist-x\" x=\"270.0\" y=\"99\" text-anchor=\"middle\">6 Aug</text>\n  </svg>\n       </figure>\n    </div>"},{"id":"station-04","title":"Shared language","eyebrow":"Station 04","h":430,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring good\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 8 of 10\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill good\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"384.53 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">8</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">of 10</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">41 property renames this pass; naming now measurable</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>First inspection</span><b class=\"\">6 / 10</b></div><div class=\"d-fact\"><span>This inspection</span><b class=\"\">8 / 10</b></div><div class=\"d-fact\"><span>Movement</span><b class=\"good\">+2 since first inspection</b></div></div>\n      </div>\n      <figure class=\"d-chart\">\n         <figcaption>Across the inspections</figcaption>\n         <svg class=\"dhist\" viewBox=\"0 0 300 108\" role=\"img\"\n    aria-label=\"Score across inspections: 6, 7, 8\">\n    <line class=\"dhist-base\" x1=\"30\" y1=\"78\" x2=\"270\" y2=\"78\"/>\n    <path class=\"dhist-line\" d=\"M30.0,44.4 L150.0,38.8 L270.0,33.2\"/>\n    <circle class=\"dhist-dot\" cx=\"30.0\" cy=\"44.4\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"30.0\" y=\"33.4\" text-anchor=\"middle\">6</text><circle class=\"dhist-dot\" cx=\"150.0\" cy=\"38.8\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"150.0\" y=\"27.8\" text-anchor=\"middle\">7</text><circle class=\"dhist-dot\" cx=\"270.0\" cy=\"33.2\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"270.0\" y=\"22.2\" text-anchor=\"middle\">8</text>\n    <text class=\"dhist-x\" x=\"30.0\" y=\"99\" text-anchor=\"middle\">3 Aug</text><text class=\"dhist-x\" x=\"150.0\" y=\"99\" text-anchor=\"middle\">5 Aug</text><text class=\"dhist-x\" x=\"270.0\" y=\"99\" text-anchor=\"middle\">6 Aug</text>\n  </svg>\n       </figure>\n    </div>"},{"id":"station-05","title":"Testing & validation","eyebrow":"Station 05","h":430,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring warn\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 4 of 10\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill warn\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"192.27 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">4</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">of 10</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">both config typos survive a fifth inspection</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>First inspection</span><b class=\"\">5 / 10</b></div><div class=\"d-fact\"><span>This inspection</span><b class=\"\">4 / 10</b></div><div class=\"d-fact\"><span>Movement</span><b class=\"\">-1 since first inspection</b></div></div>\n      </div>\n      <figure class=\"d-chart\">\n         <figcaption>Across the inspections</figcaption>\n         <svg class=\"dhist\" viewBox=\"0 0 300 108\" role=\"img\"\n    aria-label=\"Score across inspections: 5, 4, 4\">\n    <line class=\"dhist-base\" x1=\"30\" y1=\"78\" x2=\"270\" y2=\"78\"/>\n    <path class=\"dhist-line\" d=\"M30.0,50.0 L150.0,55.6 L270.0,55.6\"/>\n    <circle class=\"dhist-dot\" cx=\"30.0\" cy=\"50.0\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"30.0\" y=\"39.0\" text-anchor=\"middle\">5</text><circle class=\"dhist-dot\" cx=\"150.0\" cy=\"55.6\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"150.0\" y=\"44.6\" text-anchor=\"middle\">4</text><circle class=\"dhist-dot\" cx=\"270.0\" cy=\"55.6\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"270.0\" y=\"44.6\" text-anchor=\"middle\">4</text>\n    <text class=\"dhist-x\" x=\"30.0\" y=\"99\" text-anchor=\"middle\">3 Aug</text><text class=\"dhist-x\" x=\"150.0\" y=\"99\" text-anchor=\"middle\">5 Aug</text><text class=\"dhist-x\" x=\"270.0\" y=\"99\" text-anchor=\"middle\">6 Aug</text>\n  </svg>\n       </figure>\n    </div>"},{"id":"station-06","title":"Orchestration","eyebrow":"Station 06","h":430,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring warn\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 6 of 10\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill warn\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"288.4 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">6</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">of 10</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">the token &quot;drift&quot; was mostly a submodule pin</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>First inspection</span><b class=\"\">5 / 10</b></div><div class=\"d-fact\"><span>This inspection</span><b class=\"\">6 / 10</b></div><div class=\"d-fact\"><span>Movement</span><b class=\"good\">+1 since first inspection</b></div><div class=\"d-fact\"><span>If finished work is promoted</span><b class=\"good\">7 / 10</b></div></div>\n      </div>\n      <figure class=\"d-chart\">\n         <figcaption>Across the inspections</figcaption>\n         <svg class=\"dhist\" viewBox=\"0 0 300 108\" role=\"img\"\n    aria-label=\"Score across inspections: 5, 5, 6\">\n    <line class=\"dhist-base\" x1=\"30\" y1=\"78\" x2=\"270\" y2=\"78\"/>\n    <path class=\"dhist-line\" d=\"M30.0,50.0 L150.0,50.0 L270.0,44.4\"/>\n    <circle class=\"dhist-dot\" cx=\"30.0\" cy=\"50.0\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"30.0\" y=\"39.0\" text-anchor=\"middle\">5</text><circle class=\"dhist-dot\" cx=\"150.0\" cy=\"50.0\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"150.0\" y=\"39.0\" text-anchor=\"middle\">5</text><circle class=\"dhist-dot\" cx=\"270.0\" cy=\"44.4\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"270.0\" y=\"33.4\" text-anchor=\"middle\">6</text>\n    <text class=\"dhist-x\" x=\"30.0\" y=\"99\" text-anchor=\"middle\">3 Aug</text><text class=\"dhist-x\" x=\"150.0\" y=\"99\" text-anchor=\"middle\">5 Aug</text><text class=\"dhist-x\" x=\"270.0\" y=\"99\" text-anchor=\"middle\">6 Aug</text>\n  </svg>\n       </figure>\n    </div>"},{"id":"station-07","title":"Governance","eyebrow":"Station 07","h":430,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring warn\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 6 of 10\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill warn\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"288.4 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">6</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">of 10</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">PR #84 still an open draft; still zero tags</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>First inspection</span><b class=\"\">4 / 10</b></div><div class=\"d-fact\"><span>This inspection</span><b class=\"\">6 / 10</b></div><div class=\"d-fact\"><span>Movement</span><b class=\"good\">+2 since first inspection</b></div></div>\n      </div>\n      <figure class=\"d-chart\">\n         <figcaption>Across the inspections</figcaption>\n         <svg class=\"dhist\" viewBox=\"0 0 300 108\" role=\"img\"\n    aria-label=\"Score across inspections: 4, 6, 6\">\n    <line class=\"dhist-base\" x1=\"30\" y1=\"78\" x2=\"270\" y2=\"78\"/>\n    <path class=\"dhist-line\" d=\"M30.0,55.6 L150.0,44.4 L270.0,44.4\"/>\n    <circle class=\"dhist-dot\" cx=\"30.0\" cy=\"55.6\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"30.0\" y=\"44.6\" text-anchor=\"middle\">4</text><circle class=\"dhist-dot\" cx=\"150.0\" cy=\"44.4\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"150.0\" y=\"33.4\" text-anchor=\"middle\">6</text><circle class=\"dhist-dot\" cx=\"270.0\" cy=\"44.4\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"270.0\" y=\"33.4\" text-anchor=\"middle\">6</text>\n    <text class=\"dhist-x\" x=\"30.0\" y=\"99\" text-anchor=\"middle\">3 Aug</text><text class=\"dhist-x\" x=\"150.0\" y=\"99\" text-anchor=\"middle\">5 Aug</text><text class=\"dhist-x\" x=\"270.0\" y=\"99\" text-anchor=\"middle\">6 Aug</text>\n  </svg>\n       </figure>\n    </div>"},{"id":"station-08","title":"Feedback & adoption","eyebrow":"Station 08","h":430,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring warn\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 5 of 10\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill warn\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"240.33 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">5</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">of 10</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">no new evidence this pass</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>First inspection</span><b class=\"\">3 / 10</b></div><div class=\"d-fact\"><span>This inspection</span><b class=\"\">5 / 10</b></div><div class=\"d-fact\"><span>Movement</span><b class=\"good\">+2 since first inspection</b></div></div>\n      </div>\n      <figure class=\"d-chart\">\n         <figcaption>Across the inspections</figcaption>\n         <svg class=\"dhist\" viewBox=\"0 0 300 108\" role=\"img\"\n    aria-label=\"Score across inspections: 3, 5, 5\">\n    <line class=\"dhist-base\" x1=\"30\" y1=\"78\" x2=\"270\" y2=\"78\"/>\n    <path class=\"dhist-line\" d=\"M30.0,61.2 L150.0,50.0 L270.0,50.0\"/>\n    <circle class=\"dhist-dot\" cx=\"30.0\" cy=\"61.2\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"30.0\" y=\"50.2\" text-anchor=\"middle\">3</text><circle class=\"dhist-dot\" cx=\"150.0\" cy=\"50.0\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"150.0\" y=\"39.0\" text-anchor=\"middle\">5</text><circle class=\"dhist-dot\" cx=\"270.0\" cy=\"50.0\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"270.0\" y=\"39.0\" text-anchor=\"middle\">5</text>\n    <text class=\"dhist-x\" x=\"30.0\" y=\"99\" text-anchor=\"middle\">3 Aug</text><text class=\"dhist-x\" x=\"150.0\" y=\"99\" text-anchor=\"middle\">5 Aug</text><text class=\"dhist-x\" x=\"270.0\" y=\"99\" text-anchor=\"middle\">6 Aug</text>\n  </svg>\n       </figure>\n    </div>"},{"id":"station-09","title":"Machine-readable docs","eyebrow":"Station 09","h":430,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring warn\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 6 of 10\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill warn\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"288.4 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">6</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">of 10</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">icons now 100% documented to convention</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>First inspection</span><b class=\"\">5 / 10</b></div><div class=\"d-fact\"><span>This inspection</span><b class=\"\">6 / 10</b></div><div class=\"d-fact\"><span>Movement</span><b class=\"good\">+1 since first inspection</b></div><div class=\"d-fact\"><span>If finished work is promoted</span><b class=\"good\">9 / 10</b></div></div>\n      </div>\n      <figure class=\"d-chart\">\n         <figcaption>Across the inspections</figcaption>\n         <svg class=\"dhist\" viewBox=\"0 0 300 108\" role=\"img\"\n    aria-label=\"Score across inspections: 5, 5, 6\">\n    <line class=\"dhist-base\" x1=\"30\" y1=\"78\" x2=\"270\" y2=\"78\"/>\n    <path class=\"dhist-line\" d=\"M30.0,50.0 L150.0,50.0 L270.0,44.4\"/>\n    <circle class=\"dhist-dot\" cx=\"30.0\" cy=\"50.0\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"30.0\" y=\"39.0\" text-anchor=\"middle\">5</text><circle class=\"dhist-dot\" cx=\"150.0\" cy=\"50.0\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"150.0\" y=\"39.0\" text-anchor=\"middle\">5</text><circle class=\"dhist-dot\" cx=\"270.0\" cy=\"44.4\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"270.0\" y=\"33.4\" text-anchor=\"middle\">6</text>\n    <text class=\"dhist-x\" x=\"30.0\" y=\"99\" text-anchor=\"middle\">3 Aug</text><text class=\"dhist-x\" x=\"150.0\" y=\"99\" text-anchor=\"middle\">5 Aug</text><text class=\"dhist-x\" x=\"270.0\" y=\"99\" text-anchor=\"middle\">6 Aug</text>\n  </svg>\n       </figure>\n    </div>"},{"id":"station-10","title":"Agent access","eyebrow":"Station 10","h":430,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring warn\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 4 of 10\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill warn\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"192.27 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">4</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">of 10</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">skills still user-level; no CLAUDE.md</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>First inspection</span><b class=\"\">4 / 10</b></div><div class=\"d-fact\"><span>This inspection</span><b class=\"\">4 / 10</b></div><div class=\"d-fact\"><span>Movement</span><b class=\"\">unchanged</b></div><div class=\"d-fact\"><span>If finished work is promoted</span><b class=\"good\">6 / 10</b></div></div>\n      </div>\n      <figure class=\"d-chart\">\n         <figcaption>Across the inspections</figcaption>\n         <svg class=\"dhist\" viewBox=\"0 0 300 108\" role=\"img\"\n    aria-label=\"Score across inspections: 4, 4, 4\">\n    <line class=\"dhist-base\" x1=\"30\" y1=\"78\" x2=\"270\" y2=\"78\"/>\n    <path class=\"dhist-line\" d=\"M30.0,55.6 L150.0,55.6 L270.0,55.6\"/>\n    <circle class=\"dhist-dot\" cx=\"30.0\" cy=\"55.6\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"30.0\" y=\"44.6\" text-anchor=\"middle\">4</text><circle class=\"dhist-dot\" cx=\"150.0\" cy=\"55.6\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"150.0\" y=\"44.6\" text-anchor=\"middle\">4</text><circle class=\"dhist-dot\" cx=\"270.0\" cy=\"55.6\" r=\"4\"/>\n      <text class=\"dhist-v\" x=\"270.0\" y=\"44.6\" text-anchor=\"middle\">4</text>\n    <text class=\"dhist-x\" x=\"30.0\" y=\"99\" text-anchor=\"middle\">3 Aug</text><text class=\"dhist-x\" x=\"150.0\" y=\"99\" text-anchor=\"middle\">5 Aug</text><text class=\"dhist-x\" x=\"270.0\" y=\"99\" text-anchor=\"middle\">6 Aug</text>\n  </svg>\n       </figure>\n    </div>"},{"id":"cascade","title":"Three tiers, two mode layers","eyebrow":"Token system","h":340,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><p class=\"d-big good\">1,619</p></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">The cascade, drawn — how one change reaches every brand and breakpoint.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Token system</b></div></div>\n      </div>\n      \n    </div>"},{"id":"coverage-rings","title":"Design is done. Code is not.","eyebrow":"Coverage","h":340,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><p class=\"d-big warn\">100%</p></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">The two coverage figures side by side, which is the whole argument in one image.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Coverage</b></div></div>\n      </div>\n      \n    </div>"},{"id":"stations","title":"All ten stations at once","eyebrow":"Inspection","h":340,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><p class=\"d-big warn\">55</p></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">The full inspection strip — every station, its score and its light.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Inspection</b></div></div>\n      </div>\n      \n    </div>"},{"id":"now","title":"What is moving today","eyebrow":"Right now","h":400,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><p class=\"d-big good\"></p></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">Live from the Jira queue: what is ready for release and what is in development.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Right now</b></div></div>\n      </div>\n      \n    </div>"},{"id":"wellpass-coverage","title":"Wellpass design coverage","eyebrow":"Design coverage review","h":230,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring good\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 100% of 100\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill good\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"480.66 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">100%</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">Design coverage review</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">Every Wellpass surface has a design system component behind it.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Design coverage review</b></div><div class=\"d-fact\"><span>Last read</span><b class=\"\">6 Aug 2026</b></div></div>\n      </div>\n      \n    </div>"},{"id":"ui-kit","title":"Components in the UI Kit","eyebrow":"Full traversal of the UI Kit","h":230,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><p class=\"d-big good\">128</p></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">2,889 variants across two brands and five breakpoints. The basic kit is complete and shipping.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Full traversal of the UI Kit</b></div><div class=\"d-fact\"><span>Last read</span><b class=\"\">6 Aug 2026</b></div></div>\n      </div>\n      \n    </div>"},{"id":"bma","title":"BMA integration at or past design QA","eyebrow":"Notion BMA build plan","h":230,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring good\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 72% of 100\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill good\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"346.08 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">72%</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">Notion BMA build plan</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">28 of 39 in-scope items. Only 6 remain in backlog, all Low or Medium impact.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Notion BMA build plan</b></div><div class=\"d-fact\"><span>Last read</span><b class=\"\">6 Aug 2026</b></div></div>\n      </div>\n      \n    </div>"},{"id":"contrast","title":"Colour pairs passing WCAG AA","eyebrow":"Computed from resolved token values, both brands","h":230,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><p class=\"d-big good\">18/20</p></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">11 reach AAA. The two below are disabled text, which WCAG exempts — so every governed pair passes.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Computed from resolved token values, both brands</b></div><div class=\"d-fact\"><span>Last read</span><b class=\"\">6 Aug 2026</b></div></div>\n      </div>\n      \n    </div>"},{"id":"binding","title":"Fills bound to design tokens","eyebrow":"Full traversal of 109,402 layers","h":230,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring good\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 96% of 100\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill good\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"461.44 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">96%</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">Full traversal of 109,402 layers</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">98.6% excluding icon placeholders. Strokes are at 100%. Zero local styles remain.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Full traversal of 109,402 layers</b></div><div class=\"d-fact\"><span>Last read</span><b class=\"\">6 Aug 2026</b></div></div>\n      </div>\n      \n    </div>"},{"id":"icons","title":"Icons documented to convention","eyebrow":"Full read of the icon library","h":230,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><p class=\"d-big good\">348/348</p></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">Every public icon carries tags, description, use case and category. 69,182 characters.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Full read of the icon library</b></div><div class=\"d-fact\"><span>Last read</span><b class=\"\">6 Aug 2026</b></div></div>\n      </div>\n      \n    </div>"},{"id":"tokens","title":"Token variables described","eyebrow":"Full read of the token system","h":230,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring good\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 98% of 100\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill good\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"471.05 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">98%</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">Full read of the token system</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">1,584 of 1,619 across the token system. 72% resolve through aliases.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Full read of the token system</b></div><div class=\"d-fact\"><span>Last read</span><b class=\"\">6 Aug 2026</b></div></div>\n      </div>\n      \n    </div>"},{"id":"hygiene","title":"Generic layer names","eyebrow":"Full traversal of the UI Kit","h":230,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring good\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 0.54% of 100\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill good\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"2.6 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">0.54%</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">Full traversal of the UI Kit</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">591 of 109,402 layers, and zero detached instances anywhere.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Full traversal of the UI Kit</b></div><div class=\"d-fact\"><span>Last read</span><b class=\"\">6 Aug 2026</b></div></div>\n      </div>\n      \n    </div>"},{"id":"focus","title":"Stateful components with a focus state","eyebrow":"Variant options across 92 component sets","h":230,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring good\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 94% of 100\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill good\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"451.82 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">94%</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">Variant options across 92 component sets</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">32 of 34. Accessibility is a required phase in the contribution checklist, not a review note.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Variant options across 92 component sets</b></div><div class=\"d-fact\"><span>Last read</span><b class=\"\">6 Aug 2026</b></div></div>\n      </div>\n      \n    </div>"},{"id":"code-coverage","title":"Core set built in code","eyebrow":"GitHub API","h":230,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><div class=\"sring bad\">\n    <svg class=\"chart\" viewBox=\"0 0 168 168\" style=\"max-width:168px\" role=\"img\"\n      aria-label=\" 41% of 100\">\n      <g transform=\"rotate(-90 84 84)\">\n        <circle class=\"c-donut-track\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"/>\n        <circle class=\"c-donut-fill bad\" cx=\"84\" cy=\"84\" r=\"76.5\" stroke-width=\"11\"\n          stroke-dasharray=\"197.07 480.66\"/>\n      </g>\n      <text class=\"sring-n\" x=\"84\" y=\"84\" text-anchor=\"middle\" dominant-baseline=\"central\">41%</text>\n    </svg>\n    <p class=\"sring-k\"></p>\n    <p class=\"sring-t\">GitHub API</p>\n  </div></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">15 of 37. The design is finished for all of them — this is the gap.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">GitHub API</b></div><div class=\"d-fact\"><span>Last read</span><b class=\"\">6 Aug 2026</b></div></div>\n      </div>\n      \n    </div>"},{"id":"code-a11y","title":"Accessibility assertions in code","eyebrow":"GitHub API","h":230,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><p class=\"d-big bad\">0</p></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">Storybook accessibility tests have never run — two typos in vitest.config.ts.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">GitHub API</b></div><div class=\"d-fact\"><span>Last read</span><b class=\"\">6 Aug 2026</b></div></div>\n      </div>\n      \n    </div>"},{"id":"queue","title":"Specified tickets waiting, unstarted","eyebrow":"Jira DSC board","h":230,"body":"\n    <div class=\"d-top\">\n      <div class=\"d-ring\"><p class=\"d-big bad\">25</p></div>\n      <div class=\"d-body\">\n        <p class=\"d-finding\">24 unassigned. Nine have been waiting 297 days with finished designs.</p>\n        <div class=\"d-facts\"><div class=\"d-fact\"><span>Measured by</span><b class=\"\">Jira DSC board</b></div><div class=\"d-fact\"><span>Last read</span><b class=\"\">6 Aug 2026</b></div></div>\n      </div>\n      \n    </div>"}];
 const byId = Object.fromEntries(ITEMS.map((it) => [it.id, it]));
 
 const $ = (s) => document.querySelector(s);
@@ -394,6 +666,8 @@ function render() {
   }
   const i = ITEMS.findIndex((x) => x.id === id);
   $('#d-title').textContent = it.title;
+  $('#d-eyebrow').textContent = it.eyebrow;
+  $('#d-work').innerHTML = it.body;
   const url = BASE + '/' + id + '.html';
   $('#d-url').textContent = url;
   $('#d-open').href = './' + id + '.html';

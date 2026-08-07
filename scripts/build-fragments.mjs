@@ -12,7 +12,7 @@
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
-import { cascadeField } from '../src/charts.mjs';
+import { cascadeField, scoreRing } from '../src/charts.mjs';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -122,6 +122,9 @@ const catalogue = [
         title: s.name,
         note: s.note,
         tone: TONE_OF_LIGHT[s.light] || 'warn',
+        ring: { value: s.score, max: 10, label: s.name, sub: 'of 10' },
+        history: h,
+        potential: s.potential,
         h: 430,
         delta: delta > 0 ? `+${delta} since first inspection` : delta < 0 ? `${delta} since first inspection` : 'unchanged',
       };
@@ -148,19 +151,97 @@ const catalogue = [
       title: f.label,
       note: f.proof,
       tone: f.tone,
+      date: f.date,
+      // A percentage is a ring; an absolute count has no denominator to draw.
+      ring: /^\d+(\.\d+)?%$/.test(String(f.value))
+        ? { value: f.value, max: 100, at: parseFloat(f.value), label: f.label, sub: f.source }
+        : null,
       h: 230,
     })),
   },
 ];
 
+/* The card is the dashboard's card, not a second visual language: a white
+   surface with an accent eyebrow, a headline, and the same score ring the
+   Coverage, Quality, Delivery and Governance tabs use. A fragment that looks
+   nothing like the page it came from is a fragment nobody trusts is the same
+   number. The ring carries the tone, so the coloured top edge is gone with it. */
 const cardOf = (it) => `
-  <a class="card ${it.tone}" href="#${it.id}" data-id="${it.id}">
+  <a class="card" href="#${it.id}" data-id="${it.id}">
     <span class="c-eyebrow">${esc(it.eyebrow || '')}</span>
-    <span class="c-metric">${esc(it.metric || '')}${it.unit ? `<span class="c-unit">${esc(it.unit)}</span>` : ''}</span>
     <span class="c-title">${esc(it.title)}</span>
+    ${it.ring
+      ? scoreRing(it.ring.value, { max: it.ring.max, at: it.ring.at, label: it.ring.label, sub: it.ring.sub, tone: it.tone, size: 118 })
+      : `<span class="c-metric ${it.tone}">${esc(it.metric || '')}</span>`}
     <span class="c-note">${esc(it.note || '')}</span>
     <span class="c-foot">${esc(it.delta || 'Open fragment')}<span class="c-go" aria-hidden="true">→</span></span>
   </a>`;
+
+/* ---- detail bodies ---------------------------------------------------------
+   Built here, at build time, one per fragment. The detail is not a bigger copy
+   of the embeddable card — that card is deliberately one number, because it has
+   to survive being dropped into a Notion page at 320px. The detail is where the
+   number gets its working: the arc, the run of inspections behind it, what
+   moved and what it would take to move further. The embeddable card is shown at
+   the bottom as the thing you actually copy. */
+
+// A local line chart: the module's own history() is declared further down the
+// file and would be in its temporal dead zone up here.
+const histChart = (vals, dates, max = 10) => {
+  const pts = vals.map((v, i) => [i, v]).filter(([, v]) => v != null);
+  if (pts.length < 2) return '';
+  const w = 300, h = 108, padX = 30, padTop = 22, padBot = 30;
+  const x = (i) => padX + (i * (w - padX * 2)) / (vals.length - 1);
+  const y = (v) => padTop + (1 - v / max) * (h - padTop - padBot);
+  const d = pts.map(([i, v], k) => `${k ? 'L' : 'M'}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+  return `<svg class="dhist" viewBox="0 0 ${w} ${h}" role="img"
+    aria-label="Score across inspections: ${pts.map(([, v]) => v).join(', ')}">
+    <line class="dhist-base" x1="${padX}" y1="${h - padBot}" x2="${w - padX}" y2="${h - padBot}"/>
+    <path class="dhist-line" d="${d}"/>
+    ${pts.map(([i, v]) => `<circle class="dhist-dot" cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="4"/>
+      <text class="dhist-v" x="${x(i).toFixed(1)}" y="${(y(v) - 11).toFixed(1)}" text-anchor="middle">${v}</text>`).join('')}
+    ${dates.map((dt, i) => `<text class="dhist-x" x="${x(i).toFixed(1)}" y="${h - 9}" text-anchor="middle">${esc(dt)}</text>`).join('')}
+  </svg>`;
+};
+
+const DETAIL_DATES = ['3 Aug', '5 Aug', fmt(data.inspection.date).replace(/ \d{4}$/, '')];
+
+const factRow = (k, v, tone = '') => `<div class="d-fact"><span>${esc(k)}</span><b class="${tone}">${esc(String(v))}</b></div>`;
+
+const detailOf = (it) => {
+  const ring = it.ring
+    ? scoreRing(it.ring.value, { max: it.ring.max, at: it.ring.at, label: '', sub: it.ring.sub, tone: it.tone, size: 168 })
+    : `<p class="d-big ${it.tone}">${esc(it.metric || '')}</p>`;
+
+  const chart = it.history && it.history.length > 1
+    ? `<figure class="d-chart">
+         <figcaption>Across the inspections</figcaption>
+         ${histChart(it.history, DETAIL_DATES.slice(0, it.history.length))}
+       </figure>`
+    : '';
+
+  const facts = it.history && it.history.length
+    ? [
+        factRow('First inspection', it.history[0] + ' / 10'),
+        factRow('This inspection', it.ring.value + ' / 10'),
+        factRow('Movement', it.delta, it.delta && it.delta.startsWith('+') ? 'good' : ''),
+        it.potential ? factRow('If finished work is promoted', it.potential + ' / 10', 'good') : '',
+      ].join('')
+    : [
+        it.eyebrow ? factRow('Measured by', it.eyebrow) : '',
+        it.date ? factRow('Last read', fmt(it.date)) : '',
+      ].join('');
+
+  return `
+    <div class="d-top">
+      <div class="d-ring">${ring}</div>
+      <div class="d-body">
+        <p class="d-finding">${esc(it.note || '')}</p>
+        <div class="d-facts">${facts}</div>
+      </div>
+      ${chart}
+    </div>`;
+};
 
 const groupOf = (g) => `
   <section class="group">
@@ -179,19 +260,17 @@ h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-
 .group .lede{margin:0 0 var(--eo-dimension-16);color:var(--eo-color-content-subtle);max-width:70ch;font-size:var(--eo-typography-body-50-font-size)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:var(--eo-dimension-gap-large)}
 
-/* The card is the fragment in summary: same figure, same tone, no iframe. */
+/* The card is the dashboard's card: white surface, accent eyebrow, headline,
+   score ring. The ring carries the tone, so there is no coloured top edge —
+   that stripe was the main thing making these read as a different system. */
 .card{
   display:flex;flex-direction:column;gap:var(--eo-dimension-gap-small);
   background:var(--eo-color-surface-default);
   border-radius:var(--eo-dimension-border-radius-large);
-  padding:var(--eo-dimension-padding-block-large);
-  border-top:3px solid var(--eo-color-border-hinted);
+  padding:var(--eo-dimension-padding-block-large) var(--eo-dimension-padding-inline-default);
   text-decoration:none;color:inherit;
   transition:transform .22s cubic-bezier(.2,.7,.3,1),box-shadow .22s cubic-bezier(.2,.7,.3,1);
 }
-.card.good{border-top-color:var(--eo-color-border-utility-positive)}
-.card.warn{border-top-color:var(--eo-color-border-utility-warning)}
-.card.bad{border-top-color:var(--eo-color-border-utility-negative)}
 .card:hover,.card:focus-visible{
   transform:translateY(-3px);
   box-shadow:
@@ -201,18 +280,20 @@ h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-
 }
 .card:focus-visible{outline:2px solid var(--eo-color-border-accent);outline-offset:3px}
 .c-eyebrow{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--eo-color-content-accent)}
+.c-title{
+  font-family:var(--eo-typography-headline-300-font-family);
+  font-size:var(--eo-typography-headline-300-font-size);
+  line-height:1.2;letter-spacing:-.01em;
+}
 .c-metric{
   font-family:var(--eo-typography-headline-500-font-family);
   font-size:var(--eo-typography-headline-500-font-size);
   line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
-  display:flex;align-items:baseline;gap:.28rem;
+  margin:var(--eo-dimension-8) 0;
 }
-.card:empty{display:none}
-.card.good .c-metric{color:var(--eo-color-content-utility-positive)}
-.card.warn .c-metric{color:var(--eo-color-content-utility-warning)}
-.card.bad .c-metric{color:var(--eo-color-content-utility-negative)}
-.c-unit{font-size:var(--eo-typography-body-100-font-size);color:var(--eo-color-content-hinted);letter-spacing:0}
-.c-title{font-weight:600;font-size:var(--eo-typography-body-100-font-size)}
+.c-metric.good{color:var(--eo-color-content-utility-positive)}
+.c-metric.warn{color:var(--eo-color-content-utility-warning)}
+.c-metric.bad{color:var(--eo-color-content-utility-negative)}
 .c-note{font-size:var(--eo-typography-body-50-font-size);line-height:var(--eo-typography-body-50-line-height);color:var(--eo-color-content-subtle)}
 .c-foot{
   margin-top:auto;padding-top:var(--eo-dimension-12);
@@ -222,6 +303,25 @@ h2{font-family:var(--eo-typography-headline-300-font-family);font-size:var(--eo-
 }
 .c-go{transition:transform .22s cubic-bezier(.2,.7,.3,1)}
 .card:hover .c-go{transform:translateX(4px);color:var(--eo-color-content-accent)}
+
+/* The score ring, lifted verbatim from the dashboard stylesheet so the two
+   cannot drift apart. */
+.c-donut-track{fill:none;stroke:var(--eo-color-surface-subtle)}
+.c-donut-fill{fill:none;stroke:var(--eo-color-surface-accent);stroke-linecap:round}
+.c-donut-fill.good{stroke:var(--eo-color-surface-utility-positive)}
+.c-donut-fill.warn{stroke:var(--eo-color-surface-utility-warning)}
+.c-donut-fill.bad{stroke:var(--eo-color-surface-utility-negative)}
+.sring{text-align:center;display:grid;justify-items:center;gap:var(--eo-dimension-gap-small);margin:var(--eo-dimension-8) 0}
+.sring .chart{width:100%}
+.sring-n{font-family:var(--eo-typography-headline-500-font-family);font-size:38px;font-weight:700;fill:var(--eo-color-content-emphasized)}
+.sring.good .sring-n{fill:var(--eo-color-content-utility-positive)}
+.sring.warn .sring-n{fill:var(--eo-color-content-utility-warning)}
+.sring.bad .sring-n{fill:var(--eo-color-content-utility-negative)}
+.sring-k{margin:0;font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-default);font-weight:600;text-wrap:balance}
+.sring-t{margin:0;font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-hinted)}
+/* The card already names the station above the ring; the ring's own label
+   would say it a second time. */
+.card .sring-k{display:none}
 
 /* ---- detail ---- */
 .detail{display:none}
@@ -236,6 +336,52 @@ body.is-detail .detail{display:block}
 .back:hover{color:var(--eo-color-content-accent)}
 .d-head{margin:0 0 var(--eo-dimension-16)}
 .d-head h2{margin:0}
+.d-eyebrow{margin:0 0 var(--eo-dimension-4);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--eo-color-content-accent)}
+.d-sub{
+  font-family:var(--eo-typography-headline-300-font-family);
+  font-size:var(--eo-typography-headline-300-font-size);
+  margin:var(--eo-dimension-40) 0 var(--eo-dimension-12);
+}
+
+/* The worked-out view: the arc, the finding and the run of inspections behind
+   the number, side by side. The embeddable card is one number by design; this
+   is where that number shows what it rests on. */
+.d-work{
+  background:var(--eo-color-surface-default);
+  border-radius:var(--eo-dimension-border-radius-large);
+  padding:var(--eo-dimension-padding-block-large) var(--eo-dimension-padding-inline-default);
+  margin-top:var(--eo-dimension-16);
+}
+.d-top{display:grid;grid-template-columns:minmax(170px,200px) minmax(260px,1fr) auto;gap:var(--eo-dimension-gap-largest);align-items:start}
+@media (max-width:900px){.d-top{grid-template-columns:1fr}}
+.d-ring{min-width:0}
+.d-big{
+  font-family:var(--eo-typography-headline-500-font-family);
+  font-size:var(--eo-typography-headline-500-font-size);
+  margin:0;line-height:1;letter-spacing:-.02em;font-variant-numeric:tabular-nums;
+}
+.d-big.good{color:var(--eo-color-content-utility-positive)}
+.d-big.warn{color:var(--eo-color-content-utility-warning)}
+.d-big.bad{color:var(--eo-color-content-utility-negative)}
+.d-finding{margin:0 0 var(--eo-dimension-16);color:var(--eo-color-content-default);max-width:60ch}
+.d-facts{display:grid;gap:0}
+.d-fact{
+  display:flex;justify-content:space-between;gap:var(--eo-dimension-gap-default);
+  padding:var(--eo-dimension-8) 0;
+  border-bottom:1px solid var(--eo-color-border-subtle);
+  font-size:var(--eo-typography-body-50-font-size);color:var(--eo-color-content-subtle);
+}
+.d-fact:last-child{border-bottom:0}
+.d-fact b{color:var(--eo-color-content-emphasized);font-variant-numeric:tabular-nums}
+.d-fact b.good{color:var(--eo-color-content-utility-positive)}
+.d-chart{margin:0;min-width:0}
+.d-chart figcaption{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--eo-color-content-hinted);margin-bottom:var(--eo-dimension-8)}
+.dhist{width:100%;max-width:300px;height:auto;overflow:visible}
+.dhist-base{stroke:var(--eo-color-border-subtle);stroke-width:1}
+.dhist-line{fill:none;stroke:var(--eo-color-content-accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.dhist-dot{fill:var(--eo-color-content-accent)}
+.dhist-v{font-size:12px;font-weight:700;fill:var(--eo-color-content-emphasized);font-variant-numeric:tabular-nums}
+.dhist-x{font-size:10px;fill:var(--eo-color-content-hinted)}
 .stage{
   background:var(--eo-color-surface-default);
   border-radius:var(--eo-dimension-border-radius-large);
@@ -297,8 +443,11 @@ ${GALLERY_CSS}
   <div class="detail" id="detail">
     <a class="back" href="#" id="back">← All fragments</a>
     <div class="d-head">
+      <p class="d-eyebrow" id="d-eyebrow"></p>
       <h2 id="d-title"></h2>
     </div>
+    <div class="d-work" id="d-work"></div>
+    <h3 class="d-sub">The embeddable card</h3>
     <div class="stage"><iframe id="d-frame" title="Fragment preview"></iframe></div>
     <div class="embed">
       <code id="d-url"></code>
@@ -318,7 +467,9 @@ ${GALLERY_CSS}
    can never describe a fragment the overview does not list. */
 const BASE = ${JSON.stringify(BASE)};
 const ITEMS = ${JSON.stringify(
-  catalogue.flatMap((g) => g.items.map((it) => ({ id: it.id, title: it.title, h: it.h })))
+  catalogue.flatMap((g) =>
+    g.items.map((it) => ({ id: it.id, title: it.title, eyebrow: it.eyebrow || '', h: it.h, body: detailOf(it) }))
+  )
 )};
 const byId = Object.fromEntries(ITEMS.map((it) => [it.id, it]));
 
@@ -337,6 +488,8 @@ function render() {
   }
   const i = ITEMS.findIndex((x) => x.id === id);
   $('#d-title').textContent = it.title;
+  $('#d-eyebrow').textContent = it.eyebrow;
+  $('#d-work').innerHTML = it.body;
   const url = BASE + '/' + id + '.html';
   $('#d-url').textContent = url;
   $('#d-open').href = './' + id + '.html';

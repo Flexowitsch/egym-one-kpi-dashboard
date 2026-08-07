@@ -225,12 +225,14 @@ export function changeList(stations, { prevLabel = '', nowLabel = '' } = {}) {
       .map((r) => {
         const dir = r.delta > 0 ? 'up' : r.delta < 0 ? 'down' : 'flat';
         const w = (Math.abs(r.delta) / maxAbs) * 50;
-        // Unchanged stations get a neutral bar of their own rather than a dot.
-        // Six of ten not moving is the finding here, so those rows need the
-        // same visual weight as the ones that did — a dot read as "no data".
+        // Six of ten not moving is the finding here, so those rows need real
+        // weight. The earlier stub was 9% wide with the midline painted over
+        // it, which read as a tick mark — indistinguishable from "no data".
+        // Unchanged rows now carry a bar centred on the midpoint, tinted with
+        // the station's own light, so the row still says where it stands.
         const bar =
           r.delta === 0
-            ? `<span class="d-bar flat" style="width:9%;left:45.5%"></span>`
+            ? `<span class="d-bar flat ${esc(r.light || 'yellow')}" style="width:22%;left:39%"></span>`
             : `<span class="d-bar ${dir}" style="width:${r2(w)}%;${
                 r.delta > 0 ? 'left:50%' : `right:50%`
               }"></span>`;
@@ -473,11 +475,15 @@ export function tierStack(tiers) {
 
    Tone comes from the station's own light, so a 4 and an 8 are distinguishable
    before the number is read. */
-export function scoreRing(value, { max = 10, label = '', sub = '', tone = 'warn', size = 132 } = {}) {
+// `at` sets the arc independently of the printed value, for the cases where the
+// label carries a unit — "98%" is not a number, so deriving the arc from it
+// drew an empty ring. Everything else keeps the old behaviour.
+export function scoreRing(value, { max = 10, label = '', sub = '', tone = 'warn', size = 132, at = null } = {}) {
   const stroke = 11;
   const r = (size - stroke) / 2 - 2;
   const c = 2 * Math.PI * r;
-  const v = Number.isFinite(Number(value)) ? Number(value) : 0;
+  const n = at != null ? at : Number(value);
+  const v = Number.isFinite(n) ? n : 0;
   const frac = max ? Math.max(0, Math.min(1, v / max)) : 0;
   return `<div class="sring ${tone}">
     <svg class="chart" viewBox="0 0 ${size} ${size}" style="max-width:${size}px" role="img"

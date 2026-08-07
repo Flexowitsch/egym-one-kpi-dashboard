@@ -548,7 +548,12 @@ eo-card > * { width: 100%; }
 /* Unchanged stations get a bar too, in a neutral tone. Six of ten not moving
    is the finding on this card, so those rows carry the same visual weight as
    the ones that did move — a bare dot read as missing data. */
-.d-bar.flat { background: var(--eo-color-border-default); }
+/* Unchanged rows: a subtle bar in the station's own light rather than a grey
+   stub. It sits above the midline, which otherwise cut straight through it. */
+.d-bar.flat { z-index: 1; }
+.d-bar.flat.green  { background: color-mix(in srgb, var(--eo-color-surface-utility-positive) 45%, transparent); }
+.d-bar.flat.yellow { background: color-mix(in srgb, var(--eo-color-surface-utility-warning) 45%, transparent); }
+.d-bar.flat.red    { background: color-mix(in srgb, var(--eo-color-surface-utility-negative) 45%, transparent); }
 .d-zero {
   position: absolute; left: calc(50% - 3px); top: 50%; transform: translateY(-50%);
   width: 6px; height: 6px; border-radius: var(--eo-dimension-border-radius-round);
@@ -1990,32 +1995,32 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
         </div><div class="change-row flat" data-token="--eo-color-border-subtle">
           <span class="c-name">Coverage &amp; gaps</span>
           <span class="c-prev">3</span>
-          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat red" style="width:22%;left:39%"></span></span>
           <span class="c-now flat">3</span>
         </div><div class="change-row flat" data-token="--eo-color-border-subtle">
           <span class="c-name">Accessibility</span>
           <span class="c-prev">5</span>
-          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat yellow" style="width:22%;left:39%"></span></span>
           <span class="c-now flat">5</span>
         </div><div class="change-row flat" data-token="--eo-color-border-subtle">
           <span class="c-name">Testing &amp; validation</span>
           <span class="c-prev">4</span>
-          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat yellow" style="width:22%;left:39%"></span></span>
           <span class="c-now flat">4</span>
         </div><div class="change-row flat" data-token="--eo-color-border-subtle">
           <span class="c-name">Governance</span>
           <span class="c-prev">6</span>
-          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat yellow" style="width:22%;left:39%"></span></span>
           <span class="c-now flat">6</span>
         </div><div class="change-row flat" data-token="--eo-color-border-subtle">
           <span class="c-name">Feedback &amp; adoption</span>
           <span class="c-prev">5</span>
-          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat yellow" style="width:22%;left:39%"></span></span>
           <span class="c-now flat">5</span>
         </div><div class="change-row flat" data-token="--eo-color-border-subtle">
           <span class="c-name">Agent access</span>
           <span class="c-prev">4</span>
-          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat" style="width:9%;left:45.5%"></span></span>
+          <span class="c-track"><span class="c-mid"></span><span class="d-bar flat yellow" style="width:22%;left:39%"></span></span>
           <span class="c-now flat">4</span>
         </div>
   </div></div></eo-card>
