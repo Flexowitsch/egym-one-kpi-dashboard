@@ -10,7 +10,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   radar, donut, trend, stationBars, splitMatrix, changeList, pipeline, cascadeField,
-  unitGrid, tierStack,
+  unitGrid, tierStack, scoreRing,
 } from '../src/charts.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -118,10 +118,10 @@ const overview = `
   <p class="eyebrow" data-token="--eo-color-content-accent">Design system health · inspection ${esc(inspection?.date ?? meta.asOf)}</p>
   <h1 data-token="--eo-typography-headline-700">The state of EGYM One,<br>on one screen</h1>
   <p class="standfirst" data-token="--eo-color-content-subtle">One number for the system, ten stations behind it, and the delivery data that explains why it sits where it does.</p>
-  <div class="score-hero" data-token="--eo-typography-headline-800">
-    <span class="n"${inspection ? ` data-count="${inspection.shippedTotal}" data-tpl="__"` : ''}>${
-      inspection?.shippedTotal ?? '—'
-    }</span><span class="d">/100</span>
+  <div class="score-hero">
+    <span class="n" data-token="--eo-typography-headline-800"${
+      inspection ? ` data-count="${inspection.shippedTotal}" data-tpl="__"` : ''
+    }>${inspection?.shippedTotal ?? '—'}</span><span class="d" data-token="--eo-color-content-hinted">/100</span>
   </div>
   <p class="score-sub"><b>${inspection?.reds ?? 0}</b> red · <b>${inspection?.yellows ?? 0}</b> yellow · <b>${
     inspection?.greens ?? 0
@@ -309,9 +309,8 @@ const overview = `
   )}
   <div class="bento">
     <div class="span-12">${splitMatrix(designVsCode?.dimensions ?? [])}</div>
-    )}
     ${tile(
-      'span-12',
+      'span-12 solid fairness',
       `<p class="eyebrow">In fairness — what is open on our side</p>
        <h3>Strong, not spotless</h3>
        <p class="tile-text">${esc(designOpen?.note ?? '')}</p>
@@ -475,11 +474,17 @@ const coverageTab = `
 const qualityTab = `
 <section class="band">
   ${bandHead('Stations 02 · 03 · 05', 'Practices, accessibility and testing', 'Craft is good where it is enforced, and drifts where nothing checks it.')}
-  <div class="stat-row">
-    ${stat(st(2)?.score ?? '—', 'Best practices', 'of 10', 'warn')}
-    ${stat(st(3)?.score ?? '—', 'Accessibility', 'of 10', 'warn')}
-    ${stat(st(5)?.score ?? '—', 'Testing & validation', 'of 10', 'bad')}
-    ${stat(st(4)?.score ?? '—', 'Shared language', 'of 10', 'warn')}
+  <!-- Station scores as rings rather than bare numerals: the same drawing the
+       Coverage tab uses for its ratio, so a score reads the same way wherever
+       it appears. Tone comes from the station's own light. -->
+  <div class="ring-row">
+    ${[2, 3, 5, 4]
+      .map((n) => {
+        const stn = st(n);
+        const tone = stn?.light === 'green' ? 'good' : stn?.light === 'red' ? 'bad' : 'warn';
+        return scoreRing(stn?.score ?? '—', { label: stn?.name ?? '', sub: 'of 10', tone });
+      })
+      .join('')}
   </div>
 </section>
 
@@ -586,6 +591,29 @@ const queueRows = rfd.tickets
 const deliveryTab = `
 <section class="band">
   ${bandHead('Delivery', 'A queue waiting on capacity, not decisions', 'Everything in “Ready for Development” already has a spec and a priority.', meta.asOf, false)}
+  <!-- The three ratios the queue actually turns on, drawn the same way as
+       every other score on the dashboard. -->
+  <div class="ring-row">
+    ${scoreRing(rfd.count, {
+      max: jira.openIssuesTotal,
+      label: 'Ready for development',
+      sub: `of ${jira.openIssuesTotal} open`,
+      tone: 'bad',
+    })}
+    ${scoreRing(rfd.unassigned, { max: rfd.count, label: 'Unassigned', sub: `of ${rfd.count} ready`, tone: 'bad' })}
+    ${scoreRing(jira.byStatus['In Development'] ?? 0, {
+      max: rfd.count,
+      label: 'In development',
+      sub: `of ${rfd.count} ready`,
+      tone: 'warn',
+    })}
+    ${scoreRing(cv.mergedCommunityPRs, {
+      max: cv.mergedCommunityPRs,
+      label: 'Community PRs merged',
+      sub: `${cv.externalContributors} contributors`,
+      tone: 'good',
+    })}
+  </div>
   <div class="bento">
     ${tile('span-6', `<p class="eyebrow">All open DSC issues</p><h3>${jira.openIssuesTotal} open</h3>${bars(jira.byStatus)}`)}
     ${tile(
@@ -616,11 +644,15 @@ const deliveryTab = `
 const governanceTab = `
 <section class="band">
   ${bandHead('Stations 06 · 07 · 09 · 10', 'Governance, orchestration and agent readiness', 'The written governance is good. Most of it is invisible from where engineers work.')}
-  <div class="stat-row">
-    ${stat(st(7)?.score ?? '—', 'Governance', 'of 10', 'warn')}
-    ${stat(st(6)?.score ?? '—', 'Orchestration', `→ ${st(6)?.potential ?? '—'} if promoted`, 'warn')}
-    ${stat(st(9)?.score ?? '—', 'Machine-readable docs', `→ ${st(9)?.potential ?? '—'} if promoted`, 'warn')}
-    ${stat(st(10)?.score ?? '—', 'Agent access', `→ ${st(10)?.potential ?? '—'} if promoted`, 'bad')}
+  <div class="ring-row">
+    ${[7, 6, 9, 10]
+      .map((n) => {
+        const stn = st(n);
+        const tone = stn?.light === 'green' ? 'good' : stn?.light === 'red' ? 'bad' : 'warn';
+        const sub = stn?.potential ? `→ ${stn.potential} if promoted` : 'of 10';
+        return scoreRing(stn?.score ?? '—', { label: stn?.name ?? '', sub, tone });
+      })
+      .join('')}
   </div>
 </section>
 
@@ -811,7 +843,12 @@ const html = `<!doctype html>
     ([id, , content], i) =>
       `<div class="panel ${i === 0 ? 'is-active' : ''}" id="panel-${id}" role="tabpanel" aria-labelledby="tab-${id}" ${
         i === 0 ? '' : 'hidden'
-      }>${content}</div>`
+      }>
+        <!-- Section rail. Built at runtime from this panel's own band heads, so
+             it cannot drift from the sections it points at. -->
+        <nav class="rail" aria-label="Sections on this page"></nav>
+        ${content}
+      </div>`
   ).join('')}
 </main>
 

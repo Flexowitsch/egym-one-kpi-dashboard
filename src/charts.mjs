@@ -465,3 +465,33 @@ export function tierStack(tiers) {
   return `<svg class="ts" viewBox="0 0 100 100" preserveAspectRatio="none"
     aria-hidden="true" focusable="false">${bars}</svg>`;
 }
+
+/* ------------------------------------------------------------ score ring ---
+   The donut, at stat scale, for a score out of ten. Same drawing as the
+   coverage ring on the Coverage tab — reusing it means a score reads the same
+   way wherever it appears, and the eye learns one shape instead of three.
+
+   Tone comes from the station's own light, so a 4 and an 8 are distinguishable
+   before the number is read. */
+export function scoreRing(value, { max = 10, label = '', sub = '', tone = 'warn', size = 132 } = {}) {
+  const stroke = 11;
+  const r = (size - stroke) / 2 - 2;
+  const c = 2 * Math.PI * r;
+  const v = Number.isFinite(Number(value)) ? Number(value) : 0;
+  const frac = max ? Math.max(0, Math.min(1, v / max)) : 0;
+  return `<div class="sring ${tone}">
+    <svg class="chart" viewBox="0 0 ${size} ${size}" style="max-width:${size}px" role="img"
+      aria-label="${esc(label)} ${value} of ${max}">
+      <g transform="rotate(-90 ${size / 2} ${size / 2})">
+        <circle class="c-donut-track" cx="${size / 2}" cy="${size / 2}" r="${r2(r)}" stroke-width="${stroke}"/>
+        <circle class="c-donut-fill ${tone}" cx="${size / 2}" cy="${size / 2}" r="${r2(r)}" stroke-width="${stroke}"
+          stroke-dasharray="${r2(c * frac)} ${r2(c)}"/>
+      </g>
+      <text class="sring-n" x="${size / 2}" y="${size / 2}" text-anchor="middle" dominant-baseline="central">${esc(
+        String(value)
+      )}</text>
+    </svg>
+    <p class="sring-k">${esc(label)}</p>
+    ${sub ? `<p class="sring-t">${esc(sub)}</p>` : ''}
+  </div>`;
+}

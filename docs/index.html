@@ -992,30 +992,14 @@ body[data-tab-state="overview"].cursor-on * { cursor: none; }
    Scoped to the overview because the other tabs are the technical read and a
    blurred backdrop behind a table of numbers costs legibility for nothing.
    =========================================================================== */
-body[data-tab-state="overview"] .bento > eo-card {
-  --eo-color-surface-default: color-mix(in srgb, var(--eo-color-surface-subtle) 62%, transparent);
-  backdrop-filter: blur(14px) saturate(1.15);
-  -webkit-backdrop-filter: blur(14px) saturate(1.15);
-  border-radius: var(--eo-dimension-border-radius-default);
-}
-/* A hairline so the edge still reads where the card meets a pale patch of the
-   field. Without it a translucent card over a light ground has no boundary. */
-body[data-tab-state="overview"] .bento > eo-card::after {
-  content: '';
-  position: absolute; inset: 0;
-  border: 1px solid color-mix(in srgb, var(--eo-color-border-subtle) 70%, transparent);
-  border-radius: inherit;
-  pointer-events: none;
-}
+/* Cards use --eo-color-surface-default, full stop.
+   An earlier version made them frosted by *overriding* that token with a
+   color-mix of surface-subtle. That looked fine and was exactly backwards: on
+   a page whose argument is that every value resolves through the cascade, the
+   cards had stopped using the surface token and started redefining it. The
+   field reads through the gaps between cards instead. */
 body[data-tab-state="overview"] .bento > eo-card { position: relative; }
 
-@supports not (backdrop-filter: blur(1px)) {
-  /* No blur means no frosting, and a flat 62% card over a busy field is worse
-     than an opaque one — so fall back to solid rather than to transparent. */
-  body[data-tab-state="overview"] .bento > eo-card {
-    --eo-color-surface-default: var(--eo-color-surface-subtle);
-  }
-}
 
 /* ---------- the KPI panel motifs ----------
    Each panel's background is a drawing of its own number: a field of units
@@ -1145,6 +1129,97 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
 @media (max-width: 900px) {
   .pcard-in { grid-template-columns: 1fr; gap: var(--eo-dimension-gap-small); }
 }
+
+
+
+/* The open-items list reads as a two-column set of findings inside one card. */
+.fairness .openlist {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--eo-dimension-gap-large) var(--eo-dimension-gap-extra-large);
+}
+
+/* ---------- score rings ----------
+   Same drawing as the coverage donut, at stat scale. Using one shape for every
+   score means the eye learns it once — a station out of ten and a ratio out of
+   a hundred read the same way. */
+.ring-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  gap: var(--eo-dimension-gap-extra-large);
+  margin: var(--eo-dimension-24) 0 0;
+}
+.sring { text-align: center; display: grid; justify-items: center; gap: var(--eo-dimension-gap-small); }
+.sring .chart { width: 100%; }
+.sring-n {
+  font-family: var(--eo-typography-headline-500-font-family);
+  font-size: 42px;
+  font-weight: 700;
+  fill: var(--eo-color-content-emphasized);
+}
+.sring.good .sring-n { fill: var(--eo-color-content-utility-positive); }
+.sring.warn .sring-n { fill: var(--eo-color-content-utility-warning); }
+.sring.bad  .sring-n { fill: var(--eo-color-content-utility-negative); }
+.sring-k {
+  margin: 0;
+  font-size: var(--eo-typography-body-50-font-size);
+  color: var(--eo-color-content-default);
+  font-weight: 600;
+  text-wrap: balance;
+}
+.sring-t { margin: 0; font-size: var(--eo-typography-body-50-font-size); color: var(--eo-color-content-hinted); }
+
+/* ---------- section rail ----------
+   Ticks down the right edge, labels on hover. Collapsed by default because a
+   permanent list of nine labels is another column of text competing with the
+   content on a page that already has plenty. */
+.rail {
+  position: fixed;
+  right: var(--eo-dimension-16);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 40;
+  display: flex; flex-direction: column;
+  gap: var(--eo-dimension-gap-smallest);
+  padding: var(--eo-dimension-8);
+  border-radius: var(--eo-dimension-border-radius-round);
+}
+.panel:not(.is-active) .rail { display: none; }
+.rail a {
+  display: flex; align-items: center; justify-content: flex-end;
+  gap: var(--eo-dimension-gap-small);
+  text-decoration: none;
+  padding: var(--eo-dimension-4);
+  color: var(--eo-color-content-hinted);
+  font-size: var(--eo-typography-body-50-font-size);
+  line-height: 1.2;
+}
+.rail .tick {
+  display: block; width: 18px; height: 2px; flex: none;
+  border-radius: 2px;
+  background: var(--eo-color-border-default);
+  transition: width 0.25s var(--ease-out), background-color 0.25s var(--ease-out);
+}
+.rail .lbl {
+  max-width: 0; overflow: hidden; white-space: nowrap;
+  opacity: 0;
+  transition: max-width 0.32s var(--ease-out), opacity 0.22s var(--ease-out);
+}
+.rail:hover .lbl, .rail:focus-within .lbl { max-width: 15rem; opacity: 1; }
+.rail:hover, .rail:focus-within {
+  background: color-mix(in srgb, var(--eo-color-surface-subtle) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--eo-color-border-subtle);
+}
+.rail a:hover { color: var(--eo-color-content-emphasized); }
+.rail a:hover .tick { width: 26px; background: var(--eo-color-content-accent); }
+.rail a.is-current .tick { width: 26px; background: var(--eo-color-content-accent); }
+.rail a.is-current { color: var(--eo-color-content-emphasized); font-weight: 600; }
+.rail a:focus-visible { outline: 2px solid var(--eo-color-border-accent); outline-offset: 2px; border-radius: 4px; }
+
+/* No room for it beside the content on a narrow screen. */
+@media (max-width: 1180px) { .rail { display: none; } }
 </style>
 </head>
 <body data-tab-state="overview">
@@ -1228,13 +1303,17 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
 
 <main class="shell">
   <div class="panel is-active" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview" >
+        <!-- Section rail. Built at runtime from this panel's own band heads, so
+             it cannot drift from the sections it points at. -->
+        <nav class="rail" aria-label="Sections on this page"></nav>
+        
 <section class="hero">
   <div class="hero-inner">
   <p class="eyebrow" data-token="--eo-color-content-accent">Design system health · inspection 2026-08-06</p>
   <h1 data-token="--eo-typography-headline-700">The state of EGYM One,<br>on one screen</h1>
   <p class="standfirst" data-token="--eo-color-content-subtle">One number for the system, ten stations behind it, and the delivery data that explains why it sits where it does.</p>
-  <div class="score-hero" data-token="--eo-typography-headline-800">
-    <span class="n" data-count="55" data-tpl="__">55</span><span class="d">/100</span>
+  <div class="score-hero">
+    <span class="n" data-token="--eo-typography-headline-800" data-count="55" data-tpl="__">55</span><span class="d" data-token="--eo-color-content-hinted">/100</span>
   </div>
   <p class="score-sub"><b>1</b> red · <b>7</b> yellow · <b>2</b> green · <b>+6</b> available without new work</p>
   <div class="pill-row">
@@ -1824,8 +1903,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
           </div>
         </eo-card>
   </div></div>
-    )}
-    <eo-card class="tile span-12" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">In fairness — what is open on our side</p>
+    <eo-card class="tile span-12 solid fairness" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">In fairness — what is open on our side</p>
        <h3>Strong, not spotless</h3>
        <p class="tile-text">The design side is strong, not spotless. These are the open items on our side of the line — all of them small, specific and already understood.</p>
        <ul class="openlist"><li><b>Residual unbound fills</b><span>Fill binding is at 96%, or 98.6% once icon placeholders are excluded. What remains is the logo brand marks and placeholder text still sitting in accordion-item.</span></li><li><b>66 of 128 components undescribed</b><span>Half the in-scope set has no description. The 62 that do average 1,342 characters — when this team documents, it documents properly.</span></li><li><b>Properties Glossary has drifted</b><span>14 of 34 entries are spelled differently from the real Figma property, and 8 match none. Now a generatable diff rather than a manual audit.</span></li><li><b>UI Kit changelog stalled</b><span>Last real entry is 0.0.20 on 8 May, with a malformed [0.0.0] entry above it.</span></li><li><b>Semver documented, not practised</b><span>0.0.15 deprecated three components and renamed two — and shipped as a patch.</span></li><li><b>One open contrast report</b><span>Brand-on-dark AA failure on free and secondary buttons, unanswered since 31 July.</span></li><li><b>2 broken variable aliases</b><span>dimension/size/icon/default points at deleted variables in both Smart Strength modes, so icon sizing falls back on that hardware. Specific and quick to repoint.</span></li><li><b>35 undescribed variables</b><span>All recent component-level additions. The other 1,584 are described — 98% coverage.</span></li><li><b>1 broken component set</b><span>illustrative-empty-state has conflicting variant combinations, so Figma cannot read its properties at all.</span></li><li><b>One icon breaks hyphen-case</b><span>&quot;genius weekly target&quot; uses spaces where all 347 others use hyphens.</span></li><li><b>3 public properties still disagree</b><span>Intent on two date components, isLoading on card-class, and is user filled on input-text and input-unit. Renaming these is breaking, so it needs the scheduled track and a migration note rather than a quiet fix.</span></li></ul></div></eo-card>
@@ -2052,7 +2130,12 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
   </div>
 </section>
 
-</div><div class="panel " id="panel-coverage" role="tabpanel" aria-labelledby="tab-coverage" hidden>
+
+      </div><div class="panel " id="panel-coverage" role="tabpanel" aria-labelledby="tab-coverage" hidden>
+        <!-- Section rail. Built at runtime from this panel's own band heads, so
+             it cannot drift from the sections it points at. -->
+        <nav class="rail" aria-label="Sections on this page"></nav>
+        
 <section class="band">
   <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Station 01 · red</p><h2 data-token="--eo-typography-headline-500">Coverage &amp; gaps</h2><p data-token="--eo-color-content-subtle">15 of 37 in code; the form-control hole is unchanged</p></div>
   <div class="bento">
@@ -2081,14 +2164,67 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
        <p class="tile-text">The yellow anchor requires the core set to be “mostly present”. A system whose consumers write <b>36 raw &lt;input&gt; elements</b> across five repositories does not have its core set present. <b>input-text, input-dropdown, textarea and toggle</b> all have full Figma property contracts and no code.</p>
        <p class="tile-text">The slot is not empty — it is occupied by a mature, documented, react-hook-form-compatible library. A minimal component will become the fifth option in those applications rather than replacing anything.</p></div></eo-card>
   </div>
-</section></div><div class="panel " id="panel-quality" role="tabpanel" aria-labelledby="tab-quality" hidden>
+</section>
+      </div><div class="panel " id="panel-quality" role="tabpanel" aria-labelledby="tab-quality" hidden>
+        <!-- Section rail. Built at runtime from this panel's own band heads, so
+             it cannot drift from the sections it points at. -->
+        <nav class="rail" aria-label="Sections on this page"></nav>
+        
 <section class="band">
   <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Stations 02 · 03 · 05</p><h2 data-token="--eo-typography-headline-500">Practices, accessibility and testing</h2><p data-token="--eo-color-content-subtle">Craft is good where it is enforced, and drifts where nothing checks it.</p></div>
-  <div class="stat-row">
-    <div class="stat warn"><div class="stat-in"><div class="v " data-token="--eo-color-content-utility-warning" data-count="8" data-tpl="__">8</div><p class="k" data-token="--eo-color-content-subtle">Best practices</p><p class="t" data-token="--eo-color-content-hinted">of 10</p></div></div>
-    <div class="stat warn"><div class="stat-in"><div class="v " data-token="--eo-color-content-utility-warning" data-count="5" data-tpl="__">5</div><p class="k" data-token="--eo-color-content-subtle">Accessibility</p><p class="t" data-token="--eo-color-content-hinted">of 10</p></div></div>
-    <div class="stat bad"><div class="stat-in"><div class="v " data-token="--eo-color-content-utility-negative" data-count="4" data-tpl="__">4</div><p class="k" data-token="--eo-color-content-subtle">Testing &amp; validation</p><p class="t" data-token="--eo-color-content-hinted">of 10</p></div></div>
-    <div class="stat warn"><div class="stat-in"><div class="v " data-token="--eo-color-content-utility-warning" data-count="8" data-tpl="__">8</div><p class="k" data-token="--eo-color-content-subtle">Shared language</p><p class="t" data-token="--eo-color-content-hinted">of 10</p></div></div>
+  <!-- Station scores as rings rather than bare numerals: the same drawing the
+       Coverage tab uses for its ratio, so a score reads the same way wherever
+       it appears. Tone comes from the station's own light. -->
+  <div class="ring-row">
+    <div class="sring good">
+    <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
+      aria-label="Best practices 8 of 10">
+      <g transform="rotate(-90 66 66)">
+        <circle class="c-donut-track" cx="66" cy="66" r="58.5" stroke-width="11"/>
+        <circle class="c-donut-fill good" cx="66" cy="66" r="58.5" stroke-width="11"
+          stroke-dasharray="294.05 367.57"/>
+      </g>
+      <text class="sring-n" x="66" y="66" text-anchor="middle" dominant-baseline="central">8</text>
+    </svg>
+    <p class="sring-k">Best practices</p>
+    <p class="sring-t">of 10</p>
+  </div><div class="sring warn">
+    <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
+      aria-label="Accessibility 5 of 10">
+      <g transform="rotate(-90 66 66)">
+        <circle class="c-donut-track" cx="66" cy="66" r="58.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="66" cy="66" r="58.5" stroke-width="11"
+          stroke-dasharray="183.78 367.57"/>
+      </g>
+      <text class="sring-n" x="66" y="66" text-anchor="middle" dominant-baseline="central">5</text>
+    </svg>
+    <p class="sring-k">Accessibility</p>
+    <p class="sring-t">of 10</p>
+  </div><div class="sring warn">
+    <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
+      aria-label="Testing &amp; validation 4 of 10">
+      <g transform="rotate(-90 66 66)">
+        <circle class="c-donut-track" cx="66" cy="66" r="58.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="66" cy="66" r="58.5" stroke-width="11"
+          stroke-dasharray="147.03 367.57"/>
+      </g>
+      <text class="sring-n" x="66" y="66" text-anchor="middle" dominant-baseline="central">4</text>
+    </svg>
+    <p class="sring-k">Testing &amp; validation</p>
+    <p class="sring-t">of 10</p>
+  </div><div class="sring good">
+    <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
+      aria-label="Shared language 8 of 10">
+      <g transform="rotate(-90 66 66)">
+        <circle class="c-donut-track" cx="66" cy="66" r="58.5" stroke-width="11"/>
+        <circle class="c-donut-fill good" cx="66" cy="66" r="58.5" stroke-width="11"
+          stroke-dasharray="294.05 367.57"/>
+      </g>
+      <text class="sring-n" x="66" y="66" text-anchor="middle" dominant-baseline="central">8</text>
+    </svg>
+    <p class="sring-k">Shared language</p>
+    <p class="sring-t">of 10</p>
+  </div>
   </div>
 </section>
 
@@ -2142,9 +2278,70 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
        <p class="tile-text">vitest.config.ts points at <b>two paths that do not exist</b> — <code>vitest.config.storybook/ts</code> and <code>packages/eguym-…</code>. The correctly named files are right there. <code>npm run storybook:test</code> resolves zero projects and passes silently, so every Storybook test, including every accessibility check, has never run. Found in four consecutive inspections.</p>
        <p class="tile-text">Branch protection compounds it: <code>required_status_checks</code> is strict with an <b>empty contexts array</b>, so a pull request with a red build satisfies protection today.</p></div></eo-card>
   </div>
-</section></div><div class="panel " id="panel-delivery" role="tabpanel" aria-labelledby="tab-delivery" hidden>
+</section>
+      </div><div class="panel " id="panel-delivery" role="tabpanel" aria-labelledby="tab-delivery" hidden>
+        <!-- Section rail. Built at runtime from this panel's own band heads, so
+             it cannot drift from the sections it points at. -->
+        <nav class="rail" aria-label="Sections on this page"></nav>
+        
 <section class="band">
   <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Delivery</p><h2 data-token="--eo-typography-headline-500">A queue waiting on capacity, not decisions</h2><p data-token="--eo-color-content-subtle">Everything in “Ready for Development” already has a spec and a priority.</p><p class="stamp"><span class="dot manual"></span>Updated 6 Aug 2026 · read by hand</p></div>
+  <!-- The three ratios the queue actually turns on, drawn the same way as
+       every other score on the dashboard. -->
+  <div class="ring-row">
+    <div class="sring bad">
+    <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
+      aria-label="Ready for development 25 of 117">
+      <g transform="rotate(-90 66 66)">
+        <circle class="c-donut-track" cx="66" cy="66" r="58.5" stroke-width="11"/>
+        <circle class="c-donut-fill bad" cx="66" cy="66" r="58.5" stroke-width="11"
+          stroke-dasharray="78.54 367.57"/>
+      </g>
+      <text class="sring-n" x="66" y="66" text-anchor="middle" dominant-baseline="central">25</text>
+    </svg>
+    <p class="sring-k">Ready for development</p>
+    <p class="sring-t">of 117 open</p>
+  </div>
+    <div class="sring bad">
+    <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
+      aria-label="Unassigned 24 of 25">
+      <g transform="rotate(-90 66 66)">
+        <circle class="c-donut-track" cx="66" cy="66" r="58.5" stroke-width="11"/>
+        <circle class="c-donut-fill bad" cx="66" cy="66" r="58.5" stroke-width="11"
+          stroke-dasharray="352.86 367.57"/>
+      </g>
+      <text class="sring-n" x="66" y="66" text-anchor="middle" dominant-baseline="central">24</text>
+    </svg>
+    <p class="sring-k">Unassigned</p>
+    <p class="sring-t">of 25 ready</p>
+  </div>
+    <div class="sring warn">
+    <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
+      aria-label="In development 4 of 25">
+      <g transform="rotate(-90 66 66)">
+        <circle class="c-donut-track" cx="66" cy="66" r="58.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="66" cy="66" r="58.5" stroke-width="11"
+          stroke-dasharray="58.81 367.57"/>
+      </g>
+      <text class="sring-n" x="66" y="66" text-anchor="middle" dominant-baseline="central">4</text>
+    </svg>
+    <p class="sring-k">In development</p>
+    <p class="sring-t">of 25 ready</p>
+  </div>
+    <div class="sring good">
+    <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
+      aria-label="Community PRs merged 19 of 19">
+      <g transform="rotate(-90 66 66)">
+        <circle class="c-donut-track" cx="66" cy="66" r="58.5" stroke-width="11"/>
+        <circle class="c-donut-fill good" cx="66" cy="66" r="58.5" stroke-width="11"
+          stroke-dasharray="367.57 367.57"/>
+      </g>
+      <text class="sring-n" x="66" y="66" text-anchor="middle" dominant-baseline="central">19</text>
+    </svg>
+    <p class="sring-k">Community PRs merged</p>
+    <p class="sring-t">9 contributors</p>
+  </div>
+  </div>
   <div class="bento">
     <eo-card class="tile span-6" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">All open DSC issues</p><h3>117 open</h3><div class="bars"><div class="bar-row"><span class="label">Neu</span>
       <span class="bar-track neutral" data-token="--eo-color-surface-subtle"><span style="width:100%"></span></span>
@@ -2244,14 +2441,64 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
       <span class="count">1</span></div></div>
        <p class="tile-text">Only low-impact items remain in backlog; everything BMA-blocking is triaged, prioritized or already in design QA.</p></div></eo-card>
   </div>
-</section></div><div class="panel " id="panel-governance" role="tabpanel" aria-labelledby="tab-governance" hidden>
+</section>
+      </div><div class="panel " id="panel-governance" role="tabpanel" aria-labelledby="tab-governance" hidden>
+        <!-- Section rail. Built at runtime from this panel's own band heads, so
+             it cannot drift from the sections it points at. -->
+        <nav class="rail" aria-label="Sections on this page"></nav>
+        
 <section class="band">
   <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Stations 06 · 07 · 09 · 10</p><h2 data-token="--eo-typography-headline-500">Governance, orchestration and agent readiness</h2><p data-token="--eo-color-content-subtle">The written governance is good. Most of it is invisible from where engineers work.</p></div>
-  <div class="stat-row">
-    <div class="stat warn"><div class="stat-in"><div class="v " data-token="--eo-color-content-utility-warning" data-count="6" data-tpl="__">6</div><p class="k" data-token="--eo-color-content-subtle">Governance</p><p class="t" data-token="--eo-color-content-hinted">of 10</p></div></div>
-    <div class="stat warn"><div class="stat-in"><div class="v " data-token="--eo-color-content-utility-warning" data-count="6" data-tpl="__">6</div><p class="k" data-token="--eo-color-content-subtle">Orchestration</p><p class="t" data-token="--eo-color-content-hinted">→ 7 if promoted</p></div></div>
-    <div class="stat warn"><div class="stat-in"><div class="v " data-token="--eo-color-content-utility-warning" data-count="6" data-tpl="__">6</div><p class="k" data-token="--eo-color-content-subtle">Machine-readable docs</p><p class="t" data-token="--eo-color-content-hinted">→ 9 if promoted</p></div></div>
-    <div class="stat bad"><div class="stat-in"><div class="v " data-token="--eo-color-content-utility-negative" data-count="4" data-tpl="__">4</div><p class="k" data-token="--eo-color-content-subtle">Agent access</p><p class="t" data-token="--eo-color-content-hinted">→ 6 if promoted</p></div></div>
+  <div class="ring-row">
+    <div class="sring warn">
+    <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
+      aria-label="Governance 6 of 10">
+      <g transform="rotate(-90 66 66)">
+        <circle class="c-donut-track" cx="66" cy="66" r="58.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="66" cy="66" r="58.5" stroke-width="11"
+          stroke-dasharray="220.54 367.57"/>
+      </g>
+      <text class="sring-n" x="66" y="66" text-anchor="middle" dominant-baseline="central">6</text>
+    </svg>
+    <p class="sring-k">Governance</p>
+    <p class="sring-t">of 10</p>
+  </div><div class="sring warn">
+    <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
+      aria-label="Orchestration 6 of 10">
+      <g transform="rotate(-90 66 66)">
+        <circle class="c-donut-track" cx="66" cy="66" r="58.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="66" cy="66" r="58.5" stroke-width="11"
+          stroke-dasharray="220.54 367.57"/>
+      </g>
+      <text class="sring-n" x="66" y="66" text-anchor="middle" dominant-baseline="central">6</text>
+    </svg>
+    <p class="sring-k">Orchestration</p>
+    <p class="sring-t">→ 7 if promoted</p>
+  </div><div class="sring warn">
+    <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
+      aria-label="Machine-readable docs 6 of 10">
+      <g transform="rotate(-90 66 66)">
+        <circle class="c-donut-track" cx="66" cy="66" r="58.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="66" cy="66" r="58.5" stroke-width="11"
+          stroke-dasharray="220.54 367.57"/>
+      </g>
+      <text class="sring-n" x="66" y="66" text-anchor="middle" dominant-baseline="central">6</text>
+    </svg>
+    <p class="sring-k">Machine-readable docs</p>
+    <p class="sring-t">→ 9 if promoted</p>
+  </div><div class="sring warn">
+    <svg class="chart" viewBox="0 0 132 132" style="max-width:132px" role="img"
+      aria-label="Agent access 4 of 10">
+      <g transform="rotate(-90 66 66)">
+        <circle class="c-donut-track" cx="66" cy="66" r="58.5" stroke-width="11"/>
+        <circle class="c-donut-fill warn" cx="66" cy="66" r="58.5" stroke-width="11"
+          stroke-dasharray="147.03 367.57"/>
+      </g>
+      <text class="sring-n" x="66" y="66" text-anchor="middle" dominant-baseline="central">4</text>
+    </svg>
+    <p class="sring-k">Agent access</p>
+    <p class="sring-t">→ 6 if promoted</p>
+  </div>
   </div>
 </section>
 
@@ -2273,7 +2520,8 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
        <p class="tile-text">Stations 06, 09 and 10 are held down almost entirely by an AI-readiness repository sitting in a playground organisation that is not linked from either design system repo, from Notion, or from Slack. It holds a validated 3,061-token <code>design.md</code>, 127 machine-readable component contracts against a published JSON Schema, a working design-to-token drift detector, and an agent skill wired for both Claude Code and Copilot. Both of its validators pass, offline, in under a second.</p>
        <p class="tile-text">Promoting it is a move, not a build. It is the largest single score movement available.</p></div></eo-card>
   </div>
-</section></div>
+</section>
+      </div>
 </main>
 
 <footer class="closer">

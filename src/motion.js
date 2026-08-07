@@ -432,6 +432,8 @@ function smoothScroll() {
   gsap.ticker.lagSmoothing(0);
   // Tab switches jump to the top; Lenis owns scroll position, so tell it.
   window.__dashScrollTop = () => lenis.scrollTo(0, { immediate: true });
+  // Section-rail jumps go through Lenis too, or they fight it.
+  window.__dashScrollTo = (el) => lenis.scrollTo(el, { offset: -96 });
 }
 
 /* ---------------------------------------------------- the token cascade ---
@@ -645,6 +647,9 @@ function cursor() {
     // the cursor stays — it is part of the product now — but it stops
     // annotating, because a label popping over every number gets in the way of
     // reading them.
+    // closest() walks up from the element actually under the pointer, so a
+    // child with its own token always wins over the container it sits in —
+    // which is why the /100 was reporting the score's headline token.
     const t = onOverview() ? e.target.closest?.('[data-token]') : null;
     root.classList.toggle('is-hover', Boolean(hot || t));
     root.classList.toggle('has-token', Boolean(t));
@@ -837,8 +842,13 @@ window.__dashTabIn = (panel) => {
   // immediately, and by the time anyone switched to the tab the animation was
   // long over. That is why Coverage and Delivery arrived fully formed.
   requestAnimationFrame(() => {
-    ScrollTrigger.refresh();
+    // Build first, refresh after. The other order creates triggers inside a
+    // refresh pass, which makes ScrollTrigger recurse into refresh() and throw
+    // — and because that happened during init, the preloader never reached its
+    // own kill timer and the page sat on the loading screen forever.
+    sectionRail(panel);
     replayPanel(panel);
+    settle();
   });
 };
 
@@ -864,11 +874,29 @@ function replayPanel(panel) {
 
   // Then the bars, so "117 open" fills rather than appears. This is the whole
   // point of the Delivery tab and it was the one thing not moving.
+  //
+  // Split by whether the bar is actually on screen. Playing everything at once
+  // meant the BMA build plan — which sits several screens down — had finished
+  // before the reader ever reached it, which is the same mistake as animating
+  // a card that is below the fold. What is visible plays now; what is not gets
+  // its own trigger and plays on arrival.
   const bars = $$('.bar-track > span, .meter > span, .sbar .track > span, .d-bar', panel);
-  bars.forEach((el, i) => {
+  const vh = window.innerHeight;
+  let onScreen = 0;
+  bars.forEach((el) => {
     const to = el.dataset.w || el.style.width || '0%';
     el.dataset.w = to;
-    tl.fromTo(el, { width: 0 }, { width: to, duration: 0.75, ease: 'siteOut' }, 0.25 + i * 0.045);
+    const top = el.getBoundingClientRect().top;
+    if (top < vh * 0.95) {
+      tl.fromTo(el, { width: 0 }, { width: to, duration: 0.75, ease: 'siteOut' }, 0.25 + onScreen++ * 0.045);
+    } else {
+      const group = el.closest('.bars') || el.closest('eo-card') || el;
+      if (!group.offsetParent) { el.style.width = to; return; }
+      gsap.fromTo(el, { width: 0 }, {
+        width: to, duration: 0.75, ease: 'siteOut',
+        scrollTrigger: { trigger: group, start: 'top 88%', once: true },
+      });
+    }
   });
 
   // Donuts sweep, pipelines wipe, trend lines draw.
@@ -946,6 +974,86 @@ function failsafe() {
   window.addEventListener('load', () => setTimeout(clear, 1500));
 }
 
+/* --------------------------------------------------------- section rail ---
+   A floating index down the right edge of each panel. Built from the panel's
+   own band heads rather than a hand-written list, so it cannot point at a
+   section that has been renamed or removed. Collapsed to ticks until hovered,
+   because on a page this dense a permanent list of nine labels is another
+   column of text competing with the content.
+
+   Marks the section you are in, and jumps on click. */
+const railed = new WeakSet();
+function sectionRail(panel) {
+  const rail = $('.rail', panel);
+  // A hidden panel has no layout, so any trigger built against it measures at
+  // zero and corrupts the refresh pass. Rails are built when a panel becomes
+  // visible, not up front.
+  if (!rail || !panel.classList.contains('is-active') || railed.has(panel)) return;
+  railed.add(panel);
+
+  // Index the sections, not the headings. Only the overview carries a band
+  // head on every section; the other tabs structure themselves with an eyebrow
+  // inside the first card, so keying off <h2> found one or two entries and the
+  // rail removed itself. A section is the thing you actually jump to.
+  const sections = $$(':scope > section', panel);
+  const label = (sec) => {
+    const h2 = $('.band-head h2', sec);
+    if (h2) return h2.textContent.trim();
+    const eyebrow = $('.eyebrow', sec);
+    const h3 = $('h3', sec);
+    if (eyebrow && h3) return h3.textContent.trim();
+    return (eyebrow || h3)?.textContent.trim() || '';
+  };
+
+  const items = sections.map((sec) => ({ sec, text: label(sec) })).filter((x) => x.text);
+  if (items.length < 2) { rail.remove(); return; }
+
+  rail.innerHTML = items
+    .map(({ sec, text }, i) => {
+      sec.id = sec.id || `sec-${panel.id.replace('panel-', '')}-${i}`;
+      return `<a href="#${sec.id}" data-i="${i}"><span class="lbl">${text}</span><span class="tick"></span></a>`;
+    })
+    .join('');
+
+  const links = $$('a', rail);
+  links.forEach((a, i) => {
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const target = items[i].sec;
+      // Lenis owns the scroll, so scrollIntoView would fight it.
+      if (window.__dashScrollTo) window.__dashScrollTo(target);
+      else target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    });
+  });
+
+  // Current section, driven by whichever one holds the upper third.
+  items.forEach(({ sec }, i) => {
+    ScrollTrigger.create({
+      trigger: sec,
+      start: 'top 40%',
+      end: 'bottom 40%',
+      onToggle: (self) => {
+        if (!self.isActive) return;
+        links.forEach((a, k) => a.classList.toggle('is-current', k === i));
+      },
+    });
+  });
+  links[0]?.classList.add('is-current');
+}
+
+/* Coalesced ScrollTrigger refresh. Never called synchronously from inside
+   trigger creation — that is what made refresh() recurse. */
+let settlePending = false;
+function settle() {
+  if (settlePending) return;
+  settlePending = true;
+  requestAnimationFrame(() => {
+    settlePending = false;
+    ScrollTrigger.sort();
+    ScrollTrigger.refresh();
+  });
+}
+
 /* ------------------------------------------------------------------ init --- */
 function init() {
   smoothScroll();
@@ -986,15 +1094,19 @@ function init() {
   manifesto();
   cursor();
   velocity();
+  sectionRail($('.panel.is-active'));
   failsafe();
 
   // Pinned triggers have to be evaluated before the ones that sit after them,
-  // or a later refresh reintroduces exactly the problem above.
-  const settle = () => { ScrollTrigger.sort(); ScrollTrigger.refresh(); };
+  // or a later refresh reintroduces exactly the problem above. Coalesced to one
+  // refresh per frame, because load, fonts.ready and two custom-element
+  // definitions all land within milliseconds of each other and each refresh is
+  // a full remeasure of every trigger on the page.
   settle();
   window.addEventListener('load', settle);
   if (document.fonts?.ready) document.fonts.ready.then(settle);
   customElements.whenDefined('eo-card').then(settle);
+  customElements.whenDefined('eo-button').then(settle);
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
