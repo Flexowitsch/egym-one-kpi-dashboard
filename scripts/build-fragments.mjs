@@ -197,6 +197,67 @@ const cardOf = (it) => `
     </span>
   </a>`;
 
+/* ---- the figures behind each station ---------------------------------------
+   A score out of ten tells a reader where a station sits; it does not tell them
+   what it is made of. "100% Wellpass design coverage" does — it is a number a
+   product manager can carry into a meeting and act on, which a 3/10 is not.
+
+   Two or three per station, every one read from the same ds-kpi-data.json the
+   dashboard is built from, so they cannot drift from it. Tone is the judgement,
+   not the colour: good is a number to point at, bad is one to fix. */
+const A = data.accessibility;
+const CV = data.communityVelocity;
+const FA = data.figmaAudit;
+const TA = data.tokenAudit;
+const IA = data.iconAudit;
+const CO = data.coverage;
+
+const KPIS = {
+  'station-01': [
+    { v: `${CO.designCoverageWellpassPct}%`, k: 'Wellpass design coverage', t: 'Every surface Wellpass needs is designed and reviewed', tone: 'good' },
+    { v: `${CO.inCodePct}%`, k: 'of the core set built in code', t: `${CO.inCode} of ${CO.coreSetTotal}`, tone: 'bad' },
+    { v: String(FA.inventory.inScope), k: 'components in the UI Kit', t: 'ready to build from', tone: 'good' },
+  ],
+  'station-02': [
+    { v: `${FA.soundness.fillsBoundPct}%`, k: 'of colours come from the system', t: `${FA.soundness.fillsBoundPctExcludingIconPlaceholders}% excluding icon placeholders`, tone: 'good' },
+    { v: String(FA.soundness.detachedInstances), k: 'detached instances', t: `across ${FA.soundness.layersScanned.toLocaleString('en-GB')} layers`, tone: 'good' },
+    { v: String(data.deepScan.localStyles.uiKit + data.deepScan.localStyles.icons), k: 'hand-made styles left', t: 'everything runs through variables', tone: 'good' },
+  ],
+  'station-03': [
+    { v: `${A.designSide.contrast.aaPass}/${A.designSide.contrast.pairsTested}`, k: 'colour pairs pass WCAG AA', t: `${A.designSide.contrast.aaaPass} reach AAA`, tone: 'good' },
+    { v: `${A.designSide.focusStates.pct}%`, k: 'have a visible focus state', t: `${A.designSide.focusStates.withFocusState} of ${A.designSide.focusStates.statefulComponents} interactive components`, tone: 'good' },
+    { v: String(A.codeSide.axeAssertions), k: 'accessibility checks in code', t: 'nothing verifies the built components', tone: 'bad' },
+  ],
+  'station-04': [
+    { v: String(data.glossaryEntries ?? 34), k: 'properties in the shared glossary', t: 'one agreed name per concept', tone: 'good' },
+    { v: '0', k: 'validators on the code side', t: 'nothing catches a name drifting apart', tone: 'bad' },
+  ],
+  'station-05': [
+    { v: '0', k: 'Storybook tests have ever run', t: 'the suite resolves zero projects and exits green', tone: 'bad' },
+    { v: '2', k: 'wrong paths in one config file', t: 'the entire cause, unchanged across five inspections', tone: 'bad' },
+  ],
+  'station-06': [
+    { v: TA.variables.toLocaleString('en-GB'), k: 'token variables, one pipeline', t: 'design to code, no manual step', tone: 'good' },
+    { v: `${TA.aliasPct}%`, k: 'resolve through an alias', t: 'which is how one change reaches every brand', tone: 'good' },
+  ],
+  'station-07': [
+    { v: String(CV.gitTags), k: 'releases a consumer can read', t: `${CV.gitHubReleases} GitHub releases, no changelog`, tone: 'bad' },
+    { v: `${CV.contributingPRDraftAgeDays} days`, k: 'the contribution guide has sat unmerged', t: 'still a draft', tone: 'bad' },
+  ],
+  'station-08': [
+    { v: String(CV.externalContributors), k: 'engineers outside the team have shipped code', t: `${CV.mergedCommunityPRs} pull requests merged`, tone: 'good' },
+    { v: `${CV.medianTimeToMergeDays} days`, k: 'median time to merge', t: `worst cases ${CV.timeToMergeTailDays.join(', ')} days`, tone: 'warn' },
+  ],
+  'station-09': [
+    { v: `${IA.documentation.described}/${IA.documentation.publicComponents}`, k: 'icons documented to convention', t: '100% — tags, description, use case, category', tone: 'good' },
+    { v: `${FA.documentation.described}/${FA.documentation.described + FA.documentation.bare}`, k: 'components carry a description', t: `median ${FA.documentation.medianDescriptionChars.toLocaleString('en-GB')} characters where present`, tone: 'warn' },
+  ],
+  'station-10': [
+    { v: '127', k: 'machine-readable component contracts', t: 'validated against a published schema', tone: 'good' },
+    { v: '0', k: 'repositories link to them', t: 'finished work nothing points at', tone: 'bad' },
+  ],
+};
+
 /* ---- plain language -------------------------------------------------------
    These fragments get read by people who do not build design systems — product
    managers, engineering managers, stakeholders in a review. For them a figure
@@ -407,7 +468,21 @@ const detailOf = (it) => {
        </div>`
     : '';
 
+  const kpis = KPIS[it.id];
+  const strip = kpis
+    ? `<div class="d-kpis">${kpis
+        .map(
+          (m) => `<div class="d-kpi ${m.tone}">
+            <span class="k-v">${esc(m.v)}</span>
+            <span class="k-k">${esc(m.k)}</span>
+            <span class="k-t">${esc(m.t)}</span>
+          </div>`
+        )
+        .join('')}</div>`
+    : '';
+
   return `
+    ${strip}
     ${explain}
     <div class="d-top">
       <div class="d-ring">${ring}</div>
@@ -553,6 +628,34 @@ body.is-detail .detail{display:block}
 /* The worked-out view: the arc, the finding and the run of inspections behind
    the number, side by side. The embeddable card is one number by design; this
    is where that number shows what it rests on. */
+/* The figures, first. A score out of ten places a station; these say what it
+   is made of, and they are what someone carries out of the page. */
+.d-kpis{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+  gap:var(--eo-dimension-gap-large);
+  background:var(--eo-color-surface-default);
+  border-radius:var(--eo-dimension-border-radius-large);
+  padding:var(--eo-dimension-padding-block-large) var(--eo-dimension-padding-inline-default);
+  margin-top:var(--eo-dimension-16);
+}
+.d-kpi{display:flex;flex-direction:column;gap:var(--eo-dimension-gap-smallest)}
+.d-kpi + .d-kpi{
+  padding-left:var(--eo-dimension-gap-large);
+  border-left:1px solid var(--eo-color-border-subtle);
+}
+@media (max-width:700px){.d-kpi + .d-kpi{padding-left:0;border-left:0}}
+.k-v{
+  font-family:var(--eo-typography-headline-500-font-family);
+  font-size:var(--eo-typography-headline-500-font-size);
+  line-height:1;letter-spacing:-.02em;
+}
+.d-kpi.good .k-v{color:var(--eo-color-content-utility-positive)}
+.d-kpi.warn .k-v{color:var(--eo-color-content-utility-warning)}
+.d-kpi.bad .k-v{color:var(--eo-color-content-utility-negative)}
+.k-k{font-weight:600;font-size:var(--eo-typography-body-100-font-size);margin-top:var(--eo-dimension-4)}
+.k-t{font-size:var(--eo-typography-body-50-font-size);line-height:var(--eo-typography-body-50-line-height);color:var(--eo-color-content-subtle)}
+
 /* The plain-language layer sits above the measurement, because the reader this
    is written for needs to know what is being counted before a percentage means
    anything to them. */
