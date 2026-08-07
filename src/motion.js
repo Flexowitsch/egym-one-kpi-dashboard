@@ -207,28 +207,22 @@ function matrixReveal() {
   // own eo-card, so it crosses the trigger line separately and the build is
   // actually visible — inside a single container it was over before most of
   // the rows had reached the viewport.
-  cards.forEach((card, i) => {
-    const cells = $$('.cell', card);
-    const name = $('.mname', card);
-    const detail = $$('.mcard-detail > span', card);
-
-    gsap.set(cells, { scale: 0, transformOrigin: '50% 50%' });
-
-    // Each card on its own trigger. The set is a single column, so scroll
-    // position already delivers them one after another — an added per-index
-    // delay only holds a card invisible after it has crossed the line.
-    const tl = gsap.timeline({
-      scrollTrigger: { trigger: card, start: 'top 90%', once: true },
-    });
-    tl.fromTo(card, { opacity: 0, y: 34, scale: 0.985 }, { opacity: 1, y: 0, scale: 1, duration: 0.75, ease: 'siteOut' }, 0);
-    if (name) tl.fromTo(name, { opacity: 0, x: -10 }, { opacity: 1, x: 0, duration: 0.45, ease: 'siteOut' }, 0.1);
-    // Design lands before code. The pause between them is the finding, so it
-    // survives every restructuring of this card.
-    if (cells[0]) tl.to(cells[0], { scale: 1, duration: 0.4, ease: 'back.out(2.2)' }, 0.2);
-    if (cells[1]) tl.to(cells[1], { scale: 1, duration: 0.4, ease: 'back.out(2.2)' }, 0.5);
-    if (detail.length) {
-      tl.fromTo(detail, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.45, stagger: 0.1, ease: 'siteOut' }, 0.28);
-    }
+  // The container moves; the contents do not. Choreographing the name, the two
+  // cells and the detail lines separately meant a card arrived and then spent
+  // another half-second assembling itself — the row was on screen and readable
+  // while its dots were still growing and its second column was still fading
+  // up. Reading a card that is still building reads as a card that is broken.
+  // Each card on its own trigger. The set is a single column, so scroll
+  // position already delivers them one after another.
+  cards.forEach((card) => {
+    gsap.fromTo(
+      card,
+      { opacity: 0, y: 34, scale: 0.985 },
+      {
+        opacity: 1, y: 0, scale: 1, duration: 0.75, ease: 'siteOut',
+        scrollTrigger: { trigger: card, start: 'top 90%', once: true },
+      }
+    );
   });
 }
 

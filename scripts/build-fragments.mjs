@@ -102,6 +102,13 @@ fragments.items.forEach((f) => writeFileSync(resolve(outDir, `${f.id}.html`), pa
    browser's back button behaves. */
 
 const TONE_OF_LIGHT = { green: 'good', yellow: 'warn', red: 'bad' };
+/* The score's rating in words. Red / yellow / green describes how the dial is
+   painted; it says nothing to a reader who is not already holding the legend.
+   "Needs work / partial / good" is the same three buckets stated as a judgement,
+   which is what the number is for. The colours stay — as colour. */
+const RATING = { red: 'needs work', yellow: 'partial', green: 'good' };
+const rating = (light) => RATING[light] || light;
+
 
 // One catalogue for every level of the page: the cards are rendered from it at
 // build time and the detail view reads it at runtime, so the two can never
@@ -1085,7 +1092,7 @@ const stationPage = (s, dates, all) => {
             has to read from across a room when this is a tile on a board. -->
        <span class="st-ghost" aria-hidden="true">${nn}</span>
        <div class="st-in">
-         <p class="v-eyebrow pop" style="animation-delay:.05s">Station ${nn} · ${esc(s.light)}</p>
+         <p class="v-eyebrow pop" style="animation-delay:.05s">Station ${nn} · ${esc(rating(s.light))}</p>
          <h1 class="st-name pop" style="animation-delay:.12s">${esc(s.name)}</h1>
          <div class="st-viz">
            ${dial(s.score, s.light)}

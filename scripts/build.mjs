@@ -93,6 +93,13 @@ const stamp = (date, live = true) =>
     live ? 'refreshes automatically' : 'read by hand'
   }</p>`;
 
+/* The score's rating in words. Red / yellow / green describes how the dial is
+   painted; it says nothing to a reader who is not already holding the legend.
+   "Needs work / partial / good" is the same three buckets stated as a judgement,
+   which is what the number is for. The colours stay — as colour. */
+const RATING = { red: 'needs work', yellow: 'partial', green: 'good' };
+const rating = (light) => RATING[light] || light;
+
 const bandHead = (eyebrow, title, sub, date, live = true) =>
   `<div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">${esc(
     eyebrow
@@ -123,9 +130,9 @@ const overview = `
       inspection ? ` data-count="${inspection.shippedTotal}" data-tpl="__"` : ''
     }>${inspection?.shippedTotal ?? '—'}</span><span class="d" data-token="--eo-color-content-hinted">/100</span>
   </div>
-  <p class="score-sub"><b>${inspection?.reds ?? 0}</b> red · <b>${inspection?.yellows ?? 0}</b> yellow · <b>${
+  <p class="score-sub"><b>${inspection?.reds ?? 0}</b> ${(inspection?.reds ?? 0) === 1 ? 'needs' : 'need'} work · <b>${inspection?.yellows ?? 0}</b> partial · <b>${
     inspection?.greens ?? 0
-  }</b> green${gap > 0 ? ` · <b>+${gap}</b> available without new work` : ''}</p>
+  }</b> good${gap > 0 ? ` · <b>+${gap}</b> available without new work` : ''}</p>
   <div class="pill-row">
     ${chip(`${coverage.inCode} of ${coverage.coreSetTotal} core components in code`, coverage.inCodePct >= 50 ? 'warning' : 'negative')}
     ${chip(`${rfd.count} tickets ready, unstarted`, 'negative')}
@@ -442,7 +449,7 @@ const overview = `
 /* ══════════════════════════════════════════════════════════════ COVERAGE ═══ */
 const coverageTab = `
 <section class="band">
-  ${bandHead('Station 01 · red', 'Coverage & gaps', esc(st(1)?.note ?? ''))}
+  ${bandHead(`Station 01 · ${rating('red')}`, 'Coverage & gaps', esc(st(1)?.note ?? ''))}
   <div class="bento">
     ${tile(
       'span-5',
@@ -462,7 +469,7 @@ const coverageTab = `
     )}
     ${tile(
       'span-12',
-      `<p class="eyebrow">Why this stays red</p>
+      `<p class="eyebrow">Why this stays low</p>
        <h3>The gap is concentrated on the single most-used control in any system</h3>
        <p class="tile-text">The yellow anchor requires the core set to be “mostly present”. A system whose consumers write <b>36 raw &lt;input&gt; elements</b> across five repositories does not have its core set present. <b>input-text, input-dropdown, textarea and toggle</b> all have full Figma property contracts and no code.</p>
        <p class="tile-text">The slot is not empty — it is occupied by a mature, documented, react-hook-form-compatible library. A minimal component will become the fifth option in those applications rather than replacing anything.</p>`
@@ -923,9 +930,21 @@ const html = `<!doctype html>
     // The other tabs are the technical read, and the fragments come off them.
     document.body.dataset.tabState = id;
     // The KPI rail hides the header while it is pinned. Leaving the overview
-    // mid-pin means its onToggle never fires, so clear the flag here or the
-    // header stays gone on a tab that has no rail to justify it.
+    // mid-pin means its onToggle never fires, so the flag is cleared here.
+    //
+    // Clearing it is not enough on its own: the hide is a CSS transition, and
+    // switching tabs mid-transition left it frozen part-way — the header stayed
+    // at 40% opacity and half a line up, on a tab with no rail to justify it.
+    // Suppressing the transition for one frame makes it snap back instead,
+    // which is also the right behaviour: changing tab should not fade a header
+    // in, it should just be there.
+    const navEl = document.querySelector('.nav');
+    if (navEl) navEl.style.transition = 'none';
     document.body.classList.remove('rail-pinned');
+    if (navEl) {
+      void navEl.offsetHeight;
+      navEl.style.transition = '';
+    }
     window.scrollTo({ top: 0, behavior: 'instant' });
     window.__dashTabIn && window.__dashTabIn(document.getElementById('panel-' + id));
   };

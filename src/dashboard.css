@@ -65,7 +65,9 @@ body {
    as chrome. The rail has its own "keep scrolling" affordance, so nothing is
    lost. motion.js sets the class from the pin's onToggle; the nav returns the
    moment the rail releases. */
-body.rail-pinned .nav {
+/* Scoped to the overview: the rail only exists there, so the rule that hides
+   the header for it must not be able to match on any other tab. */
+body[data-tab-state="overview"].rail-pinned .nav {
   transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;

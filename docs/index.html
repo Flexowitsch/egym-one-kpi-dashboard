@@ -73,7 +73,9 @@ body {
    as chrome. The rail has its own "keep scrolling" affordance, so nothing is
    lost. motion.js sets the class from the pin's onToggle; the nav returns the
    moment the rail releases. */
-body.rail-pinned .nav {
+/* Scoped to the overview: the rail only exists there, so the rule that hides
+   the header for it must not be able to match on any other tab. */
+body[data-tab-state="overview"].rail-pinned .nav {
   transform: translateY(-100%);
   opacity: 0;
   pointer-events: none;
@@ -1384,7 +1386,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
   <div class="score-hero">
     <span class="n" data-token="--eo-typography-headline-800" data-count="55" data-tpl="__">55</span><span class="d" data-token="--eo-color-content-hinted">/100</span>
   </div>
-  <p class="score-sub"><b>1</b> red · <b>7</b> yellow · <b>2</b> green · <b>+6</b> available without new work</p>
+  <p class="score-sub"><b>1</b> needs work · <b>7</b> partial · <b>2</b> good · <b>+6</b> available without new work</p>
   <div class="pill-row">
     <eo-label intent="negative" size="small" data-token="eo-label · intent=negative">15 of 37 core components in code</eo-label>
     <eo-label intent="negative" size="small" data-token="eo-label · intent=negative">25 tickets ready, unstarted</eo-label>
@@ -2209,7 +2211,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
         
         
 <section class="band">
-  <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Station 01 · red</p><h2 data-token="--eo-typography-headline-500">Coverage &amp; gaps</h2><p data-token="--eo-color-content-subtle">15 of 37 in code; the form-control hole is unchanged</p></div>
+  <div class="band-head"><p class="eyebrow" data-token="--eo-color-content-accent">Station 01 · needs work</p><h2 data-token="--eo-typography-headline-500">Coverage &amp; gaps</h2><p data-token="--eo-color-content-subtle">15 of 37 in code; the form-control hole is unchanged</p></div>
   <div class="bento">
     <eo-card class="tile span-5" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Built</p>
        <h3>15 of 37 core components</h3>
@@ -2231,7 +2233,7 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
        <ul class="chips"><li><eo-label intent="info" size="small" data-token="eo-label · intent=info">Avatar (DSC-37)</eo-label></li><li><eo-label intent="info" size="small" data-token="eo-label · intent=info">Countdown (DSC-172)</eo-label></li></ul>
        <p class="eyebrow" style="margin-top:var(--eo-dimension-8)">In development</p>
        <ul class="chips"><li><eo-label intent="warning" size="small" data-token="eo-label · intent=warning">Alert - Snackbar/Toast (DSC-101)</eo-label></li><li><eo-label intent="warning" size="small" data-token="eo-label · intent=warning">Form - Search Filter (DSC-188)</eo-label></li></ul></div></eo-card>
-    <eo-card class="tile span-12" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Why this stays red</p>
+    <eo-card class="tile span-12" full-height data-token="eo-card · full-height"><div class="tile-in"><p class="eyebrow">Why this stays low</p>
        <h3>The gap is concentrated on the single most-used control in any system</h3>
        <p class="tile-text">The yellow anchor requires the core set to be “mostly present”. A system whose consumers write <b>36 raw &lt;input&gt; elements</b> across five repositories does not have its core set present. <b>input-text, input-dropdown, textarea and toggle</b> all have full Figma property contracts and no code.</p>
        <p class="tile-text">The slot is not empty — it is occupied by a mature, documented, react-hook-form-compatible library. A minimal component will become the fifth option in those applications rather than replacing anything.</p></div></eo-card>
@@ -2664,9 +2666,21 @@ body[data-tab-state="overview"] .bento > eo-card { position: relative; }
     // The other tabs are the technical read, and the fragments come off them.
     document.body.dataset.tabState = id;
     // The KPI rail hides the header while it is pinned. Leaving the overview
-    // mid-pin means its onToggle never fires, so clear the flag here or the
-    // header stays gone on a tab that has no rail to justify it.
+    // mid-pin means its onToggle never fires, so the flag is cleared here.
+    //
+    // Clearing it is not enough on its own: the hide is a CSS transition, and
+    // switching tabs mid-transition left it frozen part-way — the header stayed
+    // at 40% opacity and half a line up, on a tab with no rail to justify it.
+    // Suppressing the transition for one frame makes it snap back instead,
+    // which is also the right behaviour: changing tab should not fade a header
+    // in, it should just be there.
+    const navEl = document.querySelector('.nav');
+    if (navEl) navEl.style.transition = 'none';
     document.body.classList.remove('rail-pinned');
+    if (navEl) {
+      void navEl.offsetHeight;
+      navEl.style.transition = '';
+    }
     window.scrollTo({ top: 0, behavior: 'instant' });
     window.__dashTabIn && window.__dashTabIn(document.getElementById('panel-' + id));
   };
