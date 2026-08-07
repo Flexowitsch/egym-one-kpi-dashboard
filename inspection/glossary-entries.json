@@ -1,0 +1,15 @@
+{
+  "source": "Notion — Properties Glossary",
+  "url": "https://app.notion.com/p/352d894dd22a81f4b2c2c8ea73ae5410",
+  "readAt": "2026-08-07",
+  "partial": true,
+  "note": "read via workspace search; the database query hit the Notion plan limit, so this is 28 of roughly 34 entries",
+  "entries": [
+    "justify", "direction", "content", "has subline", "has icon", "thickness",
+    "has label", "hierarchy", "is selected", "bodyContent", "placement",
+    "trailingIcon", "leadingIcon", "headerContent", "footerContent", "state",
+    "has bodyContent", "has leadingIcon", "has notificationBadge", "has button",
+    "icon", "number of items", "onSurface", "has trailingIcon", "intent",
+    "width", "size", "type"
+  ]
+}

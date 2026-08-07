@@ -1,0 +1,148 @@
+{
+  "checkedAt": "2026-08-07",
+  "figmaSnapshot": "2026-08-07",
+  "snapshotAgeDays": 0,
+  "glossaryEntries": 28,
+  "glossaryPartial": true,
+  "exact": 18,
+  "caseDrift": [
+    {
+      "glossary": "bodyContent",
+      "figma": "body-content"
+    },
+    {
+      "glossary": "trailingIcon",
+      "figma": "trailing-icon"
+    },
+    {
+      "glossary": "leadingIcon",
+      "figma": "leading-icon"
+    },
+    {
+      "glossary": "has leadingIcon",
+      "figma": "has leading-icon"
+    },
+    {
+      "glossary": "has notificationBadge",
+      "figma": "has notification-badge"
+    },
+    {
+      "glossary": "onSurface",
+      "figma": "on-surface"
+    },
+    {
+      "glossary": "has trailingIcon",
+      "figma": "has trailing-icon"
+    }
+  ],
+  "codeOnly": [
+    "headerContent",
+    "footerContent"
+  ],
+  "orphan": [
+    "has bodyContent"
+  ],
+  "uncoveredCount": 288,
+  "uncoveredTop": [
+    {
+      "name": "label",
+      "type": "TEXT",
+      "sets": 54
+    },
+    {
+      "name": "is open",
+      "type": "VARIANT",
+      "sets": 15
+    },
+    {
+      "name": "disabled",
+      "type": "VARIANT",
+      "sets": 12
+    },
+    {
+      "name": "headline",
+      "type": "TEXT",
+      "sets": 10
+    },
+    {
+      "name": "has divider",
+      "type": "BOOLEAN",
+      "sets": 7
+    },
+    {
+      "name": "sport",
+      "type": "VARIANT",
+      "sets": 7
+    },
+    {
+      "name": "status",
+      "type": "VARIANT",
+      "sets": 7
+    },
+    {
+      "name": "slot",
+      "type": "SLOT",
+      "sets": 6
+    },
+    {
+      "name": "value",
+      "type": "TEXT",
+      "sets": 6
+    },
+    {
+      "name": "studio-name",
+      "type": "TEXT",
+      "sets": 6
+    },
+    {
+      "name": "appearance",
+      "type": "VARIANT",
+      "sets": 6
+    },
+    {
+      "name": "is active",
+      "type": "VARIANT",
+      "sets": 5
+    },
+    {
+      "name": "step",
+      "type": "VARIANT",
+      "sets": 5
+    },
+    {
+      "name": "is collapsed",
+      "type": "VARIANT",
+      "sets": 5
+    },
+    {
+      "name": "has fade",
+      "type": "BOOLEAN",
+      "sets": 4
+    },
+    {
+      "name": "has alert",
+      "type": "BOOLEAN",
+      "sets": 4
+    },
+    {
+      "name": "label distance",
+      "type": "TEXT",
+      "sets": 4
+    },
+    {
+      "name": "scroll-position",
+      "type": "VARIANT",
+      "sets": 4
+    },
+    {
+      "name": "is dismissable",
+      "type": "BOOLEAN",
+      "sets": 4
+    },
+    {
+      "name": "placeholder",
+      "type": "TEXT",
+      "sets": 4
+    }
+  ]
+}

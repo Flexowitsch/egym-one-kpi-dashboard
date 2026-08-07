@@ -2,14 +2,15 @@
   "name": "egym-one-kpi-dashboard",
   "version": "0.1.0",
   "private": true,
-  "description": "EGYM One Design System — KPI dashboard. Built with the real design system packages and token system.",
+  "description": "EGYM One Design System \u2014 KPI dashboard. Built with the real design system packages and token system.",
   "type": "module",
   "scripts": {
     "vendor": "node scripts/vendor-ds.mjs",
-    "build": "node scripts/build.mjs && node scripts/build-fragments.mjs",
+    "build": "node scripts/build.mjs && node scripts/build-fragments.mjs && node scripts/check-glossary.mjs",
     "refresh": "node scripts/refresh-data.mjs",
     "dev": "npx serve docs -l 4173",
-    "fragments": "node scripts/build-fragments.mjs"
+    "fragments": "node scripts/build-fragments.mjs",
+    "check:glossary": "node scripts/check-glossary.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.25.0"
