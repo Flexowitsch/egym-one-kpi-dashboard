@@ -452,18 +452,26 @@ const history = (vals, dates, max = 10) => {
   </svg>`;
 };
 
-const stationPage = (s, dates) => {
+const stationId = (n) => 'station-' + String(n).padStart(2, '0');
+
+const stationPage = (s, dates, all) => {
   const tone = TONE[s.light];
   const delta = s.history.filter((v) => v !== null);
   const moved = delta.length > 1 ? delta[delta.length - 1] - delta[0] : 0;
+  const i = all.findIndex((x) => x.n === s.n);
+  const prev = all[(i - 1 + all.length) % all.length];
+  const next = all[(i + 1) % all.length];
+  const nn = String(s.n).padStart(2, '0');
+
   return visPage(
-    `Station ${String(s.n).padStart(2, '0')} · ${s.name}`,
+    `Station ${nn} · ${s.name}`,
     `<div class="v-frag st ${tone}">
        <div class="st-bg" aria-hidden="true">${cascadeField({ width: 520, height: 340, seed: 3 + s.n, cycles: 1 })}</div>
+       <!-- The station number, oversized and outlined. It is the one thing that
+            has to read from across a room when this is a tile on a board. -->
+       <span class="st-ghost" aria-hidden="true">${nn}</span>
        <div class="st-in">
-         <p class="v-eyebrow pop" style="animation-delay:.05s">Station ${String(s.n).padStart(2, '0')} · ${esc(
-           s.light
-         )}</p>
+         <p class="v-eyebrow pop" style="animation-delay:.05s">Station ${nn} · ${esc(s.light)}</p>
          <h1 class="st-name pop" style="animation-delay:.12s">${esc(s.name)}</h1>
          <div class="st-viz">
            ${dial(s.score, s.light)}
@@ -479,6 +487,18 @@ const stationPage = (s, dates) => {
                : `<span class="flat">Unchanged</span> across all three inspections`
            }${s.potential ? ` · <span class="pot">${s.potential}</span> if finished work is promoted` : ''}
          </p>
+         <!-- Walking the set. target=_top so a click inside a Notion embed
+              takes the whole page rather than nesting the gallery inside the
+              iframe it was launched from. -->
+         <nav class="st-nav pop" style="animation-delay:1.55s" aria-label="Stations">
+           <a href="./${stationId(prev.n)}.html" target="_top" rel="prev">
+             <span aria-hidden="true">←</span> ${esc(prev.name)}
+           </a>
+           <a class="st-all" href="./index.html" target="_top">All ten</a>
+           <a href="./${stationId(next.n)}.html" target="_top" rel="next">
+             ${esc(next.name)} <span aria-hidden="true">→</span>
+           </a>
+         </nav>
          <p class="v-meta"><span>Design system multi-point inspection</span><span>Updated ${esc(
            fmt(inspection.date)
          )}</span></p>
@@ -493,7 +513,12 @@ const STATION_CSS = `
    the root elements, min-height:100% resolves against auto and the card stops
    at its content, leaving a white band under it inside the iframe. */
 html,body{height:100%}
+/* Flex column, so the inner block actually stretches. A percentage min-height
+   on .st-in resolved against a parent that only had min-height itself, so it
+   computed to auto — the content sat in the top third of every embed and the
+   footer never reached the bottom. */
 .st{position:relative;overflow:hidden;min-height:100%;padding:0;
+  display:flex;flex-direction:column;
   border-top:3px solid var(--eo-color-border-hinted)}
 .st.good{border-top-color:var(--eo-color-border-utility-positive)}
 .st.warn{border-top-color:var(--eo-color-border-utility-warning)}
@@ -508,15 +533,42 @@ html,body{height:100%}
    the person placing the block chooses the width — without a cap, a full-width
    embed stretched the history SVG (and with it its type) to three times the
    size of the dial next to it. */
-.st-in{position:relative;z-index:1;padding:var(--eo-dimension-padding-block-large);
+.st-in{position:relative;z-index:1;flex:1;
+  padding:var(--eo-dimension-padding-block-large);
   display:flex;flex-direction:column;gap:var(--eo-dimension-gap-small);
-  min-height:100%;max-width:760px}
-.st-name{margin:0;font-family:var(--eo-typography-headline-400-font-family);
-  font-size:var(--eo-typography-headline-400-font-size);line-height:1.1;
-  letter-spacing:-.01em;text-wrap:balance}
+  max-width:760px}
+/* Display scale, not card scale. These are read as a tile on a board, often
+   at half size, so the name carries at the size a headline would. */
+.st-name{margin:0;font-family:var(--eo-typography-headline-600-font-family,var(--eo-typography-headline-500-font-family));
+  font-size:clamp(2rem,5.2vw,3.25rem);line-height:1.05;
+  letter-spacing:-.025em;text-wrap:balance}
+/* The outlined station number. Sits behind everything, bleeds off the bottom
+   right corner, and is the marker you read first at a distance. */
+/* Bottom-right, tucked into the space the reading column leaves free. It used
+   to sit at -0.3em of a 20rem type size, which put nearly a third of it below
+   the card's own overflow:hidden — the marker was there and simply cut off. */
+.st-ghost{position:absolute;right:.04em;bottom:-.08em;z-index:0;
+  font-family:var(--eo-typography-headline-800-font-family);
+  font-size:clamp(7rem,20vw,13rem);line-height:.82;color:transparent;
+  -webkit-text-stroke:1.5px var(--eo-color-border-subtle);
+  user-select:none;pointer-events:none}
+.st.good .st-ghost{-webkit-text-stroke-color:var(--eo-color-border-utility-positive);opacity:.28}
+.st.warn .st-ghost{-webkit-text-stroke-color:var(--eo-color-border-utility-warning);opacity:.3}
+.st.bad  .st-ghost{-webkit-text-stroke-color:var(--eo-color-border-utility-negative);opacity:.26}
+
+/* Walking the set */
+.st-nav{display:flex;align-items:baseline;gap:var(--eo-dimension-gap-default);
+  flex-wrap:wrap;margin:var(--eo-dimension-8) 0 0;
+  font-family:var(--eo-typography-action-label-100-font-family);
+  font-size:var(--eo-typography-body-50-font-size)}
+.st-nav a{color:var(--eo-color-content-subtle);text-decoration:none;
+  padding:var(--eo-dimension-4) 0;border-bottom:1px solid transparent}
+.st-nav a:hover{color:var(--eo-color-content-accent);border-bottom-color:var(--eo-color-border-accent)}
+.st-nav a:focus-visible{outline:2px solid var(--eo-color-border-accent);outline-offset:3px;border-radius:2px}
+.st-nav .st-all{margin-left:auto;color:var(--eo-color-content-accent);font-weight:700}
 .st-viz{display:flex;align-items:center;gap:var(--eo-dimension-gap-largest);
   flex-wrap:wrap;margin:0}
-.dial{width:190px;max-width:46%;flex:0 0 auto}
+.dial{width:230px;max-width:48%;flex:0 0 auto}
 .hist{width:240px;max-width:52%;flex:0 0 auto}
 
 /* Each segment draws itself along its own arc, so the dial fills tick by tick
@@ -529,7 +581,7 @@ html,body{height:100%}
 .seg.on.good{stroke:var(--eo-color-content-utility-positive)}
 .seg.on.warn{stroke:var(--eo-color-content-utility-warning)}
 .seg.on.bad{stroke:var(--eo-color-content-utility-negative)}
-.dial-n{font-family:var(--eo-typography-headline-800-font-family);font-size:74px;
+.dial-n{font-family:var(--eo-typography-headline-800-font-family);font-size:80px;
   letter-spacing:-.04em;animation:pop .6s cubic-bezier(.22,1,.36,1) 1.1s backwards}
 .dial-n.good{fill:var(--eo-color-content-utility-positive)}
 .dial-n.warn{fill:var(--eo-color-content-utility-warning)}
@@ -577,6 +629,8 @@ html,body{height:100%}
 @media(max-width:440px){
   .dial,.hist{width:100%;max-width:100%}
   .st-bg{opacity:.2}
+  .st-ghost{font-size:6rem;opacity:.5}
+  .st-nav{font-size:.7rem}
 }
 `;
 
@@ -585,6 +639,6 @@ html,body{height:100%}
 const HIST_DATES = ['3 Aug', '5 Aug', fmt(inspection.date).replace(/ \d{4}$/, '')];
 
 inspection.stations.forEach((s) =>
-  writeFileSync(resolve(outDir, `station-${String(s.n).padStart(2, '0')}.html`), stationPage(s, HIST_DATES))
+  writeFileSync(resolve(outDir, `${stationId(s.n)}.html`), stationPage(s, HIST_DATES, inspection.stations))
 );
 console.log(`  stations: ${inspection.stations.length} fragments (station-01 … station-${String(inspection.stations.length).padStart(2, '0')})`);
